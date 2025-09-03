@@ -1,5 +1,24 @@
 # Problem Statement
 
+## Purpose of the Study
+
+Explaining Quantum Error Correction codes to others is difficult,
+both to people not knowlegable of quantum computing and collegues in the lab.
+
+## Value Proposition
+
+We will help solve the communication barrier by creating a visual and interactive aid.
+It should be intuitive enough for the general public while also allowing enough expressivity
+for researchers.
+
+## Sustainability goals
+
+Simulating general quantum computers on classical hardware is very energy intensive, 
+this is of course not sustainable.
+Therefore we will focus on the pauli subset of states which is much more efficient to simulate.
+To make our system scalable the client's device will be running the simulation, this also
+puts a soft limit on how much computation we can reasonably do.
+
 ## Requirements
 
 - Have a visual grid with interactive qubits
@@ -19,4 +38,16 @@
     - Explain syndome decoding
 - The simulation needs to run on the client
 - Have a toggle to see "what is going on underneath"
+
+## Design Questions
+
+- How can we display an entangled quantum state?
+- How to simulate a surface code in a way that's fast yet accurate enough?
+    - Look into STIM to see how they do it
+
+## Deliverables
+
+- A website that can display and simulate surface codes with or without defects
+    - The website needs to be interactive to encourage exploration and learning by doing
+- A report describing how we created the website, and why we did or didn't make certain decisions
 
