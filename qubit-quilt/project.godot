@@ -1,0 +1,27 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Qubit Quilt"
+config/description="Quilt the Qubits in a lattice into logical qubits and stabilizers to find and correct any errors that may arise without disturbing the logical state."
+config/version="0.0.1"
+run/main_scene="uid://jukmsc1d2v30"
+config/features=PackedStringArray("4.4", "GL Compatibility")
+boot_splash/bg_color=Color(0.101945, 0.363405, 0.348002, 1)
+boot_splash/fullsize=false
+boot_splash/image="uid://2elixld3h017"
+config/icon="uid://dap1h5xt63u8j"
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0, 0, 0, 1)
