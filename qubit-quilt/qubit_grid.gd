@@ -3,7 +3,7 @@ extends Node3D
 
 @export var x_qubits: int = 8
 @export var y_qubits: int = 4
-@export var cell_size: float = 2.6
+@export var cell_size: float = 1.5
 
 @onready var qubit_grid: Node3D = %QubitGrid
 

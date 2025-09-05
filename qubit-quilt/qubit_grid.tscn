@@ -17,7 +17,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 13.6961)
 [node name="QubitGrid" type="Node3D" parent="."]
 unique_name_in_owner = true
 script = ExtResource("1_6duni")
-cell_size = 1.5
 qubit_scene = ExtResource("2_5u0ha")
 
 [connection signal="ready" from="QubitGrid" to="QubitGrid" method="_on_ready"]
