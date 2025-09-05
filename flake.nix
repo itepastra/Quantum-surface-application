@@ -10,8 +10,8 @@
         in
         pkgs.mkShell {
           packages = [
-            pkgs.dotnetCorePackages.dotnet_9.sdk
-            pkgs.nuget
+            pkgs.godot
+            pkgs.blender
           ];
         };
     };
