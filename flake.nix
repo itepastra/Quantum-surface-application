@@ -12,6 +12,7 @@
           packages = [
             pkgs.godot
             pkgs.blender
+            pkgs.inkscape
           ];
         };
     };
