@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3 uid="uid://jukmsc1d2v30"]
+
+[ext_resource type="Script" uid="uid://ckikupasg3gwl" path="res://qubit_grid.gd" id="1_6duni"]
+[ext_resource type="PackedScene" uid="uid://c2ct5l3xnl1ug" path="res://qubit.tscn" id="2_5u0ha"]
+
+[node name="Scene" type="Node3D"]
+
+[node name="Camera" type="Camera3D" parent="."]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 13.2243)
+projection = 1
+size = 15.0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 13.6961)
+
+[node name="QubitGrid" type="Node3D" parent="."]
+unique_name_in_owner = true
+script = ExtResource("1_6duni")
+qubit_scene = ExtResource("2_5u0ha")
+
+[connection signal="ready" from="QubitGrid" to="QubitGrid" method="_on_ready"]
