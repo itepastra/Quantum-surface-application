@@ -1,8 +1,14 @@
 {
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    booktheme = {
+      url = "github:getzola/book";
+      flake = false;
+    };
+  };
 
   outputs =
-    { self, nixpkgs, ... }:
+    { self, nixpkgs, ... }@inputs:
     {
       devShells."x86_64-linux".default =
         let
@@ -27,6 +33,7 @@
 
             nativeBuildInputs = [
               pkgs.zola
+              pkgs.git
             ];
 
             src = fs.toSource {
@@ -35,6 +42,8 @@
             };
 
             buildPhase = ''
+              mkdir -p themes/book
+              cp -r ${inputs.booktheme}/* themes/book
               zola build --output-dir $out
             '';
           };
