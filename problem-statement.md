@@ -61,36 +61,31 @@ Over the 9-week duration of the MDP course, our plan foresees the following phas
 Understand user needs and define functional requirements
 Review QEC literature, including papers suggested by the challenge provider and other relevant sources
 
-**Phase 2: Visual grid (weeks ...-...)**
+**Phase 2: Visual grid (weeks 2)**
 - Milestone: 
-Implement the core interactive grid and basic qubit manipulations
-Concrete features of the app:
-- adding/removing qubits from the lattice including defects
-- changing the state of qubits
+Implement the core interactive grid and basic qubit manipulations, allowing users to add or remove qubits (including defects) and change their states dynamically
 
-**Phase 3: Stabilizers**
+**Phase 3: Stabilizers (week 3)**
 - Milestone:
 Implement ancillas as stabilizers (X and Z) to enable measurement of data qubit states
            
-**Phase 4: Single Logical qubits**
+**Phase 4: Single Logical qubits (week 4)**
 - Milestone: 
 Create a single logical qubit patch with active stabilizers. Ensure efficient spatial allocation of physical qubits to define the patch.
 
-**Phase 5: Two Logical Qubits & Lattice Surgery**
+**Phase 5: Two Logical Qubits & Lattice Surgery (week 5-6)**
 - Milestone:
 Introduce a second logical qubit and implement lattice surgery, including merging and splitting patches for entangling operations.
 
-**Phase 6: Error simulation**
+**Phase 6: Error simulation (week 7-8)**
 - Milestone: 
-Show QEC in action and make error processes intuitive
-                
-**Phase 7: Tutorial & Educational Layer**
-- Milestone: 
-Having interactive tutorials integrated with the grid that provide user-friendly explanations of QEC
-
-**Phase 8: Web Integration & Client-Side Simulation**
+Demonstrate QEC in action by simulating errors, providing an intuitive visualization of error propagation and displaying syndrome measurements to show how errors are detected
+  
+**Phase 7: Web Integration & Client-Side Simulation (week 9)**
 - Milestone: 
 Deploy the fully-functional web application for real-time interactive use
+
+In parallel with the other phases of our project plan, our team will develop an interactive tutorial integrated with the lattice grid, offering user-friendly explanations for all included QEC features. We will use the STIM library for quantum error correction simulation, while programming the interactive application in GDScript within the Godot engine for a responsive and visually rich interface.
 
 To stay in touch, we plan to meet in person twice a week and hold online discussions when needed to review and consult on the code each of us has worked on in the meantime.
 
