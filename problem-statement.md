@@ -41,6 +41,7 @@ To make our system scalable the client's device will be running the simulation, 
 - The simulation needs to run on the client
     - The server should only have to serve static files
 - Have a toggle to show the state of all the qubits or only the ancillas
+- Allow moving logical qubits to experiment with novel memory allocation techniques
 
 ### Additions
 
