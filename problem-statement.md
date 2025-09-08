@@ -1,9 +1,11 @@
 # Problem Statement
 
+## Reason for the Problem Choice
+Quantum Error Correction (QEC) is essential for building reliable quantum computers, as it protects fragile quantum information from noise and decoherence. However, QEC concepts, such as stabilizer codes, surface codes, and logical qubits, are abstract and mathematically complex. Most existing resources are either highly technical or lack interactivity, making it difficult for students, researchers and professionals to intuitively grasp how QEC works. An interactive quantum surface application focusing on QEC would make these concepts accessible and engaging.
+
 ## Purpose of the Study
 
-Explaining Quantum Error Correction codes to others is difficult,
-both to people not knowlegable of quantum computing and collegues in the lab.
+The goal is to develop an interactive application that visualizes quantum surfaces. This app will help those not knowledgeable of quantum computing to understand and learn QEC, while also providing lab colleagues with a simulated environment to explore and analyze QEC processes.
 
 ## Value Proposition
 
@@ -50,4 +52,31 @@ puts a soft limit on how much computation we can reasonably do.
 - A website that can display and simulate surface codes with or without defects
     - The website needs to be interactive to encourage exploration and learning by doing
 - A report describing how we created the website, and why we did or didn't make certain decisions
+
+## Project Plan - in progress
+Over the 9-week duration of the MDP course, our plan foresees the following phases:
+    Phase 1: Research \& Requirements (weeks 1-2)\\
+           Milestones: 
+               Understand user needs and define functional requirements
+               Review QEC literature, including papers suggested by the challenge provider and other relevant sources
+
+    Phase 2: Visual grid (weeks ...-...)\\
+           Milestone: 
+               Implement the core interactive grid and basic qubit manipulations
+           
+    Phase 3: Logical qubits 
+           Milestone: 
+                Enable creation of logical qubits and calculation of their properties
+    Phase 4: Error simulation
+           Milestone: 
+                Show QEC in action and make error processes intuitive
+    Phase 5: Tutorial \& Educational Layer 
+           Milestone: 
+               Having interactive tutorials integrated with the grid that provide user-friendly explanations of QEC
+
+    Phase 6: Web Integration \& Client-Side Simulation
+           Milestone: 
+Deploy the fully-functional web application for real-time interactive use
+
+To stay in touch, we plan to meet in person twice a week and hold online discussions when needed to review and consult on the code each of us has worked on in the meantime.
 
