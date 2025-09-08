@@ -16,9 +16,10 @@
         in
         pkgs.mkShell {
           packages = [
-            pkgs.dotnetCorePackages.dotnet_9.sdk
-            pkgs.nuget
             pkgs.zola
+            pkgs.godot
+            pkgs.blender
+            pkgs.inkscape
           ];
         };
       packages."x86_64-linux" =

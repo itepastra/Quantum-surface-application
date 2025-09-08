@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3 uid="uid://c2ct5l3xnl1ug"]
+
+[ext_resource type="Script" uid="uid://d1t0ojx53vfcm" path="res://qubit.gd" id="1_p1x3c"]
+[ext_resource type="PackedScene" uid="uid://csivrn114pf1n" path="res://assets/Qubit_ball.blend" id="1_xsr6x"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_p1x3c"]
+radius = 0.66
+
+[node name="QubitBody" type="StaticBody3D"]
+script = ExtResource("1_p1x3c")
+
+[node name="Qubit_ball" parent="." instance=ExtResource("1_xsr6x")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_p1x3c")
