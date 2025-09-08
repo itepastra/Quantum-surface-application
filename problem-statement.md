@@ -64,20 +64,31 @@ Review QEC literature, including papers suggested by the challenge provider and 
 **Phase 2: Visual grid (weeks ...-...)**
 - Milestone: 
 Implement the core interactive grid and basic qubit manipulations
-           
-**Phase 3: Logical qubits**
-- Milestone: 
-Enable creation of logical qubits and calculation of their properties
+Concrete features of the app:
+- adding/removing qubits from the lattice including defects
+- changing the state of qubits
 
-**Phase 4: Error simulation**
+**Phase 3: Stabilizers**
+- Milestone:
+Implement ancillas as stabilizers (X and Z) to enable measurement of data qubit states
+           
+**Phase 4: Single Logical qubits**
+- Milestone: 
+Create a single logical qubit patch with active stabilizers. Ensure efficient spatial allocation of physical qubits to define the patch.
+
+**Phase 5: Two Logical Qubits & Lattice Surgery**
+- Milestone:
+Introduce a second logical qubit and implement lattice surgery, including merging and splitting patches for entangling operations.
+
+**Phase 6: Error simulation**
 - Milestone: 
 Show QEC in action and make error processes intuitive
                 
-**Phase 5: Tutorial & Educational Layer**
+**Phase 7: Tutorial & Educational Layer**
 - Milestone: 
 Having interactive tutorials integrated with the grid that provide user-friendly explanations of QEC
 
-**Phase 6: Web Integration & Client-Side Simulation**
+**Phase 8: Web Integration & Client-Side Simulation**
 - Milestone: 
 Deploy the fully-functional web application for real-time interactive use
 
