@@ -20,6 +20,10 @@ boot_splash/fullsize=false
 boot_splash/image="uid://2elixld3h017"
 config/icon="uid://dap1h5xt63u8j"
 
+[filesystem]
+
+import/blender/enabled=false
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"

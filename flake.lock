@@ -16,6 +16,18 @@
         "type": "github"
       }
     },
+    "export_templates": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-rtBhRkzwg9imC8WSr4AsuQnMcfv3n/jB8+/mPRPGzzk=",
+        "type": "file",
+        "url": "https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1756911493,
@@ -35,6 +47,7 @@
     "root": {
       "inputs": {
         "booktheme": "booktheme",
+        "export_templates": "export_templates",
         "nixpkgs": "nixpkgs"
       }
     }
