@@ -12,7 +12,7 @@ about these codes in an intuitive sense.
 
 We will help solve the communication barrier by creating a visual and interactive aid.
 It should be intuitive enough for the public using the tutorials to learn
-while also allowing enough expressivity for researchers afterwards.
+while also allowing enough expressivity for researchers to explore the topic.
 
 ## Sustainability goals
 
@@ -45,7 +45,7 @@ To make our system scalable the client's device will be running the simulation, 
 ### Additions
 
 - Be able to calculate the hamming distance of the logical qubits
-- Add Y stabilizers as well
+- Add Y stabilizers as well (and a mechanism to switch between the stabilizers)
 - Different connectivies
     - Hexagonal (3 neighbors)
     - Triangular (6 neighbors)
@@ -64,6 +64,7 @@ To make our system scalable the client's device will be running the simulation, 
     - Squiggly lines between the qubits?
 - How to simulate a surface code in a way that's fast yet accurate enough?
     - Look into STIM to see how they do it
+    - Explore complexity vs performance tradeoff, what is sufficient (good enough)
 
 ## Deliverables
 
