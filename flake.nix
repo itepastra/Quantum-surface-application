@@ -12,6 +12,7 @@
           packages = [
             pkgs.dotnetCorePackages.dotnet_9.sdk
             pkgs.nuget
+            pkgs.zola
           ];
         };
     };
