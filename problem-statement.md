@@ -57,28 +57,28 @@ puts a soft limit on how much computation we can reasonably do.
 Over the 9-week duration of the MDP course, our plan foresees the following phases:
 
 **Phase 1: Research & Requirements (weeks 1-2)**
-Milestones: 
+- Milestones: 
 Understand user needs and define functional requirements
 Review QEC literature, including papers suggested by the challenge provider and other relevant sources
 
 **Phase 2: Visual grid (weeks ...-...)**
-Milestone: 
+- Milestone: 
 Implement the core interactive grid and basic qubit manipulations
            
 **Phase 3: Logical qubits**
-Milestone: 
+- Milestone: 
 Enable creation of logical qubits and calculation of their properties
 
 **Phase 4: Error simulation**
-Milestone: 
+- Milestone: 
 Show QEC in action and make error processes intuitive
                 
 **Phase 5: Tutorial & Educational Layer**
-Milestone: 
+- Milestone: 
 Having interactive tutorials integrated with the grid that provide user-friendly explanations of QEC
 
 **Phase 6: Web Integration & Client-Side Simulation**
-Milestone: 
+- Milestone: 
 Deploy the fully-functional web application for real-time interactive use
 
 To stay in touch, we plan to meet in person twice a week and hold online discussions when needed to review and consult on the code each of us has worked on in the meantime.
