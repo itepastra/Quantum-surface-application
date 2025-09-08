@@ -28,7 +28,7 @@ To make our system scalable the client's device will be running the simulation, 
     - Be able to change the state of qubits
     - Be able to add X and Z stabilizers
     - Dynamically create logical qubits
-    - Being able to do lattice surgery (we need clarification here)
+    - Being able to do lattice surgery by merging and splitting logical qubits
 - Be able to display and interact with this grid on a website
 - Simulate errors occuring and let the user see the result to understand the error
     - Show syndome measurement in an intuitive manner
