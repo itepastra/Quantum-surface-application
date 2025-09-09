@@ -10,3 +10,5 @@ Here we can see a single qubit, it has 6 possible orientations.
 - Cyan -> |->
 - Green -> |+i>
 - Purple -> |-i>
+
+{{ qubitquilt() }}
