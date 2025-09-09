@@ -32,9 +32,26 @@
           fs = pkgs.lib.fileset;
         in
         rec {
-          default = qubit-quilt-site;
-          qubit-quilt-game = pkgs.stdenv.mkDerivation {
-            name = "qubit-quilt";
+          default = pkgs.stdenv.mkDerivation {
+            name = "Qubit Quilt website";
+            src = ssg;
+
+            buildPhase = ''
+              cp ${game}/qubit-quilt.audio.position.worklet.js \
+                 ${game}/qubit-quilt.audio.worklet.js \
+                 ${game}/qubit-quilt.js \
+                 ${game}/qubit-quilt.pck \
+                 ${game}/qubit-quilt.side.wasm \
+                 ${game}/qubit-quilt.wasm .
+            '';
+
+            installPhase = ''
+              mkdir -p $out
+              cp -r . $out
+            '';
+          };
+          game = pkgs.stdenv.mkDerivation {
+            name = "Qubit Quilt";
             nativeBuildInputs = [
               pkgs.godot
               pkgs.unzip
@@ -68,8 +85,8 @@
               popd
             '';
           };
-          qubit-quilt-site = pkgs.stdenv.mkDerivation {
-            name = "qubit-quilt-site";
+          ssg = pkgs.stdenv.mkDerivation {
+            name = "Qubit Quilt SSG";
 
             nativeBuildInputs = [
               pkgs.zola
