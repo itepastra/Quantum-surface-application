@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://jukmsc1d2v30"]
+[gd_scene load_steps=4 format=3 uid="uid://jukmsc1d2v30"]
 
 [ext_resource type="Script" uid="uid://ckikupasg3gwl" path="res://qubit_grid.gd" id="1_6duni"]
 [ext_resource type="PackedScene" uid="uid://c2ct5l3xnl1ug" path="res://qubit.tscn" id="2_5u0ha"]
+[ext_resource type="PackedScene" uid="uid://bwqe3dynp0ts4" path="res://gate.tscn" id="3_pkvuj"]
 
 [node name="Scene" type="Node3D"]
 
@@ -15,8 +16,8 @@ size = 15.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 13.6961)
 
 [node name="QubitGrid" type="Node3D" parent="."]
-unique_name_in_owner = true
 script = ExtResource("1_6duni")
 qubit_scene = ExtResource("2_5u0ha")
+gate_scene = ExtResource("3_pkvuj")
 
 [connection signal="ready" from="QubitGrid" to="QubitGrid" method="_on_ready"]

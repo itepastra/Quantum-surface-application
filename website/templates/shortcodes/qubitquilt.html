@@ -1,9 +1,34 @@
 <div>
-	<canvas id="canvas"></canvas>
+	<canvas id="canvas" style="width: 100%;aspect-ratio: 4/3;"></canvas>
 	<script src="/qubit-quilt.js"></script>
 	<script>
-		const engine = Engine();
-		await engine.init("/qubit-quilt");
-		await engine.preloadFile("/qubit-quilt.pck");
+		function printProgress(current, total) {
+			console.log("Loaded " + current + " of " + total + " bytes");
+		}
+		const canvas = document.querySelector('canvas');
+
+		function resizeCanvas() {
+			canvas.width = canvas.clientWidth;
+			canvas.height = canvas.clientHeight;
+		}
+		resizeCanvas()
+
+		const GODOT_CONFIG = {
+			args: [],
+			canvasResizePolicy: 0,
+			ensureCrossOriginIsolationHeaders: true,
+			executable: "/qubit-quilt",
+			experimentalVK: false,
+			fileSizes: {
+				"/qubit-quilt.pck": 514112,
+				"/qubit-quilt.wasm": 1625538
+			},
+			focusCanvas: true,
+			gdextensionLibs: [],
+			onProgress: printProgress
+		};
+		const engine = new Engine({executable: "/qubit-quilt"});
+		engine.startGame(GODOT_CONFIG);
+
 	</script>
 </div>
