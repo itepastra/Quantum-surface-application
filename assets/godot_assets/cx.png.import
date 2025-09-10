@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ct32mq00fvvjh"
-path.s3tc="res://.godot/imported/Qubit_Colors.png-d77a4113817dfe9d5111a7f4c1e1485a.s3tc.ctex"
-path.etc2="res://.godot/imported/Qubit_Colors.png-d77a4113817dfe9d5111a7f4c1e1485a.etc2.ctex"
+uid="uid://bqg0xk827fxs2"
+path.s3tc="res://.godot/imported/cx.png-047598c37b1cb5f9ff07fb26371dc483.s3tc.ctex"
+path.etc2="res://.godot/imported/cx.png-047598c37b1cb5f9ff07fb26371dc483.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -12,8 +12,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/Qubit_Colors.png"
-dest_files=["res://.godot/imported/Qubit_Colors.png-d77a4113817dfe9d5111a7f4c1e1485a.s3tc.ctex", "res://.godot/imported/Qubit_Colors.png-d77a4113817dfe9d5111a7f4c1e1485a.etc2.ctex"]
+source_file="res://assets/cx.png"
+dest_files=["res://.godot/imported/cx.png-047598c37b1cb5f9ff07fb26371dc483.s3tc.ctex", "res://.godot/imported/cx.png-047598c37b1cb5f9ff07fb26371dc483.etc2.ctex"]
 
 [params]
 

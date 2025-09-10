@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=3 uid="uid://c2ct5l3xnl1ug"]
 
 [ext_resource type="Script" uid="uid://d1t0ojx53vfcm" path="res://qubit.gd" id="1_p1x3c"]
-[ext_resource type="ArrayMesh" uid="uid://b3ne6um1wf1xv" path="res://assets/Qubit_ball.obj" id="2_p1x3c"]
-[ext_resource type="Texture2D" uid="uid://ct32mq00fvvjh" path="res://assets/Qubit_Colors.png" id="3_xbv63"]
+[ext_resource type="ArrayMesh" uid="uid://dltjeicqvrm7a" path="res://assets/Qubit_ball.obj" id="2_p1x3c"]
+[ext_resource type="Texture2D" uid="uid://tnvcmyyd7knv" path="res://assets/Qubit_Colors.png" id="3_xbv63"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_p1x3c"]
 
@@ -20,3 +20,5 @@ transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
 gi_mode = 0
 mesh = ExtResource("2_p1x3c")
 surface_material_override/0 = SubResource("StandardMaterial3D_xbv63")
+
+[connection signal="input_event" from="." to="." method="_on_input_event"]

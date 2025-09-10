@@ -17,8 +17,6 @@ run/main_scene="uid://jukmsc1d2v30"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 boot_splash/bg_color=Color(0.101945, 0.363405, 0.348002, 1)
 boot_splash/fullsize=false
-boot_splash/image="uid://2elixld3h017"
-config/icon="uid://dap1h5xt63u8j"
 
 [filesystem]
 

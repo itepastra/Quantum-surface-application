@@ -72,10 +72,11 @@
 
             buildPhase = ''
               export HOME=$(pwd)
-              pushd assets
+              pushd ./assets
               for filename in *.svg; do
-                basename="$${filename%.svg}"
-                inkscape "$filename" --export-filename="godot_assets/$${basename}.png"
+                basename="''${filename%.svg}"
+                inkscape "$filename" --export-filename="godot_assets/''${basename}.png"
+                echo "converted $filename to png"
               done
               popd
               mkdir -p $HOME/.local/share/godot/export_templates/4.4.1.stable
