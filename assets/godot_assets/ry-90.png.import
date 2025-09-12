@@ -2,27 +2,26 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://x2jucqxvxhao"
-path.s3tc="res://.godot/imported/Qubit Colors.png-65f7fcb78f81ffb018b834275b7b2025.s3tc.ctex"
+uid="uid://bcxio1w38nuxk"
+path="res://.godot/imported/ry-90.png-7a34ee94b592acdf88fa57009e7e5003.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/Qubit Colors.png"
-dest_files=["res://.godot/imported/Qubit Colors.png-65f7fcb78f81ffb018b834275b7b2025.s3tc.ctex"]
+source_file="res://assets/ry-90.png"
+dest_files=["res://.godot/imported/ry-90.png-7a34ee94b592acdf88fa57009e7e5003.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=true
+mipmaps/generate=false
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
@@ -32,4 +31,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1

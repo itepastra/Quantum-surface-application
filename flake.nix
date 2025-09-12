@@ -24,6 +24,12 @@
             pkgs.godot
             pkgs.blender
             pkgs.inkscape
+            (pkgs.writeScriptBin "export_images" ''
+              for filename in *.svg; do
+                basename="''${filename%.svg}"
+                inkscape "$filename" --export-filename="godot_assets/''${basename}.png"
+              done
+            '')
           ];
         };
       packages."x86_64-linux" =
@@ -55,6 +61,8 @@
             nativeBuildInputs = [
               pkgs.godot
               pkgs.unzip
+              pkgs.inkscape
+              pkgs.fontconfig
             ];
 
             src = fs.toSource {
@@ -64,6 +72,13 @@
 
             buildPhase = ''
               export HOME=$(pwd)
+              pushd ./assets
+              for filename in *.svg; do
+                basename="''${filename%.svg}"
+                inkscape "$filename" --export-filename="godot_assets/''${basename}.png"
+                echo "converted $filename to png"
+              done
+              popd
               mkdir -p $HOME/.local/share/godot/export_templates/4.4.1.stable
               pushd $HOME/.local/share/godot/export_templates/4.4.1.stable
               unzip -j ${inputs.export_templates} \

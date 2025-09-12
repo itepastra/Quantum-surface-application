@@ -27,16 +27,13 @@ func _on_ready() -> void:
 			nextQubit.position.x = x - (x_qubits-1)/2.0
 			nextQubit.position.y = y - (y_qubits-1)/2.0
 			nextQubit.position *= cell_size
-			nextQubit.x_speed = randf_range(-180, 180)
-			nextQubit.y_speed = randf_range(-180, 180)
-			nextQubit.z_speed = randf_range(-180, 180)
 			self.add_child(nextQubit)
 	
 	# Initialize the horizontal connections
 	for x in x_qubits-1:
 		for y in y_qubits:
 			var startx = (x - (x_qubits-1)/2.0) * cell_size + qubit_size
-			var endx = (x +1 - (x_qubits-1)/2.0) * cell_size - qubit_size
+			var endx = (x + 1 - (x_qubits-1)/2.0) * cell_size - qubit_size
 			var gatey = (y - (y_qubits-1)/2.0) * cell_size
 			var nextGate = gate_scene.instantiate()
 			nextGate.setup(Vector2(startx, gatey), Vector2(endx, gatey))

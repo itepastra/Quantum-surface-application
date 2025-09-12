@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="180"
+   height="180"
+   viewBox="0 0 180 180"
+   version="1.1"
+   id="svg1"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1">
+    <marker
+       style="overflow:visible"
+       id="RoundedArrow"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.7)"
+         d="m -0.21114562,-4.1055728 6.42229122,3.21114561 a 1,1 90 0 1 0,1.78885438 L -0.21114562,4.1055728 A 1.236068,1.236068 31.717474 0 1 -2,3 v -6 a 1.236068,1.236068 148.28253 0 1 1.78885438,-1.1055728 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         id="path8" />
+    </marker>
+    <linearGradient
+       id="linearGradient2">
+      <stop
+         style="stop-color:#01ff00;stop-opacity:1;"
+         offset="0"
+         id="stop2" />
+      <stop
+         style="stop-color:#00ff01;stop-opacity:0.75461209;"
+         offset="0.44853833"
+         id="stop4" />
+      <stop
+         style="stop-color:#02ff00;stop-opacity:0.11383236;"
+         offset="0.89776939"
+         id="stop5" />
+      <stop
+         style="stop-color:#00ff01;stop-opacity:0;"
+         offset="1"
+         id="stop3" />
+    </linearGradient>
+    <radialGradient
+       xlink:href="#linearGradient2"
+       id="radialGradient3"
+       cx="90"
+       cy="90"
+       fx="90"
+       fy="90"
+       r="90"
+       gradientUnits="userSpaceOnUse"
+       spreadMethod="pad" />
+  </defs>
+  <g
+     id="layer1">
+    <circle
+       style="fill:url(#radialGradient3);stroke:none"
+       id="path1"
+       cx="90"
+       cy="90"
+       r="90" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:9;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#RoundedArrow)"
+       id="path5"
+       d="M 47.88993,47.889931 A 59.552631,59.552631 0 0 1 97.773177,30.956849 59.552631,59.552631 0 0 1 141.57409,60.223683" />
+  </g>
+</svg>
