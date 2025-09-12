@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bjcj6oufdjs0b"
-path.s3tc="res://.godot/imported/cy.svg-83bae7059c272376b08257a6104028e5.s3tc.ctex"
-path.etc2="res://.godot/imported/cy.svg-83bae7059c272376b08257a6104028e5.etc2.ctex"
+uid="uid://ct32mq00fvvjh"
+path.s3tc="res://.godot/imported/Qubit_Colors.png-d77a4113817dfe9d5111a7f4c1e1485a.s3tc.ctex"
+path.etc2="res://.godot/imported/Qubit_Colors.png-d77a4113817dfe9d5111a7f4c1e1485a.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -12,8 +12,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/cy.svg"
-dest_files=["res://.godot/imported/cy.svg-83bae7059c272376b08257a6104028e5.s3tc.ctex", "res://.godot/imported/cy.svg-83bae7059c272376b08257a6104028e5.etc2.ctex"]
+source_file="res://assets/Qubit_Colors.png"
+dest_files=["res://.godot/imported/Qubit_Colors.png-d77a4113817dfe9d5111a7f4c1e1485a.s3tc.ctex", "res://.godot/imported/Qubit_Colors.png-d77a4113817dfe9d5111a7f4c1e1485a.etc2.ctex"]
 
 [params]
 
@@ -34,6 +34,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=0
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

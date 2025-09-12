@@ -20,8 +20,13 @@ boot_splash/fullsize=false
 boot_splash/image="uid://2elixld3h017"
 config/icon="uid://dap1h5xt63u8j"
 
+[filesystem]
+
+import/blender/enabled=false
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true
 environment/defaults/default_clear_color=Color(1, 1, 1, 1)

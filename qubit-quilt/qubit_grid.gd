@@ -5,9 +5,9 @@ extends Node3D
 @export var y_qubits: int = 4
 @export var cell_size: float = 1.5
 
-@onready var qubit_grid: Node3D = %QubitGrid
 
 @export var qubit_scene: PackedScene
+@export var gate_scene: PackedScene
 
 const qubit_size = 1
 
@@ -30,7 +30,7 @@ func _on_ready() -> void:
 			nextQubit.x_speed = randf_range(-180, 180)
 			nextQubit.y_speed = randf_range(-180, 180)
 			nextQubit.z_speed = randf_range(-180, 180)
-			qubit_grid.add_child(nextQubit)
+			self.add_child(nextQubit)
 	
 	# Initialize the horizontal connections
 	for x in x_qubits-1:
@@ -38,9 +38,10 @@ func _on_ready() -> void:
 			var startx = (x - (x_qubits-1)/2.0) * cell_size + qubit_size
 			var endx = (x +1 - (x_qubits-1)/2.0) * cell_size - qubit_size
 			var gatey = (y - (y_qubits-1)/2.0) * cell_size
-			var nextGate: Gate = Gate.create(Vector2(startx, gatey), Vector2(endx, gatey))
+			var nextGate = gate_scene.instantiate()
+			nextGate.setup(Vector2(startx, gatey), Vector2(endx, gatey))
 			nextGate.name = "Gate (%d, %d) -> (%d, %d)" % [x,y,x+1,y]
-			qubit_grid.add_child(nextGate)
+			self.add_child(nextGate)
 
 	# Initialize the vertical connections
 	for x in x_qubits:
@@ -48,6 +49,7 @@ func _on_ready() -> void:
 			var starty = (y - (y_qubits-1)/2.0) * cell_size + qubit_size
 			var endy = (y + 1 - (y_qubits-1)/2.0) * cell_size - qubit_size
 			var gatex = (x - (x_qubits-1)/2.0) * cell_size
-			var nextGate: Gate = Gate.create(Vector2(gatex, starty), Vector2(gatex, endy))
+			var nextGate = gate_scene.instantiate()
+			nextGate.setup(Vector2(gatex, starty), Vector2(gatex, endy))
 			nextGate.name = "Gate (%d, %d) -> (%d, %d)" % [x,y,x+1,y]
-			qubit_grid.add_child(nextGate)
+			self.add_child(nextGate)

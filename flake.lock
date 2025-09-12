@@ -1,5 +1,33 @@
 {
   "nodes": {
+    "booktheme": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1741979577,
+        "narHash": "sha256-SECuhWk5pDEgERURb78QrzSyKINV62fLXladfPA5q9w=",
+        "owner": "getzola",
+        "repo": "book",
+        "rev": "4ee06ce568e1c9f6d19f53bf521fb267603bc6c4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "getzola",
+        "repo": "book",
+        "type": "github"
+      }
+    },
+    "export_templates": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-rtBhRkzwg9imC8WSr4AsuQnMcfv3n/jB8+/mPRPGzzk=",
+        "type": "file",
+        "url": "https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1756911493,
@@ -18,6 +46,8 @@
     },
     "root": {
       "inputs": {
+        "booktheme": "booktheme",
+        "export_templates": "export_templates",
         "nixpkgs": "nixpkgs"
       }
     }

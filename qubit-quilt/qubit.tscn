@@ -1,16 +1,22 @@
-[gd_scene load_steps=4 format=3 uid="uid://c2ct5l3xnl1ug"]
+[gd_scene load_steps=6 format=3 uid="uid://c2ct5l3xnl1ug"]
 
 [ext_resource type="Script" uid="uid://d1t0ojx53vfcm" path="res://qubit.gd" id="1_p1x3c"]
-[ext_resource type="PackedScene" uid="uid://csivrn114pf1n" path="res://assets/Qubit_ball.blend" id="1_xsr6x"]
+[ext_resource type="ArrayMesh" uid="uid://b3ne6um1wf1xv" path="res://assets/Qubit_ball.obj" id="2_p1x3c"]
+[ext_resource type="Texture2D" uid="uid://ct32mq00fvvjh" path="res://assets/Qubit_Colors.png" id="3_xbv63"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_p1x3c"]
-radius = 0.66
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xbv63"]
+albedo_texture = ExtResource("3_xbv63")
 
 [node name="QubitBody" type="StaticBody3D"]
 script = ExtResource("1_p1x3c")
 
-[node name="Qubit_ball" parent="." instance=ExtResource("1_xsr6x")]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
-
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("SphereShape3D_p1x3c")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+gi_mode = 0
+mesh = ExtResource("2_p1x3c")
+surface_material_override/0 = SubResource("StandardMaterial3D_xbv63")
