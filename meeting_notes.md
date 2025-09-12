@@ -29,3 +29,25 @@
         - how to represent a quantum information, stabilizers, and show what happened
     - For the tutorial phase, figure out how to do the tutorials
     - Add phase for multiple logical qubits after the simulation phase - as well as lattice surgery on multiple qubits and the memory allocation
+
+
+
+## Week 2
+
+### Friday meeting notes
+#### Entanglement and 2 qubit gates
+- Have buttons to add gates and enable/disable them (instead of having them default)
+    - Click on qubits to add gates
+    - A way to show what you did up to now, order of gates - NEED TO ASK AND CLARIFY
+     - time based?
+     - QASM?
+     - Numbers on top?
+
+#### Getting Stim to work
+- Ran into errors when binding with modules
+- Next step to try the module on Linux
+- If that doesn't work try GDExtension
+- If that doesn't work, STIM WASM
+
+#### Divison of tasks
+- Created issues on GitHub
