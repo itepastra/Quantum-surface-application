@@ -1,0 +1,19 @@
+Import('env')
+
+env_tts = env.Clone()
+env_tts.add_source_files(env.modules_sources, "*.cpp") # Add all cpp files to the build
+
+# These paths are relative to /modules/qec/
+env_tts.Append(CPPPATH=["stim_src/include"])
+
+# LIBPATH and LIBS need to be set on the real "env" (not the clone)
+# to link the specified libraries to the Godot executable.
+
+# This is an absolute path where your .a libraries reside.
+# If using a relative path, you must convert it to a
+# full path using an utility function, such as `Dir('...').abspath`.
+env.Append(LIBPATH=[Dir('libpath').abspath])
+
+# Check with the documentation of the external library to see which library
+# files should be included/linked.
+env.Append(LIBS=['stim'])

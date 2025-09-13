@@ -38,6 +38,8 @@
           fs = pkgs.lib.fileset;
         in
         rec {
+          godot = pkgs.callPackage ./godot.nix { };
+
           default = pkgs.stdenv.mkDerivation {
             name = "Qubit Quilt website";
             src = ssg;
