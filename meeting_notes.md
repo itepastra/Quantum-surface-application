@@ -69,4 +69,7 @@
 - ADD Measuring qubits:
 	- basis measuring 
 	- different measures
+### Additional Resources:
+- An interactive introduction to the surface code: https://arthurpesah.me/blog/2023-05-13-surface-code/
+
 	
