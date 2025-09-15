@@ -10,6 +10,7 @@ extends Node3D
 @export var gate_scene: PackedScene
 
 const qubit_size = 1
+var button_group: ButtonGroup
 
 func _on_ready() -> void:
 	# Resize the camera to fit with the grid
@@ -28,3 +29,26 @@ func _on_ready() -> void:
 			nextQubit.position.y = y - (y_qubits-1)/2.0
 			nextQubit.position *= cell_size
 			self.add_child(nextQubit)
+
+
+func _ready():
+	var button = get_node("/root/Scene/HUD/Hotbar/X-90")
+	button_group = button.button_group
+
+
+func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _normal: Vector3, _shape_idx: int) -> void:
+	# the user clicked on the qubit
+	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT:
+		# find the selected gate
+		var pressed: Button = button_group.get_pressed_button()
+
+		if pressed == null:
+			return
+		elif pressed.name == "CX":
+			print("ADD CX GATE")
+		elif pressed.name == "CZ":
+			print("ADD CZ GATE")
+		else:
+			print(pressed.name)
+			return  # Unknown button
+		
