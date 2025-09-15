@@ -51,3 +51,22 @@
 
 #### Divison of tasks
 - Created issues on GitHub
+
+## Week 3
+### Meeting with Sean
+- History:
+	- history, timeline slider - step to step - highlighted step 
+	- onion layering - previous now next, alpha
+	- schedule on the side? with toggle
+    - qiskit way?
+	
+- Bell state, entanglement:
+	- top and bottom color for states, half half, for larger states divide it up more
+	- with measured state, collapse both colors
+	
+- ADD Reset qubits
+
+- ADD Measuring qubits:
+	- basis measuring 
+	- different measures
+	
