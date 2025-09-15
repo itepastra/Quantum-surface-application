@@ -312,8 +312,6 @@ let
           '';
         };
 
-        qec-src = ./qec-module;
-
         outputs = [
           "out"
         ]
@@ -385,8 +383,7 @@ let
         ];
 
         prePatch = ''
-          cp -r ${./qec-module/module} modules/qec
-          cp -r ${./qec-module/stim_src} thirdparty/stim
+          cp -r ${./qec-module} modules/stim
         '';
 
         postPatch = ''

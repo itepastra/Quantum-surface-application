@@ -1,6 +1,6 @@
 #include "qec.h"
 
-#include <stim>
+#include "stim.h"
 
 String QEC::get_demo_circuit() {
   stim::Circuit c("H 0\nCNOT 0 1\nM 0 1\n");

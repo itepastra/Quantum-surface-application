@@ -1,0 +1,9 @@
+Import("env")
+Import("env_modules")
+
+env_qec = env_modules.Clone()
+
+module_obj = []
+
+env_qec.add_source_files(module_obj, "*.cc")  # Add all cpp files to the build
+env.modules_sources += module_obj

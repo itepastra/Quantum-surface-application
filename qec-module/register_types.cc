@@ -3,13 +3,13 @@
 #include "core/object/class_db.h"
 #include "qec.h"
 
-void initialize_qec_module(ModuleInitializationLevel p_level) {
+void initialize_stim_module(ModuleInitializationLevel p_level) {
   if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
     return;
   }
   ClassDB::register_class<QEC>();
 }
 
-void uninitialize_qec_module(ModuleInitializationLevel p_level) {
+void uninitialize_stim_module(ModuleInitializationLevel p_level) {
   // Nothing to do here in this example.
 }
