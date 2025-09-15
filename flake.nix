@@ -54,6 +54,7 @@
             installPhase = ''
               mkdir -p $out
               cp -r . $out
+              cp ${./assets/favicon.png} $out
             '';
           };
           game = pkgs.stdenv.mkDerivation {
