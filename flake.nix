@@ -21,7 +21,7 @@
         pkgs.mkShell {
           packages = [
             pkgs.zola
-            pkgs.godot
+            self.packages."x86_64-linux".godot
             pkgs.blender
             pkgs.inkscape
             (pkgs.writeScriptBin "export_images" ''
@@ -61,7 +61,7 @@
           game = pkgs.stdenv.mkDerivation {
             name = "Qubit Quilt";
             nativeBuildInputs = [
-              pkgs.godot
+              self.packages."x86_64-linux".godot
               pkgs.unzip
               pkgs.inkscape
               pkgs.fontconfig
