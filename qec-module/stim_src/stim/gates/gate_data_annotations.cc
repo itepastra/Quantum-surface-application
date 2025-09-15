@@ -1,19 +1,19 @@
-#include "stim/gates/gates.h"
+#include "gates.h"
 
 using namespace stim;
 
 void GateDataMap::add_gate_data_annotations(bool &failed) {
-    add_gate(
-        failed,
-        Gate{
-            .name = "DETECTOR",
-            .id = GateType::DETECTOR,
-            .best_candidate_inverse_id = GateType::DETECTOR,
-            .arg_count = ARG_COUNT_SYGIL_ANY,
-            .flags =
-                (GateFlags)(GATE_ONLY_TARGETS_MEASUREMENT_RECORD | GATE_IS_NOT_FUSABLE | GATE_HAS_NO_EFFECT_ON_QUBITS),
-            .category = "Z_Annotations",
-            .help = R"MARKDOWN(
+  add_gate(failed,
+           Gate{
+               .name = "DETECTOR",
+               .id = GateType::DETECTOR,
+               .best_candidate_inverse_id = GateType::DETECTOR,
+               .arg_count = ARG_COUNT_SYGIL_ANY,
+               .flags = (GateFlags)(GATE_ONLY_TARGETS_MEASUREMENT_RECORD |
+                                    GATE_IS_NOT_FUSABLE |
+                                    GATE_HAS_NO_EFFECT_ON_QUBITS),
+               .category = "Z_Annotations",
+               .help = R"MARKDOWN(
 Annotates that a set of measurements can be used to detect errors, because the set's parity should be deterministic.
 
 Note that it is not necessary to say whether the measurement set's parity is even or odd; all that matters is that the
@@ -83,22 +83,24 @@ Example:
         DETECTOR(0, 3) rec[-1]
     }
 )MARKDOWN",
-            .unitary_data = {},
-            .flow_data = {},
-            .h_s_cx_m_r_decomposition = nullptr,
-        });
+               .unitary_data = {},
+               .flow_data = {},
+               .h_s_cx_m_r_decomposition = nullptr,
+           });
 
-    add_gate(
-        failed,
-        Gate{
-            .name = "OBSERVABLE_INCLUDE",
-            .id = GateType::OBSERVABLE_INCLUDE,
-            .best_candidate_inverse_id = GateType::OBSERVABLE_INCLUDE,
-            .arg_count = 1,
-            .flags = (GateFlags)(GATE_ONLY_TARGETS_MEASUREMENT_RECORD | GATE_TARGETS_PAULI_STRING |
-                                 GATE_IS_NOT_FUSABLE | GATE_ARGS_ARE_UNSIGNED_INTEGERS | GATE_HAS_NO_EFFECT_ON_QUBITS),
-            .category = "Z_Annotations",
-            .help = R"MARKDOWN(
+  add_gate(
+      failed,
+      Gate{
+          .name = "OBSERVABLE_INCLUDE",
+          .id = GateType::OBSERVABLE_INCLUDE,
+          .best_candidate_inverse_id = GateType::OBSERVABLE_INCLUDE,
+          .arg_count = 1,
+          .flags = (GateFlags)(GATE_ONLY_TARGETS_MEASUREMENT_RECORD |
+                               GATE_TARGETS_PAULI_STRING | GATE_IS_NOT_FUSABLE |
+                               GATE_ARGS_ARE_UNSIGNED_INTEGERS |
+                               GATE_HAS_NO_EFFECT_ON_QUBITS),
+          .category = "Z_Annotations",
+          .help = R"MARKDOWN(
 Adds measurement records to a specified logical observable.
 
 A potential point of confusion here is that Stim's notion of a logical observable is nothing more than a set of
@@ -179,21 +181,21 @@ Example:
     OBSERVABLE_INCLUDE(0) X0 X1
     OBSERVABLE_INCLUDE(1) Z0 Z2
 )MARKDOWN",
-            .unitary_data = {},
-            .flow_data = {},
-            .h_s_cx_m_r_decomposition = nullptr,
-        });
+          .unitary_data = {},
+          .flow_data = {},
+          .h_s_cx_m_r_decomposition = nullptr,
+      });
 
-    add_gate(
-        failed,
-        Gate{
-            .name = "TICK",
-            .id = GateType::TICK,
-            .best_candidate_inverse_id = GateType::TICK,
-            .arg_count = 0,
-            .flags = (GateFlags)(GATE_IS_NOT_FUSABLE | GATE_TAKES_NO_TARGETS | GATE_HAS_NO_EFFECT_ON_QUBITS),
-            .category = "Z_Annotations",
-            .help = R"MARKDOWN(
+  add_gate(failed, Gate{
+                       .name = "TICK",
+                       .id = GateType::TICK,
+                       .best_candidate_inverse_id = GateType::TICK,
+                       .arg_count = 0,
+                       .flags = (GateFlags)(GATE_IS_NOT_FUSABLE |
+                                            GATE_TAKES_NO_TARGETS |
+                                            GATE_HAS_NO_EFFECT_ON_QUBITS),
+                       .category = "Z_Annotations",
+                       .help = R"MARKDOWN(
 Annotates the end of a layer of gates, or that time is advancing.
 
 This instruction is not necessary, it has no effect on simulations, but it can be used by tools that are transforming or
@@ -225,21 +227,20 @@ Example:
     # Empty time step.
     TICK
 )MARKDOWN",
-            .unitary_data = {},
-            .flow_data = {},
-            .h_s_cx_m_r_decomposition = nullptr,
-        });
+                       .unitary_data = {},
+                       .flow_data = {},
+                       .h_s_cx_m_r_decomposition = nullptr,
+                   });
 
-    add_gate(
-        failed,
-        Gate{
-            .name = "QUBIT_COORDS",
-            .id = GateType::QUBIT_COORDS,
-            .best_candidate_inverse_id = GateType::QUBIT_COORDS,
-            .arg_count = ARG_COUNT_SYGIL_ANY,
-            .flags = (GateFlags)(GATE_IS_NOT_FUSABLE | GATE_HAS_NO_EFFECT_ON_QUBITS),
-            .category = "Z_Annotations",
-            .help = R"MARKDOWN(
+  add_gate(failed, Gate{
+                       .name = "QUBIT_COORDS",
+                       .id = GateType::QUBIT_COORDS,
+                       .best_candidate_inverse_id = GateType::QUBIT_COORDS,
+                       .arg_count = ARG_COUNT_SYGIL_ANY,
+                       .flags = (GateFlags)(GATE_IS_NOT_FUSABLE |
+                                            GATE_HAS_NO_EFFECT_ON_QUBITS),
+                       .category = "Z_Annotations",
+                       .help = R"MARKDOWN(
 Annotates the location of a qubit.
 
 Coordinates are not required and have no effect on simulations, but can be useful to tools consuming the circuit. For
@@ -270,21 +271,21 @@ Example:
     QUBIT_COORDS(1, 0) 2
     QUBIT_COORDS(1, 1) 3
 )MARKDOWN",
-            .unitary_data = {},
-            .flow_data = {},
-            .h_s_cx_m_r_decomposition = nullptr,
-        });
+                       .unitary_data = {},
+                       .flow_data = {},
+                       .h_s_cx_m_r_decomposition = nullptr,
+                   });
 
-    add_gate(
-        failed,
-        Gate{
-            .name = "SHIFT_COORDS",
-            .id = GateType::SHIFT_COORDS,
-            .best_candidate_inverse_id = GateType::SHIFT_COORDS,
-            .arg_count = ARG_COUNT_SYGIL_ANY,
-            .flags = (GateFlags)(GATE_IS_NOT_FUSABLE | GATE_TAKES_NO_TARGETS | GATE_HAS_NO_EFFECT_ON_QUBITS),
-            .category = "Z_Annotations",
-            .help = R"MARKDOWN(
+  add_gate(failed, Gate{
+                       .name = "SHIFT_COORDS",
+                       .id = GateType::SHIFT_COORDS,
+                       .best_candidate_inverse_id = GateType::SHIFT_COORDS,
+                       .arg_count = ARG_COUNT_SYGIL_ANY,
+                       .flags = (GateFlags)(GATE_IS_NOT_FUSABLE |
+                                            GATE_TAKES_NO_TARGETS |
+                                            GATE_HAS_NO_EFFECT_ON_QUBITS),
+                       .category = "Z_Annotations",
+                       .help = R"MARKDOWN(
 Accumulates offsets that affect qubit coordinates and detector coordinates.
 
 Note: when qubit/detector coordinates use fewer dimensions than SHIFT_COORDS, the offsets from the additional dimensions
@@ -319,21 +320,21 @@ Example:
         SHIFT_COORDS(0, 1)  # Advance 2nd coordinate to track loop iterations.
     }
 )MARKDOWN",
-            .unitary_data = {},
-            .flow_data = {},
-            .h_s_cx_m_r_decomposition = nullptr,
-        });
+                       .unitary_data = {},
+                       .flow_data = {},
+                       .h_s_cx_m_r_decomposition = nullptr,
+                   });
 
-    add_gate(
-        failed,
-        Gate{
-            .name = "MPAD",
-            .id = GateType::MPAD,
-            .best_candidate_inverse_id = GateType::MPAD,
-            .arg_count = ARG_COUNT_SYGIL_ZERO_OR_ONE,
-            .flags = (GateFlags)(GATE_PRODUCES_RESULTS | GATE_ARGS_ARE_DISJOINT_PROBABILITIES),
-            .category = "Z_Annotations",
-            .help = R"MARKDOWN(
+  add_gate(failed,
+           Gate{
+               .name = "MPAD",
+               .id = GateType::MPAD,
+               .best_candidate_inverse_id = GateType::MPAD,
+               .arg_count = ARG_COUNT_SYGIL_ZERO_OR_ONE,
+               .flags = (GateFlags)(GATE_PRODUCES_RESULTS |
+                                    GATE_ARGS_ARE_DISJOINT_PROBABILITIES),
+               .category = "Z_Annotations",
+               .help = R"MARKDOWN(
 Pads the measurement record with the listed measurement results.
 
 This can be useful for ensuring measurements are aligned to word boundaries, or that the
@@ -362,8 +363,8 @@ Examples:
     # Append a series of results to the measurement record.
     MPAD 0 0 1 0 1
 )MARKDOWN",
-            .unitary_data = {},
-            .flow_data = {},
-            .h_s_cx_m_r_decomposition = nullptr,
-        });
+               .unitary_data = {},
+               .flow_data = {},
+               .h_s_cx_m_r_decomposition = nullptr,
+           });
 }

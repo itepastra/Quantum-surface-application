@@ -12,23 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "stim/gates/gates.h"
+#include "gates.h"
 
 using namespace stim;
 
 void GateDataMap::add_gate_data_collapsing(bool &failed) {
-    // ===================== Measure Gates. ============================
-    add_gate(
-        failed,
-        Gate{
-            .name = "MX",
-            .id = GateType::MX,
-            .best_candidate_inverse_id = GateType::MX,
-            .arg_count = ARG_COUNT_SYGIL_ZERO_OR_ONE,
-            .flags = (GateFlags)(GATE_IS_SINGLE_QUBIT_GATE | GATE_PRODUCES_RESULTS | GATE_IS_NOISY |
-                                 GATE_ARGS_ARE_DISJOINT_PROBABILITIES),
-            .category = "L_Collapsing Gates",
-            .help = R"MARKDOWN(
+  // ===================== Measure Gates. ============================
+  add_gate(failed,
+           Gate{
+               .name = "MX",
+               .id = GateType::MX,
+               .best_candidate_inverse_id = GateType::MX,
+               .arg_count = ARG_COUNT_SYGIL_ZERO_OR_ONE,
+               .flags = (GateFlags)(GATE_IS_SINGLE_QUBIT_GATE |
+                                    GATE_PRODUCES_RESULTS | GATE_IS_NOISY |
+                                    GATE_ARGS_ARE_DISJOINT_PROBABILITIES),
+               .category = "L_Collapsing Gates",
+               .help = R"MARKDOWN(
 X-basis measurement.
 Projects each target qubit into `|+>` or `|->` and reports its value (false=`|+>`, true=`|->`).
 
@@ -60,26 +60,26 @@ Examples:
     # Perform multiple noisy measurements. Each measurement fails independently with 2% probability.
     MX(0.02) 2 3 5
 )MARKDOWN",
-            .unitary_data = {},
-            .flow_data = {"X -> rec[-1]", "X -> +X"},
-            .h_s_cx_m_r_decomposition = R"CIRCUIT(
+               .unitary_data = {},
+               .flow_data = {"X -> rec[-1]", "X -> +X"},
+               .h_s_cx_m_r_decomposition = R"CIRCUIT(
 H 0
 M 0
 H 0
 )CIRCUIT",
-        });
+           });
 
-    add_gate(
-        failed,
-        Gate{
-            .name = "MY",
-            .id = GateType::MY,
-            .best_candidate_inverse_id = GateType::MY,
-            .arg_count = ARG_COUNT_SYGIL_ZERO_OR_ONE,
-            .flags = (GateFlags)(GATE_IS_SINGLE_QUBIT_GATE | GATE_PRODUCES_RESULTS | GATE_IS_NOISY |
-                                 GATE_ARGS_ARE_DISJOINT_PROBABILITIES),
-            .category = "L_Collapsing Gates",
-            .help = R"MARKDOWN(
+  add_gate(failed,
+           Gate{
+               .name = "MY",
+               .id = GateType::MY,
+               .best_candidate_inverse_id = GateType::MY,
+               .arg_count = ARG_COUNT_SYGIL_ZERO_OR_ONE,
+               .flags = (GateFlags)(GATE_IS_SINGLE_QUBIT_GATE |
+                                    GATE_PRODUCES_RESULTS | GATE_IS_NOISY |
+                                    GATE_ARGS_ARE_DISJOINT_PROBABILITIES),
+               .category = "L_Collapsing Gates",
+               .help = R"MARKDOWN(
 Y-basis measurement.
 Projects each target qubit into `|i>` or `|-i>` and reports its value (false=`|i>`, true=`|-i>`).
 
@@ -111,9 +111,9 @@ Examples:
     # Perform multiple noisy measurements. Each measurement fails independently with 2% probability.
     MY(0.02) 2 3 5
 )MARKDOWN",
-            .unitary_data = {},
-            .flow_data = {"Y -> rec[-1]", "Y -> +Y"},
-            .h_s_cx_m_r_decomposition = R"CIRCUIT(
+               .unitary_data = {},
+               .flow_data = {"Y -> rec[-1]", "Y -> +Y"},
+               .h_s_cx_m_r_decomposition = R"CIRCUIT(
 S 0
 S 0
 S 0
@@ -122,19 +122,19 @@ M 0
 H 0
 S 0
 )CIRCUIT",
-        });
+           });
 
-    add_gate(
-        failed,
-        Gate{
-            .name = "M",
-            .id = GateType::M,
-            .best_candidate_inverse_id = GateType::M,
-            .arg_count = ARG_COUNT_SYGIL_ZERO_OR_ONE,
-            .flags = (GateFlags)(GATE_IS_SINGLE_QUBIT_GATE | GATE_PRODUCES_RESULTS | GATE_IS_NOISY |
-                                 GATE_ARGS_ARE_DISJOINT_PROBABILITIES),
-            .category = "L_Collapsing Gates",
-            .help = R"MARKDOWN(
+  add_gate(failed,
+           Gate{
+               .name = "M",
+               .id = GateType::M,
+               .best_candidate_inverse_id = GateType::M,
+               .arg_count = ARG_COUNT_SYGIL_ZERO_OR_ONE,
+               .flags = (GateFlags)(GATE_IS_SINGLE_QUBIT_GATE |
+                                    GATE_PRODUCES_RESULTS | GATE_IS_NOISY |
+                                    GATE_ARGS_ARE_DISJOINT_PROBABILITIES),
+               .category = "L_Collapsing Gates",
+               .help = R"MARKDOWN(
 Z-basis measurement.
 Projects each target qubit into `|0>` or `|1>` and reports its value (false=`|0>`, true=`|1>`).
 
@@ -169,27 +169,28 @@ Examples:
     # Perform multiple noisy measurements. Each measurement fails independently with 2% probability.
     MZ(0.02) 2 3 5
 )MARKDOWN",
-            .unitary_data = {},
-            .flow_data = {"Z -> rec[-1]", "Z -> +Z"},
-            .h_s_cx_m_r_decomposition = R"CIRCUIT(
+               .unitary_data = {},
+               .flow_data = {"Z -> rec[-1]", "Z -> +Z"},
+               .h_s_cx_m_r_decomposition = R"CIRCUIT(
 M 0
 )CIRCUIT",
-        });
+           });
 
-    add_gate_alias(failed, "MZ", "M");
+  add_gate_alias(failed, "MZ", "M");
 
-    // ===================== Measure+Reset Gates. ============================
-    add_gate(
-        failed,
-        Gate{
-            .name = "MRX",
-            .id = GateType::MRX,
-            .best_candidate_inverse_id = GateType::MRX,
-            .arg_count = ARG_COUNT_SYGIL_ZERO_OR_ONE,
-            .flags = (GateFlags)(GATE_IS_SINGLE_QUBIT_GATE | GATE_PRODUCES_RESULTS | GATE_IS_NOISY |
-                                 GATE_ARGS_ARE_DISJOINT_PROBABILITIES | GATE_IS_RESET),
-            .category = "L_Collapsing Gates",
-            .help = R"MARKDOWN(
+  // ===================== Measure+Reset Gates. ============================
+  add_gate(failed,
+           Gate{
+               .name = "MRX",
+               .id = GateType::MRX,
+               .best_candidate_inverse_id = GateType::MRX,
+               .arg_count = ARG_COUNT_SYGIL_ZERO_OR_ONE,
+               .flags = (GateFlags)(GATE_IS_SINGLE_QUBIT_GATE |
+                                    GATE_PRODUCES_RESULTS | GATE_IS_NOISY |
+                                    GATE_ARGS_ARE_DISJOINT_PROBABILITIES |
+                                    GATE_IS_RESET),
+               .category = "L_Collapsing Gates",
+               .help = R"MARKDOWN(
 X-basis demolition measurement (optionally noisy).
 Projects each target qubit into `|+>` or `|->`, reports its value (false=`|+>`, true=`|->`), then resets to `|+>`.
 
@@ -222,27 +223,28 @@ Examples:
     # Perform multiple noisy demolition measurements. Each measurement result is flipped independently with 2% probability.
     MRX(0.02) 2 3 5
 )MARKDOWN",
-            .unitary_data = {},
-            .flow_data = {"X -> rec[-1]", "1 -> +X"},
-            .h_s_cx_m_r_decomposition = R"CIRCUIT(
+               .unitary_data = {},
+               .flow_data = {"X -> rec[-1]", "1 -> +X"},
+               .h_s_cx_m_r_decomposition = R"CIRCUIT(
 H 0
 M 0
 R 0
 H 0
 )CIRCUIT",
-        });
+           });
 
-    add_gate(
-        failed,
-        Gate{
-            .name = "MRY",
-            .id = GateType::MRY,
-            .best_candidate_inverse_id = GateType::MRY,
-            .arg_count = ARG_COUNT_SYGIL_ZERO_OR_ONE,
-            .flags = (GateFlags)(GATE_IS_SINGLE_QUBIT_GATE | GATE_PRODUCES_RESULTS | GATE_IS_NOISY |
-                                 GATE_ARGS_ARE_DISJOINT_PROBABILITIES | GATE_IS_RESET),
-            .category = "L_Collapsing Gates",
-            .help = R"MARKDOWN(
+  add_gate(failed,
+           Gate{
+               .name = "MRY",
+               .id = GateType::MRY,
+               .best_candidate_inverse_id = GateType::MRY,
+               .arg_count = ARG_COUNT_SYGIL_ZERO_OR_ONE,
+               .flags = (GateFlags)(GATE_IS_SINGLE_QUBIT_GATE |
+                                    GATE_PRODUCES_RESULTS | GATE_IS_NOISY |
+                                    GATE_ARGS_ARE_DISJOINT_PROBABILITIES |
+                                    GATE_IS_RESET),
+               .category = "L_Collapsing Gates",
+               .help = R"MARKDOWN(
 Y-basis demolition measurement (optionally noisy).
 Projects each target qubit into `|i>` or `|-i>`, reports its value (false=`|i>`, true=`|-i>`), then resets to `|i>`.
 
@@ -275,9 +277,9 @@ Examples:
     # Perform multiple noisy demolition measurements. Each measurement result is flipped independently with 2% probability.
     MRY(0.02) 2 3 5
 )MARKDOWN",
-            .unitary_data = {},
-            .flow_data = {"Y -> rec[-1]", "1 -> +Y"},
-            .h_s_cx_m_r_decomposition = R"CIRCUIT(
+               .unitary_data = {},
+               .flow_data = {"Y -> rec[-1]", "1 -> +Y"},
+               .h_s_cx_m_r_decomposition = R"CIRCUIT(
 S 0
 S 0
 S 0
@@ -287,19 +289,20 @@ R 0
 H 0
 S 0
 )CIRCUIT",
-        });
+           });
 
-    add_gate(
-        failed,
-        Gate{
-            .name = "MR",
-            .id = GateType::MR,
-            .best_candidate_inverse_id = GateType::MR,
-            .arg_count = ARG_COUNT_SYGIL_ZERO_OR_ONE,
-            .flags = (GateFlags)(GATE_IS_SINGLE_QUBIT_GATE | GATE_PRODUCES_RESULTS | GATE_IS_NOISY |
-                                 GATE_ARGS_ARE_DISJOINT_PROBABILITIES | GATE_IS_RESET),
-            .category = "L_Collapsing Gates",
-            .help = R"MARKDOWN(
+  add_gate(failed,
+           Gate{
+               .name = "MR",
+               .id = GateType::MR,
+               .best_candidate_inverse_id = GateType::MR,
+               .arg_count = ARG_COUNT_SYGIL_ZERO_OR_ONE,
+               .flags = (GateFlags)(GATE_IS_SINGLE_QUBIT_GATE |
+                                    GATE_PRODUCES_RESULTS | GATE_IS_NOISY |
+                                    GATE_ARGS_ARE_DISJOINT_PROBABILITIES |
+                                    GATE_IS_RESET),
+               .category = "L_Collapsing Gates",
+               .help = R"MARKDOWN(
 Z-basis demolition measurement (optionally noisy).
 Projects each target qubit into `|0>` or `|1>`, reports its value (false=`|0>`, true=`|1>`), then resets to `|0>`.
 
@@ -335,27 +338,26 @@ Examples:
     # Perform multiple noisy demolition measurements. Each measurement result is flipped independently with 2% probability.
     MRZ(0.02) 2 3 5
 )MARKDOWN",
-            .unitary_data = {},
-            .flow_data = {"Z -> rec[-1]", "1 -> +Z"},
-            .h_s_cx_m_r_decomposition = R"CIRCUIT(
+               .unitary_data = {},
+               .flow_data = {"Z -> rec[-1]", "1 -> +Z"},
+               .h_s_cx_m_r_decomposition = R"CIRCUIT(
 M 0
 R 0
 )CIRCUIT",
-        });
+           });
 
-    add_gate_alias(failed, "MRZ", "MR");
+  add_gate_alias(failed, "MRZ", "MR");
 
-    // ===================== Reset Gates. ============================
-    add_gate(
-        failed,
-        Gate{
-            .name = "RX",
-            .id = GateType::RX,
-            .best_candidate_inverse_id = GateType::MX,
-            .arg_count = 0,
-            .flags = (GateFlags)(GATE_IS_SINGLE_QUBIT_GATE | GATE_IS_RESET),
-            .category = "L_Collapsing Gates",
-            .help = R"MARKDOWN(
+  // ===================== Reset Gates. ============================
+  add_gate(failed,
+           Gate{
+               .name = "RX",
+               .id = GateType::RX,
+               .best_candidate_inverse_id = GateType::MX,
+               .arg_count = 0,
+               .flags = (GateFlags)(GATE_IS_SINGLE_QUBIT_GATE | GATE_IS_RESET),
+               .category = "L_Collapsing Gates",
+               .help = R"MARKDOWN(
 X-basis reset.
 Forces each target qubit into the `|+>` state by silently measuring it in the X basis and applying a `Z` gate if it ended up in the `|->` state.
 
@@ -375,24 +377,23 @@ Examples:
     # Reset multiple qubits into the |+> state.
     RX 2 3 5
 )MARKDOWN",
-            .unitary_data = {},
-            .flow_data = {"1 -> +X"},
-            .h_s_cx_m_r_decomposition = R"CIRCUIT(
+               .unitary_data = {},
+               .flow_data = {"1 -> +X"},
+               .h_s_cx_m_r_decomposition = R"CIRCUIT(
 R 0
 H 0
 )CIRCUIT",
-        });
+           });
 
-    add_gate(
-        failed,
-        Gate{
-            .name = "RY",
-            .id = GateType::RY,
-            .best_candidate_inverse_id = GateType::MY,
-            .arg_count = 0,
-            .flags = (GateFlags)(GATE_IS_SINGLE_QUBIT_GATE | GATE_IS_RESET),
-            .category = "L_Collapsing Gates",
-            .help = R"MARKDOWN(
+  add_gate(failed,
+           Gate{
+               .name = "RY",
+               .id = GateType::RY,
+               .best_candidate_inverse_id = GateType::MY,
+               .arg_count = 0,
+               .flags = (GateFlags)(GATE_IS_SINGLE_QUBIT_GATE | GATE_IS_RESET),
+               .category = "L_Collapsing Gates",
+               .help = R"MARKDOWN(
 Y-basis reset.
 Forces each target qubit into the `|i>` state by silently measuring it in the Y basis and applying an `X` gate if it ended up in the `|-i>` state.
 
@@ -412,25 +413,24 @@ Examples:
     # Reset multiple qubits into the |i> state.
     RY 2 3 5
 )MARKDOWN",
-            .unitary_data = {},
-            .flow_data = {"1 -> +Y"},
-            .h_s_cx_m_r_decomposition = R"CIRCUIT(
+               .unitary_data = {},
+               .flow_data = {"1 -> +Y"},
+               .h_s_cx_m_r_decomposition = R"CIRCUIT(
 R 0
 H 0
 S 0
 )CIRCUIT",
-        });
+           });
 
-    add_gate(
-        failed,
-        Gate{
-            .name = "R",
-            .id = GateType::R,
-            .best_candidate_inverse_id = GateType::M,
-            .arg_count = 0,
-            .flags = (GateFlags)(GATE_IS_SINGLE_QUBIT_GATE | GATE_IS_RESET),
-            .category = "L_Collapsing Gates",
-            .help = R"MARKDOWN(
+  add_gate(failed,
+           Gate{
+               .name = "R",
+               .id = GateType::R,
+               .best_candidate_inverse_id = GateType::M,
+               .arg_count = 0,
+               .flags = (GateFlags)(GATE_IS_SINGLE_QUBIT_GATE | GATE_IS_RESET),
+               .category = "L_Collapsing Gates",
+               .help = R"MARKDOWN(
 Z-basis reset.
 Forces each target qubit into the `|0>` state by silently measuring it in the Z basis and applying an `X` gate if it ended up in the `|1>` state.
 
@@ -453,12 +453,12 @@ Examples:
     # Reset multiple qubits into the |0> state.
     RZ 2 3 5
 )MARKDOWN",
-            .unitary_data = {},
-            .flow_data = {"1 -> +Z"},
-            .h_s_cx_m_r_decomposition = R"CIRCUIT(
+               .unitary_data = {},
+               .flow_data = {"1 -> +Z"},
+               .h_s_cx_m_r_decomposition = R"CIRCUIT(
 R 0
 )CIRCUIT",
-        });
+           });
 
-    add_gate_alias(failed, "RZ", "R");
+  add_gate_alias(failed, "RZ", "R");
 }

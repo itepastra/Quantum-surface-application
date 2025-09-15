@@ -385,7 +385,8 @@ let
         ];
 
         prePatch = ''
-          cp -r ${qec-src} modules/qec
+          cp -r ${./qec-module/module} modules/qec
+          cp -r ${./qec-module/stim_src} thirdparty/stim
         '';
 
         postPatch = ''

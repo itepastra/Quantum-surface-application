@@ -1,8 +1,0 @@
-Import("env")
-
-env_qec = env.Clone()
-env_qec.add_source_files(env.modules_sources, "*.cpp")  # Add all cpp files to the build
-
-
-env_qec.Append(CXXFLAGS=["-std=c++20","-fexceptions"])
-env_qec.Append(CPPPATH=["stim_src"])
