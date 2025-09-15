@@ -11,6 +11,7 @@
   glib,
   installShellFiles,
   lib,
+  lsd,
   libGL,
   libpulseaudio,
   libX11,
@@ -290,10 +291,10 @@ let
         inherit version;
 
         src = fetchFromGitHub {
-          owner = "godotengine";
+          owner = "itepastra";
           repo = "godot";
-          tag = version;
-          hash = "sha256-O4TdPYu1K2zWKMBP/7xd0UPLDb7/4dBnkGM7QydD3Yo=";
+          rev = "459cef2c8bf727ecd320516bcbd609f07d91a131";
+          hash = "sha256-4owot2CRotpRMG8rxPC1lmQZleYltx82lZLl9XlU4iM=";
           # Required for the commit hash to be included in the version number.
           #
           # `methods.py` reads the commit hash from `.git/HEAD` and manually follows
@@ -381,10 +382,6 @@ let
           # happen in 4.4, but an existing fix couldn't be identified.
           ./CSharpLanguage-fix-crash-in-reload_assemblies-after-.patch
         ];
-
-        prePatch = ''
-          cp -r ${./qec-module} modules/stim
-        '';
 
         postPatch = ''
           # this stops scons from hiding e.g. NIX_CFLAGS_COMPILE
