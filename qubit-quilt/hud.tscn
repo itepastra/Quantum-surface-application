@@ -21,7 +21,6 @@ Button/styles/normal = SubResource("StyleBoxTexture_61f8s")
 [sub_resource type="ButtonGroup" id="ButtonGroup_640wx"]
 resource_local_to_scene = false
 resource_name = "controls"
-allow_unpress = true
 
 [node name="HUD" type="CanvasLayer"]
 
