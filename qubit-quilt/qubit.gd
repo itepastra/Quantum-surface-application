@@ -7,7 +7,7 @@ const DECAY_SPEED: float = 0.04
 # no need to recalculate the angle every time
 const angle_90 = deg_to_rad(90)
 
-var rot: Basis # the current "target" rotation
+var rot: Basis # the "target" rotation
 var is_rotating: bool
 
 func _ready():
@@ -21,9 +21,12 @@ func _ready():
 	self.rot = self.transform.basis
 
 func _process(delta: float) -> void:
+	# don't do the calculations if the qubit is in a stationary state
 	if not self.is_rotating:
 		return
+	# interpolate between the current and the target rotations and update the current rotation
 	self.transform.basis = self.transform.basis.slerp(rot, 1 - DECAY_SPEED ** delta).orthonormalized()
+	# if the target rotation is reached, stop updating the qubit
 	if self.transform.basis.is_equal_approx(rot):
 		self.is_rotating = false
 
@@ -43,6 +46,7 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 			rotation_axis = self.rot.y
 		else:
 			return  # Unknown button
-		#actually rotate the qubit
+
+		# calculate the new target rotation for the qubit and set it to be rotating
 		self.rot = self.rot.rotated(rotation_axis, angle_90)
 		self.is_rotating = true
