@@ -18,7 +18,7 @@ func _ready():
 	# start by rotating the qubit so blue (|0>) is towards the camera and |+> is on the underside
 	self.rotate_object_local(Vector3.RIGHT, angle_90)
 	self.rotate_object_local(Vector3.UP, -angle_90)
-	self.rot = Quaternion(self.transform.basis)
+	self.rot = self.transform.basis
 
 func _process(delta: float) -> void:
 	if not self.is_rotating:
