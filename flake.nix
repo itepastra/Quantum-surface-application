@@ -82,8 +82,8 @@
                 echo "converted $filename to png"
               done
               popd
-              mkdir -p $HOME/.local/share/godot/export_templates/4.4.1.stable
-              pushd $HOME/.local/share/godot/export_templates/4.4.1.stable
+              mkdir -p $HOME/.local/share/godot/export_templates/4.4.2.rc
+              pushd $HOME/.local/share/godot/export_templates/4.4.2.rc
               unzip -j ${inputs.export_templates} \
                 templates/web_dlink_nothreads_debug.zip \
                 templates/web_nothreads_debug.zip \
