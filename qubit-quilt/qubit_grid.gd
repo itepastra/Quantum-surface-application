@@ -9,8 +9,15 @@ extends Node3D
 @export var qubit_scene: PackedScene
 @export var gate_scene: PackedScene
 
+@onready var cx_button = $B
+
 const qubit_size = 1
 var button_group: ButtonGroup
+var two_qubit_mode: bool = false
+var selected_qubits: Array[Qubit] = []
+var two_qubit_gate_type: String = ""
+
+var qec = Qec.new()
 
 func _on_ready() -> void:
 	# Resize the camera to fit with the grid
@@ -32,23 +39,96 @@ func _on_ready() -> void:
 
 
 func _ready():
-	var button = get_node("/root/Scene/HUD/Hotbar/X-90")
-	button_group = button.button_group
+	# Connect to the CX button
+	var cx_button = get_node("/root/Scene/HUD/Hotbar/CX")
+	cx_button.connect("pressed", Callable(self, "_on_cx_button_pressed"))
+	
+	var cz_button = get_node("/root/Scene/HUD/Hotbar/CZ")
+	cz_button.connect("pressed", Callable(self, "_on_cz_button_pressed"))
+	
+func _on_cx_button_pressed():
+	two_qubit_gate_type = "CX"
+	selected_qubits.clear()
+	print("Select two qubits for CX gate")
 
+func _on_cz_button_pressed():
+	two_qubit_gate_type = "CZ"
+	selected_qubits.clear()
+	print("Select two qubits for CZ gate")
 
-func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _normal: Vector3, _shape_idx: int) -> void:
-	# the user clicked on the qubit
-	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT:
-		# find the selected gate
-		var pressed: Button = button_group.get_pressed_button()
-
-		if pressed == null:
-			return
-		elif pressed.name == "CX":
-			print("ADD CX GATE")
-		elif pressed.name == "CZ":
-			print("ADD CZ GATE")
-		else:
-			print(pressed.name)
-			return  # Unknown button
+func _on_qubit_selected(qubit: Qubit):
+	if two_qubit_gate_type != "" and qubit not in selected_qubits:
+		selected_qubits.append(qubit)
 		
+		if selected_qubits.size() == 2:
+			add_two_qubit_gate(selected_qubits[0], selected_qubits[1])
+			selected_qubits.clear()
+			two_qubit_gate_type = ""
+
+func add_two_qubit_gate(qubit1: Qubit, qubit2: Qubit):
+	# check qubits are nearest neighbors
+	var pos1 = get_qubit_grid_position(qubit1)
+	var pos2 = get_qubit_grid_position(qubit2)
+
+	var dx = abs(pos1.x - pos2.x)
+	var dy = abs(pos1.y - pos2.y)
+	
+
+	if (dx == 1 and dy == 0) or (dx == 0 and dy == 1):
+		# Create and position the gate
+		var gate_instance = gate_scene.instantiate()
+		add_child(gate_instance)
+		
+		# Determine if it's a horizontal or vertical connection
+		if dx == 1: # Horizontal connection
+			var x = min(pos1.x, pos2.x)
+			var y = pos1.y
+			var startx = (x - (x_qubits-1)/2.0) * cell_size + qubit_size
+			var endx = (x + 1 - (x_qubits-1)/2.0) * cell_size - qubit_size
+			var gatey = (y - (y_qubits-1)/2.0) * cell_size
+
+			# Check if we need to flip the gate based on selection order
+			var flip_horizontal = pos1.x < pos2.x
+			if flip_horizontal:
+				# Swap start and end to flip the gate
+				var temp = startx
+				startx = endx
+				endx = temp
+			gate_instance.setup(Vector3(startx, gatey, 0), Vector3(endx, gatey, 0))
+			
+		else: # Vertical connection
+			var x = pos1.x
+			var y = min(pos1.y, pos2.y)
+			var gatex = (x - (x_qubits-1)/2.0) * cell_size
+			var starty = (y - (y_qubits-1)/2.0) * cell_size + qubit_size
+			var endy = (y + 1 - (y_qubits-1)/2.0) * cell_size - qubit_size
+
+			# Check if we need to flip the gate based on selection order
+			var flip_vertical = pos1.y < pos2.y
+			if flip_vertical:
+				# Swap start and end to flip the gate
+				var temp = starty
+				starty = endy
+				endy = temp
+
+			gate_instance.setup(Vector3(gatex, starty, 0), Vector3(gatex, endy, 0))
+		
+		# Apply the gate operation to your quantum state
+		if two_qubit_gate_type == "CX":
+			print("IMPLEMENT QEC CX")
+			#qec.apply_cx(qubit1, qubit2)
+		elif two_qubit_gate_type == "CZ":
+			print("IMPLEMENT QEC CZ")
+			#qec.apply_cz(qubit1, qubit2)
+		
+		print("Added %s gate between %s and %s" % [two_qubit_gate_type, qubit1.name, qubit2.name])
+	else:
+		print("Qubits are not adjacent. Cannot add gate.")
+		selected_qubits.clear()
+		two_qubit_gate_type = ""
+
+func get_qubit_grid_position(qubit: Qubit) -> Vector2:
+	# Calculate grid position based on world position
+	var grid_x = round((qubit.position.x / cell_size) + (x_qubits - 1) / 2.0)
+	var grid_y = round((qubit.position.y / cell_size) + (y_qubits - 1) / 2.0)
+	return Vector2(grid_x, grid_y)

@@ -21,6 +21,13 @@ func _ready():
 func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _normal: Vector3, _shape_idx: int) -> void:
 	# the user clicked on the qubit
 	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT:
+		var grid = get_parent() as QubitGrid
+		
+		# Check if we're in two-qubit gate mode
+		if grid.two_qubit_gate_type != "":
+			grid._on_qubit_selected(self)
+			return
+		
 		# find the selected rotation direction from the buttongroup
 		var pressed: Button = button_group.get_pressed_button()
 		var rotation_axis: Vector3
