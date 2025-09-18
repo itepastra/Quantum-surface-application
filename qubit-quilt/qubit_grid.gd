@@ -75,45 +75,42 @@ func add_two_qubit_gate(qubit1: Qubit, qubit2: Qubit):
 	
 
 	if (dx == 1 and dy == 0) or (dx == 0 and dy == 1):
-		# Create and position the gate
 		var gate_instance = gate_scene.instantiate()
 		add_child(gate_instance)
 		
-		# Determine if it's a horizontal or vertical connection
-		if dx == 1: # Horizontal connection
+		if dx == 1: # horizontal connection
 			var x = min(pos1.x, pos2.x)
 			var y = pos1.y
 			var startx = (x - (x_qubits-1)/2.0) * cell_size + qubit_size
 			var endx = (x + 1 - (x_qubits-1)/2.0) * cell_size - qubit_size
 			var gatey = (y - (y_qubits-1)/2.0) * cell_size
 
-			# Check if we need to flip the gate based on selection order
+			# flip the gate based on selection order
 			var flip_horizontal = pos1.x < pos2.x
 			if flip_horizontal:
-				# Swap start and end to flip the gate
+				# swap start and end to flip the gate
 				var temp = startx
 				startx = endx
 				endx = temp
 			gate_instance.setup(Vector3(startx, gatey, 0), Vector3(endx, gatey, 0))
 			
-		else: # Vertical connection
+		else: # vertical connection
 			var x = pos1.x
 			var y = min(pos1.y, pos2.y)
 			var gatex = (x - (x_qubits-1)/2.0) * cell_size
 			var starty = (y - (y_qubits-1)/2.0) * cell_size + qubit_size
 			var endy = (y + 1 - (y_qubits-1)/2.0) * cell_size - qubit_size
 
-			# Check if we need to flip the gate based on selection order
+			# flip gate based on order
 			var flip_vertical = pos1.y < pos2.y
 			if flip_vertical:
-				# Swap start and end to flip the gate
 				var temp = starty
 				starty = endy
 				endy = temp
 
 			gate_instance.setup(Vector3(gatex, starty, 0), Vector3(gatex, endy, 0))
 		
-		# Apply the gate operation to your quantum state
+		# WIP, need module to work
 		if two_qubit_gate_type == "CX":
 			print("IMPLEMENT QEC CX")
 			#qec.apply_cx(qubit1, qubit2)
@@ -128,7 +125,7 @@ func add_two_qubit_gate(qubit1: Qubit, qubit2: Qubit):
 		two_qubit_gate_type = ""
 
 func get_qubit_grid_position(qubit: Qubit) -> Vector2:
-	# Calculate grid position based on world position
+	# Calculate grid position
 	var grid_x = round((qubit.position.x / cell_size) + (x_qubits - 1) / 2.0)
 	var grid_y = round((qubit.position.y / cell_size) + (y_qubits - 1) / 2.0)
 	return Vector2(grid_x, grid_y)
