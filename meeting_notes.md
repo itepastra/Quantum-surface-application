@@ -72,4 +72,6 @@
 ### Additional Resources:
 - An interactive introduction to the surface code: https://arthurpesah.me/blog/2023-05-13-surface-code/
 
-	
+### Questions for Sean for next week:
+- NN connectivity? (enforce or not)
+- which sim to use
