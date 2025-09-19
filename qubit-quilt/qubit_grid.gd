@@ -67,17 +67,42 @@ func rq(qubit: Qubit, axis: Vector3):
 	qubit.is_rotating = true
 
 func cx(control: int, target: int):
+	if not check_orthogonal_neighbors(control, target, x_qubits):
+		print_debug("Not nearest neighbors in this grid configuration")
+		return
+		
 	# apply cx between control and target
 	var qc = grid_qubits[control]
 	var qt = grid_qubits[target]
+	# TODO DO STIM STUFF HERE
 	
-	print("control basis", qc.basis)
-	print("target basis", qt.basis)
+	print_debug("control basis", qc.basis)
+	print_debug("target basis", qt.basis)
 
 func cz(control: int, target: int):
+	if not check_orthogonal_neighbors(control, target, x_qubits):
+		print_debug("Not nearest neighbors in this grid configuration")
+		return
+		
 	# apply cz between control and target
 	var qc = grid_qubits[control]
 	var qt = grid_qubits[target]
+	# TODO DO STIM STUFF HERE
 	
-	print("control basis", qc.basis)
-	print("target basis", qt.basis)
+	print_debug("control basis", qc.basis)
+	print_debug("target basis", qt.basis)
+
+func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
+	# Calculate row and column positions
+	var row1 = qubit1_pos / width
+	var col1 = qubit1_pos % width
+	var row2 = qubit2_pos / width
+	var col2 = qubit2_pos % width
+	
+	# Check if they are adjacent, includes diagonally
+	var row_diff = abs(row1 - row2)
+	var col_diff = abs(col1 - col2)
+	
+	# check Manhattan distance of 1 (orthogonal) or sqrt(2) (diagonal)
+	# but for nearest neighbor in grid orthogonal neighbors
+	return (row_diff == 0 and col_diff == 1) or (row_diff == 1 and col_diff == 0)
