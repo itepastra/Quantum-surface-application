@@ -149,7 +149,7 @@ func add_cx_cz_visuals(control: int, target: int, gate_is_cz: bool) -> void:
 		var gatex = (x - (x_qubits-1)/2.0) * cell_size
 		var starty = (y - (y_qubits-1)/2.0) * cell_size + qubit_size
 		var endy = (y + 1 - (y_qubits-1)/2.0) * cell_size - qubit_size
-		
+
 		# flip if needed
 		var flip_vertical = pos1.y < pos2.y
 		if flip_vertical:

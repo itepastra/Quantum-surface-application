@@ -28,7 +28,7 @@ func _process(delta: float) -> void:
 	# don't do the calculations if the qubit is in a stationary state
 	if not self.is_rotating:
 		return
-	# interpolate between the current a65554nd the target rotations and update the current rotation
+	# interpolate between the current and the target rotations and update the current rotation
 	self.transform.basis = self.transform.basis.slerp(rot, 1 - DECAY_SPEED ** delta).orthonormalized()
 	# if the target rotation is reached, stop updating the qubit
 	if self.transform.basis.is_equal_approx(rot):
