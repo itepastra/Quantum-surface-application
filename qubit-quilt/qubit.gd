@@ -65,6 +65,7 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 				grid.cz(grid.selected_qubit, array_pos)
 				grid.selected_qubit = -1
 		elif pressed.name == "REMOVE":
+			grid.grid_qubits[array_pos] = null
 			self.queue_free()
 		else:
 			return  # Unknown button
