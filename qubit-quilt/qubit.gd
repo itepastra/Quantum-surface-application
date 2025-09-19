@@ -45,10 +45,13 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 		var grid = get_parent() as QubitGrid
 		if pressed.name == "X-90":
 			grid.rx(array_pos)
+			grid.selected_qubit = -1
 		elif pressed.name == "Y-90":
 			grid.ry(array_pos)
+			grid.selected_qubit = -1
 		elif pressed.name == "Z-90":
 			grid.rz(array_pos)
+			grid.selected_qubit = -1
 		elif pressed.name == "CX":
 			if grid.selected_qubit == -1:
 				grid.selected_qubit = array_pos
