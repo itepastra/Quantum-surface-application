@@ -61,19 +61,19 @@ func _on_qubit_selected(qubit: Qubit):
 		selected_qubits.append(qubit)
 		
 		if selected_qubits.size() == 2:
-			add_two_qubit_gate(selected_qubits[0], selected_qubits[1])
+			add_two_qubit_gate(selected_qubits[0], selected_qubits[1], two_qubit_gate_type)
 			selected_qubits.clear()
 			two_qubit_gate_type = ""
 
-func add_two_qubit_gate(qubit1: Qubit, qubit2: Qubit):
+func add_two_qubit_gate(qubit1: Qubit, qubit2: Qubit, gate_type: String):
 	# check qubits are nearest neighbors
 	var pos1 = get_qubit_grid_position(qubit1)
 	var pos2 = get_qubit_grid_position(qubit2)
-
+	
 	var dx = abs(pos1.x - pos2.x)
 	var dy = abs(pos1.y - pos2.y)
 	
-
+	# check for nearest neighbour connectivity
 	if (dx == 1 and dy == 0) or (dx == 0 and dy == 1):
 		var gate_instance = gate_scene.instantiate()
 		add_child(gate_instance)
@@ -84,8 +84,9 @@ func add_two_qubit_gate(qubit1: Qubit, qubit2: Qubit):
 			var startx = (x - (x_qubits-1)/2.0) * cell_size + qubit_size
 			var endx = (x + 1 - (x_qubits-1)/2.0) * cell_size - qubit_size
 			var gatey = (y - (y_qubits-1)/2.0) * cell_size
-
-			# flip the gate based on selection order
+			
+			# flip the gate based on selection order so that 
+			# we have first control then target
 			var flip_horizontal = pos1.x < pos2.x
 			if flip_horizontal:
 				# swap start and end to flip the gate
@@ -100,14 +101,14 @@ func add_two_qubit_gate(qubit1: Qubit, qubit2: Qubit):
 			var gatex = (x - (x_qubits-1)/2.0) * cell_size
 			var starty = (y - (y_qubits-1)/2.0) * cell_size + qubit_size
 			var endy = (y + 1 - (y_qubits-1)/2.0) * cell_size - qubit_size
-
-			# flip gate based on order
+			
+			# flip if needed
 			var flip_vertical = pos1.y < pos2.y
 			if flip_vertical:
 				var temp = starty
 				starty = endy
 				endy = temp
-
+				
 			gate_instance.setup(Vector3(gatex, starty, 0), Vector3(gatex, endy, 0))
 		
 		# WIP, need module to work
@@ -116,6 +117,7 @@ func add_two_qubit_gate(qubit1: Qubit, qubit2: Qubit):
 			#qec.apply_cx(qubit1, qubit2)
 		elif two_qubit_gate_type == "CZ":
 			print("IMPLEMENT QEC CZ")
+			gate_instance.texture = preload("res://assets/cz.png")
 			#qec.apply_cz(qubit1, qubit2)
 		
 		print("Added %s gate between %s and %s" % [two_qubit_gate_type, qubit1.name, qubit2.name])
