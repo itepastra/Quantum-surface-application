@@ -8,6 +8,36 @@ extends Node3D
 @export var qubit_scene: PackedScene
 @export var gate_scene: PackedScene
 
+class EGroup:
+	extends Node
+	var qubits: Array[Qubit] = []
+	var eff: Basis
+	var timer: Timer
+	
+	func _init(qubits: Array[Qubit], grid: QubitGrid, period: float = 1) -> void:
+		self.qubits = qubits
+		grid.add_child(self)
+		timer = Timer.new()
+		timer.autostart = true
+		timer.wait_time = period
+		timer.timeout.connect(_on_timer_timeout)
+		self.add_child(timer)
+	
+	func _on_timer_timeout():
+		random_rotate()
+	
+	func random_rotate():
+		#if len(qubits) <= 1:
+			#qubits.map(func (qubit): qubit.eff_rot = Basis.IDENTITY)
+			#return
+		var rand = RandomNumberGenerator.new()
+		var theta = rand.randf_range(0, PI*2)
+		var phi = rand.randf_range(0, PI*2)
+		var psi = rand.randf_range(0, PI*2)
+		eff = Basis.from_euler(Vector3(theta, phi, psi))
+		qubits.map(func (qubit): qubit.eff_rot = eff)
+		qubits.map(func (qubit): qubit.is_rotating = true)
+
 const qubit_size = 1
 const angle_90 = deg_to_rad(90)
 
@@ -16,6 +46,7 @@ var two_qubit_mode: bool = false
 var selected_qubit: int = -1
 var two_qubit_gate_type: String = ""
 var grid_qubits: Array[Qubit] = []
+var entanglement_groups: Array[EGroup] = []
 
 var qec = Qec.new()
 
@@ -38,6 +69,19 @@ func _on_ready() -> void:
 			nextQubit.array_pos = y * x_qubits+x
 			grid_qubits.append(nextQubit)
 			self.add_child(nextQubit)
+	
+	# add qubits to EGroups
+	var group: int = 1
+	var rng = RandomNumberGenerator.new()
+	rng.seed = hash("QubitQuilt")
+	var row: Array[Qubit] = []
+	for qubit in grid_qubits:
+		row.append(qubit)
+		if len(row) == 4:
+			entanglement_groups.append(EGroup.new(row, self, randf_range(0.5,3.0)))
+			group += 1
+			row = []
+	entanglement_groups.append(EGroup.new(row, self))
 
 
 func _ready():
