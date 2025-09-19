@@ -38,12 +38,15 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 		var rotation_axis: Vector3
 		if pressed == null: # no pressed button, do nothing (future panning around)
 			return
+		
 		elif pressed.name == "X-90":
 			rotation_axis = self.rot.x
 		elif pressed.name == "Y-90":
 			rotation_axis = -self.rot.z
 		elif pressed.name == "Z-90":
 			rotation_axis = self.rot.y
+		elif pressed.name == "REMOVE":
+			self.queue_free()
 		else:
 			return  # Unknown button
 
