@@ -71,10 +71,13 @@ func cx(control: int, target: int):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
 		
+	add_cx_cz_visuals(control, target, false)
+	
 	# apply cx between control and target
 	var qc = grid_qubits[control]
 	var qt = grid_qubits[target]
 	# TODO DO STIM STUFF HERE
+	
 	
 	print_debug("control basis", qc.basis)
 	print_debug("target basis", qt.basis)
@@ -84,6 +87,8 @@ func cz(control: int, target: int):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
 		
+	add_cx_cz_visuals(control, target, true)
+	
 	# apply cz between control and target
 	var qc = grid_qubits[control]
 	var qt = grid_qubits[target]
@@ -94,15 +99,65 @@ func cz(control: int, target: int):
 
 func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
 	# Calculate row and column positions
-	var row1 = qubit1_pos / width
-	var col1 = qubit1_pos % width
-	var row2 = qubit2_pos / width
-	var col2 = qubit2_pos % width
+	var row1: int = qubit1_pos / width
+	var col1: int = qubit1_pos % width
+	var row2: int = qubit2_pos / width
+	var col2: int = qubit2_pos % width
 	
-	# Check if they are adjacent, includes diagonally
+	# Check if they are orthogonal neighbors
 	var row_diff = abs(row1 - row2)
 	var col_diff = abs(col1 - col2)
+	if (row_diff + col_diff) != 1:  # Manhattan distance 1
+		return false
 	
-	# check Manhattan distance of 1 (orthogonal) or sqrt(2) (diagonal)
-	# but for nearest neighbor in grid orthogonal neighbors
-	return (row_diff == 0 and col_diff == 1) or (row_diff == 1 and col_diff == 0)
+	return true
+
+func get_qubit_position_from_index(qubit_index: int) -> Vector2i:
+	var col = qubit_index % x_qubits
+	var row = qubit_index / x_qubits
+	return Vector2i(col, row)
+
+func add_cx_cz_visuals(control: int, target: int, gate_is_cz: bool) -> void:
+	var pos1 = get_qubit_position_from_index(control)
+	var pos2 = get_qubit_position_from_index(target)
+	var dx = abs(pos1.x - pos2.x)
+	var dy = abs(pos1.y - pos2.y)
+	
+	var gate_instance = gate_scene.instantiate()
+	add_child(gate_instance)
+	
+	if dx == 1: # horizontal connection
+		var x = min(pos1.x, pos2.x)
+		var y = pos1.y
+		var startx = (x - (x_qubits-1)/2.0) * cell_size + qubit_size
+		var endx = (x + 1 - (x_qubits-1)/2.0) * cell_size - qubit_size
+		var gatey = (y - (y_qubits-1)/2.0) * cell_size
+		
+		# flip the gate based on selection order so that 
+		# we have first control then target
+		var flip_horizontal = pos1.x < pos2.x
+		if flip_horizontal:
+			# swap start and end to flip the gate
+			var temp = startx
+			startx = endx
+			endx = temp
+		gate_instance.setup(Vector3(startx, gatey, 0), Vector3(endx, gatey, 0))
+		
+	else: # vertical connection
+		var x = pos1.x
+		var y = min(pos1.y, pos2.y)
+		var gatex = (x - (x_qubits-1)/2.0) * cell_size
+		var starty = (y - (y_qubits-1)/2.0) * cell_size + qubit_size
+		var endy = (y + 1 - (y_qubits-1)/2.0) * cell_size - qubit_size
+		
+		# flip if needed
+		var flip_vertical = pos1.y < pos2.y
+		if flip_vertical:
+			var temp = starty
+			starty = endy
+			endy = temp
+			
+		gate_instance.setup(Vector3(gatex, starty, 0), Vector3(gatex, endy, 0))
+	
+	if gate_is_cz:
+		gate_instance.texture = preload("res://assets/cz.png")
