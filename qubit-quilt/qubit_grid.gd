@@ -49,12 +49,10 @@ func _ready():
 func _on_cx_button_pressed():
 	two_qubit_gate_type = "CX"
 	selected_qubits.clear()
-	print("Select two qubits for CX gate")
 
 func _on_cz_button_pressed():
 	two_qubit_gate_type = "CZ"
 	selected_qubits.clear()
-	print("Select two qubits for CZ gate")
 
 func _on_qubit_selected(qubit: Qubit):
 	if two_qubit_gate_type != "" and qubit not in selected_qubits:
@@ -113,16 +111,16 @@ func add_two_qubit_gate(qubit1: Qubit, qubit2: Qubit, gate_type: String):
 		
 		# WIP, need module to work
 		if two_qubit_gate_type == "CX":
-			print("IMPLEMENT QEC CX")
+			print_debug("IMPLEMENT QEC CX")
 			#qec.apply_cx(qubit1, qubit2)
 		elif two_qubit_gate_type == "CZ":
-			print("IMPLEMENT QEC CZ")
+			print_debug("IMPLEMENT QEC CZ")
 			gate_instance.texture = preload("res://assets/cz.png")
 			#qec.apply_cz(qubit1, qubit2)
 		
-		print("Added %s gate between %s and %s" % [two_qubit_gate_type, qubit1.name, qubit2.name])
+		print_debug("Added %s gate between %s and %s" % [two_qubit_gate_type, qubit1.name, qubit2.name])
 	else:
-		print("Qubits are not adjacent. Cannot add gate.")
+		print_debug("Qubits are not adjacent. Cannot add gate.")
 		selected_qubits.clear()
 		two_qubit_gate_type = ""
 
