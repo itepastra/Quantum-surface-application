@@ -1,7 +1,7 @@
 class_name Gate
 extends Sprite3D
 
-
+const DECAY_SPEED: float = 0.5
 
 static var self_scene: PackedScene;
 
@@ -25,3 +25,9 @@ func setup(start, end):
 	self.position.x = average_vec.x
 	self.position.y = average_vec.y
 	self.rotate_object_local(Vector3.BACK, atan2(diff.y, diff.x))
+	
+	
+func _process(delta: float) -> void:
+	if self.modulate.a < 0.01:
+		self.queue_free()
+	self.modulate.a = self.modulate.a * (1 - DECAY_SPEED) ** delta

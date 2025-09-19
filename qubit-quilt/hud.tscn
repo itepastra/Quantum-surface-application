@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://8h8kpjesx5mq"]
+[gd_scene load_steps=19 format=3 uid="uid://8h8kpjesx5mq"]
 
 [ext_resource type="Texture2D" uid="uid://dmha0kcdynqvd" path="res://assets/button.png" id="1_640wx"]
 [ext_resource type="Theme" uid="uid://cvssq0yc2h85n" path="res://controls.tres" id="2_1xsix"]
@@ -6,6 +6,8 @@
 [ext_resource type="Texture2D" uid="uid://bcxio1w38nuxk" path="res://assets/ry-90.png" id="3_1xsix"]
 [ext_resource type="Texture2D" uid="uid://da2w8t4egghnx" path="res://assets/rz-90.png" id="4_rftc2"]
 [ext_resource type="Texture2D" uid="uid://d3gp5wrfswige" path="res://assets/qubit.png" id="6_1xsix"]
+[ext_resource type="Texture2D" uid="uid://bqg0xk827fxs2" path="res://assets/cx.png" id="6_g10ll"]
+[ext_resource type="Texture2D" uid="uid://dvns5f3gub7wt" path="res://assets/cz.png" id="7_gpiub"]
 [ext_resource type="Texture2D" uid="uid://rbqvyjfs8ov0" path="res://assets/qubit +.png" id="7_rftc2"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_61f8s"]
@@ -81,6 +83,19 @@ button_group = SubResource("ButtonGroup_640wx")
 shortcut = SubResource("Shortcut_61f8s")
 icon = ExtResource("4_rftc2")
 icon_alignment = 1
+
+[node name="CX" type="Button" parent="Hotbar"]
+layout_mode = 2
+toggle_mode = true
+button_group = SubResource("ButtonGroup_640wx")
+icon = ExtResource("6_g10ll")
+icon_alignment = 1
+
+[node name="CZ" type="Button" parent="Hotbar"]
+layout_mode = 2
+toggle_mode = true
+button_group = SubResource("ButtonGroup_640wx")
+icon = ExtResource("7_gpiub")
 
 [node name="REMOVE" type="Button" parent="Hotbar"]
 layout_mode = 2

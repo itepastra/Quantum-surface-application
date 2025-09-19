@@ -3,5 +3,4 @@
 .env
 result
 export/
-
-.ccls-cache
+.DS_Store
