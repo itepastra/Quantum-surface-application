@@ -18,6 +18,14 @@ var two_qubit_gate_type: String = ""
 var grid_qubits: Array[Qubit] = []
 var start_pos: Vector3
 
+var operation_idx: int = 0 # index of the operation that the user will be doing
+var operations: Array[QubitOperation] = []
+
+func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, target_idx: int=-1, basis: Basis = Basis.IDENTITY) -> void:
+	operations.resize(operation_idx + 1)
+	operations[operation_idx] = QubitOperation.new(operation, qubit_idx, target_idx, basis)
+	operation_idx += 1
+
 var qec = Qec.new()
 
 func _on_ready() -> void:
@@ -35,20 +43,69 @@ func _on_ready() -> void:
 		for x in x_qubits:
 			make_qubit(x,y)
 
-func make_qubit(x: int, y: int):
+func make_qubit(x: int, y: int, basis: Basis = Basis(Vector3(-0,-1,-0), Vector3(0,-0,1), Vector3(-1,0,0))):
 	var nextQubit: Qubit = qubit_scene.instantiate()
 	nextQubit.name = "Qubit (%d, %d)" % [x,y]
 	nextQubit.position.x = x + start_pos.x
 	nextQubit.position.y = y + start_pos.y
 	nextQubit.position *= cell_size
 	nextQubit.array_pos = y*x_qubits + x
+	nextQubit.transform.basis = basis
 	if len(grid_qubits) <= nextQubit.array_pos:
 		grid_qubits.append(nextQubit)
 	else:
 		grid_qubits[nextQubit.array_pos] = nextQubit
 	self.add_child(nextQubit)
 
+func handle_undo() -> void:
+	if self.operation_idx <= 0:
+		print("undo without any action")
+		return
+	else:
+		operation_idx -= 1 # go from "what the user will be doing" to "what the user just did" to undo that
+		var selected_op = operations[self.operation_idx]
+		match selected_op.operation:
+			QubitOperation.Operation.RX:
+				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.x, -angle_90)
+			QubitOperation.Operation.RY:
+				rq(grid_qubits[selected_op.index], -grid_qubits[selected_op.index].rot.z, -angle_90)
+			QubitOperation.Operation.RZ:
+				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.y, -angle_90)
+			QubitOperation.Operation.ADD:
+				grid_qubits[selected_op.index].queue_free()
+				grid_qubits[selected_op.index] = null
+			QubitOperation.Operation.DELETE:
+				var x: int = selected_op.index % x_qubits
+				var y: int = selected_op.index / x_qubits
+				make_qubit(x, y, selected_op.basis)
+
+func handle_redo() -> void:
+	if self.operation_idx >= len(operations):
+		print("redo without any future")
+		return
+	else:
+		var selected_op = operations[self.operation_idx]
+		match selected_op.operation:
+			QubitOperation.Operation.RX:
+				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.x, angle_90)
+			QubitOperation.Operation.RY:
+				rq(grid_qubits[selected_op.index], -grid_qubits[selected_op.index].rot.z, angle_90)
+			QubitOperation.Operation.RZ:
+				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.y, angle_90)
+			QubitOperation.Operation.ADD:
+				var x: int = floori(selected_op.index % x_qubits)
+				var y: int = floori(selected_op.index / x_qubits)
+				make_qubit(x, y)
+			QubitOperation.Operation.DELETE:
+				grid_qubits[selected_op.index].queue_free()
+				grid_qubits[selected_op.index] = null
+		operation_idx += 1 # redo "what the user will be doing"
+
 func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("undo", false, true):
+		handle_undo()
+	elif event.is_action_pressed("redo", false, true):
+		handle_redo()
 	# filter out all the input events that aren't mouse clicks with the create button selected
 	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT and self.button.button_pressed:
 		# get the position in grid space of the click
@@ -67,25 +124,32 @@ func _input(event: InputEvent) -> void:
 				collision = true
 		# create a qubit at the correct position
 		if not collision:
-			make_qubit(roundi(snapped_pos.x), roundi(snapped_pos.y))
+			var x = roundi(snapped_pos.x)
+			var y = roundi(snapped_pos.y)
+			make_qubit(x, y)
+			append_or_update(QubitOperation.Operation.ADD, y*x_qubits + x)
 
 
 func rx(qubit: int):
 	var q = grid_qubits[qubit]
 	rq(q, q.rot.x)
+	append_or_update(QubitOperation.Operation.RX, qubit)
+
 
 func ry(qubit: int):
 	var q = grid_qubits[qubit]
 	# the qubit's y-axis is the -z axis in godot
 	rq(q, -q.rot.z)
+	append_or_update(QubitOperation.Operation.RY, qubit)
 
 func rz(qubit: int):
 	var q = grid_qubits[qubit]
 	# the qubit's z-axis is the y axis in godot
 	rq(q, q.rot.y)
+	append_or_update(QubitOperation.Operation.RZ, qubit)
 
-func rq(qubit: Qubit, axis: Vector3):
-	qubit.rot = qubit.rot.rotated(axis, angle_90).orthonormalized()
+func rq(qubit: Qubit, axis: Vector3, angle=angle_90):
+	qubit.rot = qubit.rot.rotated(axis, angle).orthonormalized()
 	qubit.is_rotating = true
 
 func cx(control: int, target: int):
@@ -99,7 +163,7 @@ func cx(control: int, target: int):
 	var qc = grid_qubits[control]
 	var qt = grid_qubits[target]
 	# TODO DO STIM STUFF HERE
-	
+	append_or_update(QubitOperation.Operation.CX, control, target)
 	
 	print_debug("control basis", qc.basis)
 	print_debug("target basis", qt.basis)
@@ -115,7 +179,8 @@ func cz(control: int, target: int):
 	var qc = grid_qubits[control]
 	var qt = grid_qubits[target]
 	# TODO DO STIM STUFF HERE
-	
+	append_or_update(QubitOperation.Operation.CZ, control, target)
+
 	print_debug("control basis", qc.basis)
 	print_debug("target basis", qt.basis)
 
