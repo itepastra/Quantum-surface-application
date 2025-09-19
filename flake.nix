@@ -42,7 +42,7 @@
 
           default = pkgs.stdenv.mkDerivation {
             name = "Qubit Quilt website";
-            src = ssg;
+            src = math-rendered;
 
             buildPhase = ''
               cp ${game}/qubit-quilt.audio.position.worklet.js \
@@ -56,7 +56,8 @@
             installPhase = ''
               mkdir -p $out
               cp -r . $out
-              cp ${./assets/favicon.png} $out
+              cp ${./assets/favicon.png} $out/favicon.png
+              cp -r ${./website/static} $out/static
             '';
           };
           game = pkgs.stdenv.mkDerivation {
@@ -121,6 +122,27 @@
               mkdir -p themes/book
               cp -r ${inputs.booktheme}/* themes/book
               zola build --output-dir $out
+            '';
+          };
+          math-rendered = pkgs.stdenv.mkDerivation {
+            pname = "html-math-renderer";
+            version = "1.0";
+
+            src = ssg;
+
+            buildInputs = [
+              pkgs.nodejs
+              pkgs.nodePackages.katex
+            ];
+
+            buildPhase = ''
+              mkdir -p $out
+              cp ${./render-math.js} ./render-math.js
+              node ./render-math.js $src $out
+            '';
+
+            installPhase = ''
+              echo "Files written to $out"
             '';
           };
         };
