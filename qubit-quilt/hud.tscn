@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://8h8kpjesx5mq"]
+[gd_scene load_steps=27 format=3 uid="uid://8h8kpjesx5mq"]
 
 [ext_resource type="Texture2D" uid="uid://dmha0kcdynqvd" path="res://assets/button.png" id="1_640wx"]
 [ext_resource type="Theme" uid="uid://cvssq0yc2h85n" path="res://controls.tres" id="2_1xsix"]
@@ -44,6 +44,30 @@ action = &"z90"
 [sub_resource type="Shortcut" id="Shortcut_61f8s"]
 events = [SubResource("InputEventAction_rftc2")]
 
+[sub_resource type="InputEventAction" id="InputEventAction_g10ll"]
+action = &"cx"
+
+[sub_resource type="Shortcut" id="Shortcut_gpiub"]
+events = [SubResource("InputEventAction_g10ll")]
+
+[sub_resource type="InputEventAction" id="InputEventAction_gpiub"]
+action = &"cz"
+
+[sub_resource type="Shortcut" id="Shortcut_amv7k"]
+events = [SubResource("InputEventAction_gpiub")]
+
+[sub_resource type="InputEventAction" id="InputEventAction_amv7k"]
+action = &"add"
+
+[sub_resource type="Shortcut" id="Shortcut_1fv7p"]
+events = [SubResource("InputEventAction_amv7k")]
+
+[sub_resource type="InputEventAction" id="InputEventAction_4u2vk"]
+action = &"remove"
+
+[sub_resource type="Shortcut" id="Shortcut_4q17s"]
+events = [SubResource("InputEventAction_4u2vk")]
+
 [node name="HUD" type="CanvasLayer"]
 
 [node name="Hotbar" type="HBoxContainer" parent="."]
@@ -88,6 +112,7 @@ icon_alignment = 1
 layout_mode = 2
 toggle_mode = true
 button_group = SubResource("ButtonGroup_640wx")
+shortcut = SubResource("Shortcut_gpiub")
 icon = ExtResource("6_g10ll")
 icon_alignment = 1
 
@@ -95,22 +120,23 @@ icon_alignment = 1
 layout_mode = 2
 toggle_mode = true
 button_group = SubResource("ButtonGroup_640wx")
+shortcut = SubResource("Shortcut_amv7k")
 icon = ExtResource("7_gpiub")
-
-[node name="REMOVE" type="Button" parent="Hotbar"]
-layout_mode = 2
-theme = ExtResource("2_1xsix")
-toggle_mode = true
-button_group = SubResource("ButtonGroup_640wx")
-shortcut = SubResource("Shortcut_1xsix")
-icon = ExtResource("6_1xsix")
-icon_alignment = 1
 
 [node name="ADD" type="Button" parent="Hotbar"]
 layout_mode = 2
 theme = ExtResource("2_1xsix")
 toggle_mode = true
 button_group = SubResource("ButtonGroup_640wx")
-shortcut = SubResource("Shortcut_1xsix")
+shortcut = SubResource("Shortcut_1fv7p")
 icon = ExtResource("7_rftc2")
+icon_alignment = 1
+
+[node name="REMOVE" type="Button" parent="Hotbar"]
+layout_mode = 2
+theme = ExtResource("2_1xsix")
+toggle_mode = true
+button_group = SubResource("ButtonGroup_640wx")
+shortcut = SubResource("Shortcut_4q17s")
+icon = ExtResource("6_1xsix")
 icon_alignment = 1
