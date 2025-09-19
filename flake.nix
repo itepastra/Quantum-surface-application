@@ -21,7 +21,7 @@
         pkgs.mkShell {
           packages = [
             pkgs.zola
-            pkgs.godot
+            self.packages."x86_64-linux".godot
             pkgs.blender
             pkgs.inkscape
             (pkgs.writeScriptBin "export_images" ''
@@ -38,6 +38,8 @@
           fs = pkgs.lib.fileset;
         in
         rec {
+          godot = pkgs.callPackage ./godot.nix { };
+
           default = pkgs.stdenv.mkDerivation {
             name = "Qubit Quilt website";
             src = ssg;
@@ -54,12 +56,13 @@
             installPhase = ''
               mkdir -p $out
               cp -r . $out
+              cp ${./assets/favicon.png} $out
             '';
           };
           game = pkgs.stdenv.mkDerivation {
             name = "Qubit Quilt";
             nativeBuildInputs = [
-              pkgs.godot
+              self.packages."x86_64-linux".godot
               pkgs.unzip
               pkgs.inkscape
               pkgs.fontconfig
@@ -79,8 +82,8 @@
                 echo "converted $filename to png"
               done
               popd
-              mkdir -p $HOME/.local/share/godot/export_templates/4.4.1.stable
-              pushd $HOME/.local/share/godot/export_templates/4.4.1.stable
+              mkdir -p $HOME/.local/share/godot/export_templates/4.4.2.rc
+              pushd $HOME/.local/share/godot/export_templates/4.4.2.rc
               unzip -j ${inputs.export_templates} \
                 templates/web_dlink_nothreads_debug.zip \
                 templates/web_nothreads_debug.zip \
