@@ -19,10 +19,8 @@ func _ready():
 	
 	# connect to the qubit grid for applying the gates
 	
-	# start by rotating the qubit so blue (|0>) is towards the camera and |+> is on the underside
-	self.rotate_object_local(Vector3.RIGHT, angle_90)
-	self.rotate_object_local(Vector3.UP, -angle_90)
 	self.rot = self.transform.basis
+	self.is_rotating = false
 
 func _process(delta: float) -> void:
 	# don't do the calculations if the qubit is in a stationary state
@@ -66,6 +64,7 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 				grid.selected_qubit = -1
 		elif pressed.name == "REMOVE":
 			grid.grid_qubits[array_pos] = null
+			grid.append_or_update(QubitOperation.Operation.DELETE, array_pos, -1, self.rot)
 			self.queue_free()
 		else:
 			return  # Unknown button
