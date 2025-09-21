@@ -12,9 +12,9 @@ This all has to do with measuring the qubit. You may or may not have heard about
 
 Measuring a qubit creates a single bit of classical data from the internal state of the qubit. 
 In a measurement you start by choosing a "direction" to measure on, so that could be something like
-"is the qubit blue ($\ket(0)$), or is it yellow ($\ket(1)$)". 
+"is the qubit blue ($\ket{0}$), or is it yellow ($\ket{1}$)". 
 Important to note here is that you can only do this for two opposite colors.
-Therefore, it is impossible to do is "is the qubit red $\ket(+)$ or green $\ket(+i)$".
+Therefore, it is impossible to do is "is the qubit red $\ket{+}$ or green $\ket{+i}$".
 
 You may now want to know what happens if the qubit is red, but you ask it if it's blue or yellow??
 Well, in that case the qubit may say either with 50/50 odds, the interesting thing is that after
