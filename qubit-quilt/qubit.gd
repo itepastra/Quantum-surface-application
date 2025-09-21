@@ -7,6 +7,7 @@ const DECAY_SPEED: float = 0.04
 # no need to recalculate the angle every time
 const angle_90 = deg_to_rad(90)
 
+var sound: AudioStreamPlayer
 var array_pos: int # what position this qubit has in the grid array
 var rot: Basis # the "target" rotation
 var is_rotating: bool
@@ -16,7 +17,8 @@ func _ready():
 	# they're all linked into a single button_group which gives an easy "select 1" option
 	var button = get_node("/root/Scene/HUD/Hotbar/X-90")
 	button_group = button.button_group
-	
+	self.sound = get_node("/root/Scene/SoundSource")
+
 	# connect to the qubit grid for applying the gates
 	
 	self.rot = self.transform.basis
@@ -68,3 +70,5 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 			self.queue_free()
 		else:
 			return  # Unknown button
+		
+		sound.play()
