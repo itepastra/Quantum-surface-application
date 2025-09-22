@@ -92,6 +92,7 @@
                 templates/web_nothreads_release.zip
               popd
               pushd qubit-quilt
+              ln -s ../assets/godot_assets assets
               godot --headless --import
               mkdir export
               godot --verbose --headless --export-release Web export/qubit-quilt.html

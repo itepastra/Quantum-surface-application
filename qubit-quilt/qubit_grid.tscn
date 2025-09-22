@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3 uid="uid://jukmsc1d2v30"]
 
 [ext_resource type="Script" uid="uid://ckikupasg3gwl" path="res://qubit_grid.gd" id="1_6duni"]
-[ext_resource type="Script" path="res://root.gd" id="1_eejlk"]
+[ext_resource type="Script" uid="uid://diu3l43af1nl1" path="res://root.gd" id="1_eejlk"]
 [ext_resource type="PackedScene" uid="uid://c2ct5l3xnl1ug" path="res://qubit.tscn" id="2_5u0ha"]
 [ext_resource type="PackedScene" uid="uid://bwqe3dynp0ts4" path="res://gate.tscn" id="3_pkvuj"]
 [ext_resource type="PackedScene" uid="uid://8h8kpjesx5mq" path="res://hud.tscn" id="4_sl5lu"]

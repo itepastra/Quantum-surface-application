@@ -10,7 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://bqg0xk827fxs2" path="res://assets/cx.png" id="6_g10ll"]
 [ext_resource type="Texture2D" uid="uid://dvns5f3gub7wt" path="res://assets/cz.png" id="7_gpiub"]
 [ext_resource type="Texture2D" uid="uid://rbqvyjfs8ov0" path="res://assets/qubit +.png" id="7_rftc2"]
-[ext_resource type="Script" path="res://code_edit.gd" id="10_amv7k"]
+[ext_resource type="Script" uid="uid://c1vu2ywfadoqj" path="res://code_edit.gd" id="10_amv7k"]
 [ext_resource type="Texture2D" uid="uid://dbmdldt03p44i" path="res://assets/menu.png" id="10_gpiub"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_61f8s"]
