@@ -8,6 +8,8 @@ extends Node3D
 @export var qubit_scene: PackedScene
 @export var gate_scene: PackedScene
 
+@onready var codeEdit: CodeEdit = get_node("/root/Scene/HUD/CodeEdit")
+
 const qubit_size = 1
 const angle_90 = deg_to_rad(90)
 
@@ -25,6 +27,8 @@ func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, targe
 	operations.resize(operation_idx + 1)
 	operations[operation_idx] = QubitOperation.new(operation, qubit_idx, target_idx, basis)
 	operation_idx += 1
+	codeEdit.update_qubit_operations(operations)
+	codeEdit.set_executing(operation_idx)
 
 var qec = Qec.new()
 
@@ -64,6 +68,7 @@ func handle_undo() -> void:
 	else:
 		operation_idx -= 1 # go from "what the user will be doing" to "what the user just did" to undo that
 		var selected_op = operations[self.operation_idx]
+		codeEdit.set_executing(operation_idx)
 		match selected_op.operation:
 			QubitOperation.Operation.RX:
 				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.x, -angle_90)
@@ -100,6 +105,7 @@ func handle_redo() -> void:
 				grid_qubits[selected_op.index].queue_free()
 				grid_qubits[selected_op.index] = null
 		operation_idx += 1 # redo "what the user will be doing"
+		codeEdit.set_executing(operation_idx)
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("undo", false, true):
@@ -156,7 +162,7 @@ func cx(control: int, target: int):
 	if not check_orthogonal_neighbors(control, target, x_qubits):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
-		
+	
 	add_cx_cz_visuals(control, target, false)
 	
 	# apply cx between control and target
