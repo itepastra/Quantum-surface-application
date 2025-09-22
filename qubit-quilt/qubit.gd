@@ -43,32 +43,32 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 		if pressed == null: # no pressed button, do nothing
 			return
 		var grid = get_parent() as QubitGrid
-		if pressed.name == "X-90":
-			grid.rx(array_pos)
-			grid.selected_qubit = -1
-		elif pressed.name == "Y-90":
-			grid.ry(array_pos)
-			grid.selected_qubit = -1
-		elif pressed.name == "Z-90":
-			grid.rz(array_pos)
-			grid.selected_qubit = -1
-		elif pressed.name == "CX":
-			if grid.selected_qubit == -1:
-				grid.selected_qubit = array_pos
-			else:
-				grid.cx(grid.selected_qubit, array_pos)
+		match pressed.name:
+			"X-90":
+				grid.rx(array_pos)
 				grid.selected_qubit = -1
-		elif pressed.name == "CZ":
-			if grid.selected_qubit == -1:
-				grid.selected_qubit = array_pos
-			else:
-				grid.cz(grid.selected_qubit, array_pos)
+			"Y-90":
+				grid.ry(array_pos)
 				grid.selected_qubit = -1
-		elif pressed.name == "REMOVE":
-			grid.grid_qubits[array_pos] = null
-			grid.append_or_update(QubitOperation.Operation.DELETE, array_pos, -1, self.rot)
-			self.queue_free()
-		else:
-			return  # Unknown button
-		
+			"Z-90":
+				grid.rz(array_pos)
+				grid.selected_qubit = -1
+			"CX":
+				if grid.selected_qubit == -1:
+					grid.selected_qubit = array_pos
+				else:
+					grid.cx(grid.selected_qubit, array_pos)
+					grid.selected_qubit = -1
+			"CZ":
+				if grid.selected_qubit == -1:
+					grid.selected_qubit = array_pos
+				else:
+					grid.cz(grid.selected_qubit, array_pos)
+					grid.selected_qubit = -1
+			"REMOVE":
+				grid.grid_qubits[array_pos] = null
+				grid.append_or_update(QubitOperation.Operation.DELETE, array_pos, -1, self.rot)
+				self.queue_free()
+			_:
+				return
 		sound.play()
