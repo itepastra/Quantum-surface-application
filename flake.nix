@@ -49,7 +49,6 @@
                  ${game}/qubit-quilt.audio.worklet.js \
                  ${game}/qubit-quilt.js \
                  ${game}/qubit-quilt.pck \
-                 ${game}/qubit-quilt.side.wasm \
                  ${game}/qubit-quilt.wasm .
             '';
 
