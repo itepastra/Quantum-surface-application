@@ -75,3 +75,9 @@
 ### Questions for Sean for next week:
 - NN connectivity? (enforce or not)
 - which sim to use
+
+## Week 4
+
+
+### Questions for Sean for next week:
+- Exact dates of holidays
