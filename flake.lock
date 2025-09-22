@@ -16,16 +16,20 @@
         "type": "github"
       }
     },
-    "export_templates": {
+    "godot_src": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-rtBhRkzwg9imC8WSr4AsuQnMcfv3n/jB8+/mPRPGzzk=",
-        "type": "file",
-        "url": "https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz"
+        "lastModified": 1758561194,
+        "narHash": "sha256-WqdyMusfnyjRrZTeSwTY85lL5Uqg4j3KkE71epZavxU=",
+        "owner": "itepastra",
+        "repo": "godot",
+        "rev": "2ee8451f975c4f49f95bb67bba4b2fc5809809a3",
+        "type": "github"
       },
       "original": {
-        "type": "file",
-        "url": "https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz"
+        "owner": "itepastra",
+        "repo": "godot",
+        "type": "github"
       }
     },
     "nixpkgs": {
@@ -47,7 +51,7 @@
     "root": {
       "inputs": {
         "booktheme": "booktheme",
-        "export_templates": "export_templates",
+        "godot_src": "godot_src",
         "nixpkgs": "nixpkgs"
       }
     }
