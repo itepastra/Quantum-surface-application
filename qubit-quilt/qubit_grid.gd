@@ -102,10 +102,14 @@ func handle_redo() -> void:
 		operation_idx += 1 # redo "what the user will be doing"
 
 func _input(event: InputEvent) -> void:
+	# if ctrl + z is pressed
 	if event.is_action_pressed("undo", false, true):
 		handle_undo()
-	elif event.is_action_pressed("redo", false, true):
+		return
+	# if ctrl + shift + z is pressed
+	if event.is_action_pressed("redo", false, true):
 		handle_redo()
+		return
 	# filter out all the input events that aren't mouse clicks with the create button selected
 	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT and self.button.button_pressed:
 		# get the position in grid space of the click
