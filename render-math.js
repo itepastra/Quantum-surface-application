@@ -50,6 +50,11 @@ function processFile(filePath, relativePath = "") {
     const outputFileDir = path.dirname(outputFilePath);
     fs.mkdirSync(outputFileDir, { recursive: true });
     fs.writeFileSync(outputFilePath, content);
+  } else {
+    const outputFilePath = path.join(outputDir, relativePath);
+    const outputFileDir = path.dirname(outputFilePath);
+    fs.mkdirSync(outputFileDir, { recursive: true });
+    fs.copyFileSync(fullInputPath, outputFilePath);
   }
 }
 
