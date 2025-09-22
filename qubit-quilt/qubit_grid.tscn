@@ -1,13 +1,14 @@
 [gd_scene load_steps=7 format=3 uid="uid://jukmsc1d2v30"]
 
 [ext_resource type="Script" uid="uid://ckikupasg3gwl" path="res://qubit_grid.gd" id="1_6duni"]
+[ext_resource type="Script" path="res://root.gd" id="1_eejlk"]
 [ext_resource type="PackedScene" uid="uid://c2ct5l3xnl1ug" path="res://qubit.tscn" id="2_5u0ha"]
 [ext_resource type="PackedScene" uid="uid://bwqe3dynp0ts4" path="res://gate.tscn" id="3_pkvuj"]
 [ext_resource type="PackedScene" uid="uid://8h8kpjesx5mq" path="res://hud.tscn" id="4_sl5lu"]
-[ext_resource type="Script" uid="uid://c16i7rw21hc40" path="res://hud.gd" id="5_6srkj"]
 [ext_resource type="AudioStream" uid="uid://cha5mrnyram7n" path="res://assets/click.mp3" id="6_eejlk"]
 
 [node name="Scene" type="Node3D"]
+script = ExtResource("1_eejlk")
 
 [node name="Camera" type="Camera3D" parent="."]
 unique_name_in_owner = true
@@ -21,7 +22,6 @@ qubit_scene = ExtResource("2_5u0ha")
 gate_scene = ExtResource("3_pkvuj")
 
 [node name="HUD" parent="." instance=ExtResource("4_sl5lu")]
-script = ExtResource("5_6srkj")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 14.4216)

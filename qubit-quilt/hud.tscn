@@ -1,5 +1,6 @@
-[gd_scene load_steps=27 format=3 uid="uid://8h8kpjesx5mq"]
+[gd_scene load_steps=30 format=3 uid="uid://8h8kpjesx5mq"]
 
+[ext_resource type="Script" uid="uid://c16i7rw21hc40" path="res://hud.gd" id="1_1fv7p"]
 [ext_resource type="Texture2D" uid="uid://dmha0kcdynqvd" path="res://assets/button.png" id="1_640wx"]
 [ext_resource type="Theme" uid="uid://cvssq0yc2h85n" path="res://controls.tres" id="2_1xsix"]
 [ext_resource type="Texture2D" uid="uid://151mxafqqgwl" path="res://assets/rx-90.png" id="2_a2258"]
@@ -9,6 +10,8 @@
 [ext_resource type="Texture2D" uid="uid://bqg0xk827fxs2" path="res://assets/cx.png" id="6_g10ll"]
 [ext_resource type="Texture2D" uid="uid://dvns5f3gub7wt" path="res://assets/cz.png" id="7_gpiub"]
 [ext_resource type="Texture2D" uid="uid://rbqvyjfs8ov0" path="res://assets/qubit +.png" id="7_rftc2"]
+[ext_resource type="Script" path="res://code_edit.gd" id="10_amv7k"]
+[ext_resource type="Texture2D" uid="uid://dbmdldt03p44i" path="res://assets/menu.png" id="10_gpiub"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_61f8s"]
 texture = ExtResource("1_640wx")
@@ -69,6 +72,28 @@ action = &"remove"
 events = [SubResource("InputEventAction_4u2vk")]
 
 [node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_1fv7p")
+
+[node name="CodeEdit" type="CodeEdit" parent="."]
+offset_right = 8.0
+offset_bottom = 8.0
+placeholder_text = "The QASM code indicating the move operations"
+emoji_menu_enabled = false
+wrap_mode = 1
+indent_wrapped_lines = true
+scroll_past_end_of_file = true
+highlight_current_line = true
+gutters_draw_executing_lines = true
+gutters_draw_line_numbers = true
+script = ExtResource("10_amv7k")
+
+[node name="CodeEditor" type="Button" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+toggle_mode = true
+icon = ExtResource("10_gpiub")
+icon_alignment = 1
+expand_icon = true
 
 [node name="Hotbar" type="HBoxContainer" parent="."]
 anchors_preset = 7
@@ -76,9 +101,9 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -84.0
-offset_top = -40.0
-offset_right = 84.0
+offset_left = -205.0
+offset_top = -56.0
+offset_right = 205.0
 grow_horizontal = 2
 grow_vertical = 0
 theme = SubResource("Theme_n2snw")
@@ -140,3 +165,6 @@ button_group = SubResource("ButtonGroup_640wx")
 shortcut = SubResource("Shortcut_4q17s")
 icon = ExtResource("6_1xsix")
 icon_alignment = 1
+
+[connection signal="ready" from="CodeEdit" to="CodeEdit" method="_on_ready"]
+[connection signal="toggled" from="CodeEditor" to="CodeEdit" method="_on_code_editor_toggled"]
