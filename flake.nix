@@ -49,6 +49,7 @@
                  ${game}/qubit-quilt.audio.worklet.js \
                  ${game}/qubit-quilt.js \
                  ${game}/qubit-quilt.pck \
+                 ${game}/qubit-quilt.side.wasm \
                  ${game}/qubit-quilt.wasm .
             '';
 
@@ -62,9 +63,11 @@
           templates =
             let
               template =
-                type: threads:
+                type: threads: dlink:
                 pkgs.stdenv.mkDerivation {
-                  name = "Godot-Templates-${type}-${if threads then "threads" else "nothreads"}";
+                  name = "Godot-Templates-${type}-${if threads then "threads" else "nothreads"}${
+                    if dlink then "-dlink" else ""
+                  }";
                   nativeBuildInputs = [
                     pkgs.which
                     pkgs.emscripten
@@ -83,22 +86,28 @@
                     # Patch timestamps before build, just in case
                     find . -type f -exec touch -d "@315532801" {} +
 
-                    scons platform=web target=template_${type} threads=${if threads then "yes" else "no"}
+                    scons platform=web target=template_${type} threads=${if threads then "yes" else "no"} ${
+                      if dlink then "dlink_enabled=yes" else ""
+                    }
                   '';
 
                   installPhase = ''
                     mkdir -p $out
-                    mv bin/godot.web.template_${type}.wasm32${if threads then "" else ".nothreads"}.zip $out/web_${
-                      if threads then "" else "nothreads_"
-                    }${type}.zip
+                    mv bin/godot.web.template_${type}.wasm32${if threads then "" else ".nothreads"}${
+                      if dlink then ".dlink" else ""
+                    }.zip $out/web_${if dlink then "dlink_" else ""}${if threads then "" else "nothreads_"}${type}.zip
                   '';
                 };
             in
             {
-              nothreads-debug = template "debug" false;
-              nothreads-release = template "release" false;
-              threads-debug = template "debug" true;
-              threads-release = template "release" true;
+              nothreads-debug = template "debug" false false;
+              nothreads-release = template "release" false false;
+              threads-debug = template "debug" true false;
+              threads-release = template "release" true false;
+              nothreads-debug-dlink = template "debug" false true;
+              nothreads-release-dlink = template "release" false true;
+              threads-debug-dlink = template "debug" true true;
+              threads-release-dlink = template "release" true true;
             };
           game =
             let
@@ -129,8 +138,8 @@
                 popd
                 mkdir -p $HOME/.local/share/godot/export_templates/4.4.2.rc
                 pushd $HOME/.local/share/godot/export_templates/4.4.2.rc
-                cp ${self.packages.${system}.templates.nothreads-debug}/* .
-                cp ${self.packages.${system}.templates.nothreads-release}/* .
+                cp ${self.packages.${system}.templates.nothreads-debug-dlink}/* .
+                cp ${self.packages.${system}.templates.nothreads-release-dlink}/* .
                 popd
                 pushd qubit-quilt
                 ln -s ../assets/godot_assets assets
