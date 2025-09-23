@@ -5,8 +5,8 @@
       url = "github:getzola/book";
       flake = false;
     };
-    export_templates = {
-      url = "https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz";
+    godot_src = {
+      url = "github:itepastra/godot";
       flake = false;
     };
   };
@@ -60,52 +60,102 @@
               cp -r ${./website/static} $out/static
             '';
           };
-          game = pkgs.stdenv.mkDerivation {
-            name = "Qubit Quilt";
-            nativeBuildInputs = [
-              self.packages."x86_64-linux".godot
-              pkgs.unzip
-              pkgs.inkscape
-              pkgs.fontconfig
-            ];
+          templates =
+            let
+              template =
+                type: threads: dlink:
+                pkgs.stdenv.mkDerivation {
+                  name = "Godot-Templates-${type}-${if threads then "threads" else "nothreads"}${
+                    if dlink then "-dlink" else ""
+                  }";
+                  nativeBuildInputs = [
+                    pkgs.which
+                    pkgs.emscripten
+                    pkgs.pkg-config
+                    pkgs.scons
+                  ];
 
-            src = fs.toSource {
-              root = ./.;
-              fileset = fs.union (fs.difference (fs.difference ./qubit-quilt (fs.maybeMissing ./qubit-quilt/.godot)) (fs.maybeMissing ./qubit-quilt/export)) ./assets;
+                  src = inputs.godot_src;
+
+                  SOURCE_DATE_EPOCH = 315532801;
+
+                  buildPhase = ''
+                    export HOME=$(mktemp -d)
+                    mkdir -p $HOME/.local/share/godot
+
+                    # Patch timestamps before build, just in case
+                    find . -type f -exec touch -d "@315532801" {} +
+
+                    scons platform=web target=template_${type} threads=${if threads then "yes" else "no"} ${
+                      if dlink then "dlink_enabled=yes" else ""
+                    }
+                  '';
+
+                  installPhase = ''
+                    mkdir -p $out
+                    mv bin/godot.web.template_${type}.wasm32${if threads then "" else ".nothreads"}${
+                      if dlink then ".dlink" else ""
+                    }.zip $out/web_${if dlink then "dlink_" else ""}${if threads then "" else "nothreads_"}${type}.zip
+                  '';
+                };
+            in
+            {
+              nothreads-debug = template "debug" false false;
+              nothreads-release = template "release" false false;
+              threads-debug = template "debug" true false;
+              threads-release = template "release" true false;
+              nothreads-debug-dlink = template "debug" false true;
+              nothreads-release-dlink = template "release" false true;
+              threads-debug-dlink = template "debug" true true;
+              threads-release-dlink = template "release" true true;
             };
+          game =
+            let
+              system = "x86_64-linux";
+            in
+            pkgs.stdenv.mkDerivation {
+              name = "Qubit Quilt";
+              nativeBuildInputs = [
+                self.packages.${system}.godot
+                pkgs.unzip
+                pkgs.inkscape
+                pkgs.fontconfig
+              ];
 
-            buildPhase = ''
-              export HOME=$(pwd)
-              pushd ./assets
-              for filename in *.svg; do
-                basename="''${filename%.svg}"
-                inkscape "$filename" --export-filename="godot_assets/''${basename}.png"
-                echo "converted $filename to png"
-              done
-              popd
-              mkdir -p $HOME/.local/share/godot/export_templates/4.4.2.rc
-              pushd $HOME/.local/share/godot/export_templates/4.4.2.rc
-              unzip -j ${inputs.export_templates} \
-                templates/web_dlink_nothreads_debug.zip \
-                templates/web_nothreads_debug.zip \
-                templates/web_dlink_nothreads_release.zip \
-                templates/web_nothreads_release.zip
-              popd
-              pushd qubit-quilt
-              ln -s ../assets/godot_assets assets
-              godot --headless --import
-              mkdir export
-              godot --verbose --headless --export-release Web export/qubit-quilt.html
-              popd
-            '';
+              src = fs.toSource {
+                root = ./.;
+                fileset = fs.union (fs.difference (fs.difference ./qubit-quilt (fs.maybeMissing ./qubit-quilt/.godot)) (fs.maybeMissing ./qubit-quilt/export)) ./assets;
+              };
 
-            installPhase = ''
-              mkdir -p $out
-              pushd qubit-quilt
-              cp export/* $out
-              popd
-            '';
-          };
+              buildPhase = ''
+                export HOME=$(pwd)
+                pushd ./assets
+                for filename in *.svg; do
+                  basename="''${filename%.svg}"
+                  inkscape "$filename" --export-filename="godot_assets/''${basename}.png"
+                  echo "converted $filename to png"
+                done
+                popd
+                mkdir -p $HOME/.local/share/godot/export_templates/4.4.2.rc
+                pushd $HOME/.local/share/godot/export_templates/4.4.2.rc
+                cp ${self.packages.${system}.templates.nothreads-debug-dlink}/* .
+                cp ${self.packages.${system}.templates.nothreads-release-dlink}/* .
+                popd
+                pushd qubit-quilt
+                ln -s ../assets/godot_assets assets
+                godot --headless --import
+                mkdir export
+                godot --verbose --headless --export-release Web export/qubit-quilt.html
+                popd
+              '';
+
+              installPhase = ''
+                mkdir -p $out
+                pushd qubit-quilt
+                cp export/* $out
+                popd
+              '';
+            };
           ssg = pkgs.stdenv.mkDerivation {
             name = "Qubit Quilt SSG";
 

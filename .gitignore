@@ -2,5 +2,6 @@
 .envrc
 .env
 result
+result-man
 export/
 .DS_Store
