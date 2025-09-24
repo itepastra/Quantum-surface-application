@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://bwqe3dynp0ts4"]
 
-[ext_resource type="Texture2D" path="res://assets/cx.png" id="1_ikl61"]
+[ext_resource type="Texture2D" uid="uid://bqg0xk827fxs2" path="res://assets/cx.png" id="1_ikl61"]
 [ext_resource type="Script" uid="uid://b33y2imds5xim" path="res://gate.gd" id="2_5lukw"]
 
 [node name="Gate" type="Sprite3D"]
