@@ -6,10 +6,10 @@
 [ext_resource type="Texture2D" uid="uid://151mxafqqgwl" path="res://assets/rx-90.png" id="2_a2258"]
 [ext_resource type="Texture2D" uid="uid://bcxio1w38nuxk" path="res://assets/ry-90.png" id="3_1xsix"]
 [ext_resource type="Texture2D" uid="uid://da2w8t4egghnx" path="res://assets/rz-90.png" id="4_rftc2"]
-[ext_resource type="Texture2D" uid="uid://d3gp5wrfswige" path="res://assets/qubit.png" id="6_1xsix"]
+[ext_resource type="Texture2D" uid="uid://b7jvcvv7rji0y" path="res://assets/remove-qubit.png" id="6_1xsix"]
 [ext_resource type="Texture2D" uid="uid://bqg0xk827fxs2" path="res://assets/cx.png" id="6_g10ll"]
 [ext_resource type="Texture2D" uid="uid://dvns5f3gub7wt" path="res://assets/cz.png" id="7_gpiub"]
-[ext_resource type="Texture2D" uid="uid://rbqvyjfs8ov0" path="res://assets/qubit +.png" id="7_rftc2"]
+[ext_resource type="Texture2D" uid="uid://ctgsrjsefmeqa" path="res://assets/create-qubit.png" id="7_rftc2"]
 [ext_resource type="Script" uid="uid://c1vu2ywfadoqj" path="res://code_edit.gd" id="10_amv7k"]
 [ext_resource type="Texture2D" uid="uid://dbmdldt03p44i" path="res://assets/menu.png" id="10_gpiub"]
 

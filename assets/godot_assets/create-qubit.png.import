@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://rbqvyjfs8ov0"
-path="res://.godot/imported/qubit +.png-6eb871c7073389e536c850b3cac07102.ctex"
+uid="uid://ctgsrjsefmeqa"
+path="res://.godot/imported/create-qubit.png-7e3130fe51be577af9dd1f7638791297.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/qubit +.png"
-dest_files=["res://.godot/imported/qubit +.png-6eb871c7073389e536c850b3cac07102.ctex"]
+source_file="res://assets/create-qubit.png"
+dest_files=["res://.godot/imported/create-qubit.png-7e3130fe51be577af9dd1f7638791297.ctex"]
 
 [params]
 
