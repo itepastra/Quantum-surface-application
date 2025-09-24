@@ -15,5 +15,5 @@ so we should add that the 90 degrees these rotate are half of that.
 If we call them $\sqrt(Z)$, $\sqrt(X)$ and $\sqrt(Y)$ doing it twice (multiplying) gives the 180 degree
 flip that's conventional.
 
-{{ qubitquilt(w=1,h=1) }}
+{{ qubitquilt(width=1,height=1) }}
 

@@ -33,6 +33,21 @@ func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, targe
 var qec = Qec.new()
 
 func _on_ready() -> void:
+	var args: PackedStringArray = OS.get_cmdline_user_args()
+	var width: int = 5
+	var heightz: int = 4
+	print("parsing args")
+	for arg in args:
+		print("checking arg: ", arg)
+		var parts = arg.split("=", true, 1)
+		match parts[0]:
+			"--width": 
+				width = int(parts[1])
+			"--height":
+				heightz = int(parts[1])
+			_:
+				print("Unhandled cmdline arg: %s", arg)
+	
 	self.button = get_node("/root/Scene/HUD/Hotbar/ADD")
 	# Resize the camera to fit with the grid
 	var full_grid_size = Vector2(x_qubits * cell_size, y_qubits*cell_size)

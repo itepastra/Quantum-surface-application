@@ -14,7 +14,7 @@
 		resizeCanvas()
 
 		const GODOT_CONFIG = {
-			args: [],
+			args: ["--", "--width={{width}}", "--height={{height}}"],
 			canvasResizePolicy: 0,
 			ensureCrossOriginIsolationHeaders: true,
 			executable: "/qubit-quilt",
@@ -27,8 +27,7 @@
 			gdextensionLibs: [],
 			onProgress: printProgress
 		};
-		const engine = new Engine({executable: "/qubit-quilt"});
-		engine.startGame(GODOT_CONFIG);
-
+		const engine = new Engine(GODOT_CONFIG);
+		engine.startGame({args: ['--main-pack', '/qubit-quilt.pck', "--", "--width={{width}}", "--height={{height}}"]});
 	</script>
 </div>
