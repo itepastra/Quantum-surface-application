@@ -18,6 +18,9 @@ size = 15.0
 
 [node name="QubitGrid" type="Node3D" parent="."]
 script = ExtResource("1_6duni")
+x_qubits = null
+y_qubits = null
+cell_size = null
 qubit_scene = ExtResource("2_5u0ha")
 gate_scene = ExtResource("3_pkvuj")
 

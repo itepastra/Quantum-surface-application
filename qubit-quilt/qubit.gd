@@ -15,7 +15,7 @@ var is_rotating: bool
 func _ready():
 	# this should be any of the buttons in the Hotbar, 
 	# they're all linked into a single button_group which gives an easy "select 1" option
-	var button = get_node("/root/Scene/HUD/Hotbar/X-90")
+	var button = get_node("/root/Scene/HUD/Hotbar/X")
 	button_group = button.button_group
 	self.sound = get_node("/root/Scene/SoundSource")
 
@@ -44,14 +44,20 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 			return
 		var grid = get_parent() as QubitGrid
 		match pressed.name:
-			"X-90":
+			"X":
 				grid.rx(array_pos)
 				grid.selected_qubit = -1
-			"Y-90":
+			"Y":
 				grid.ry(array_pos)
 				grid.selected_qubit = -1
-			"Z-90":
+			"Z":
 				grid.rz(array_pos)
+				grid.selected_qubit = -1
+			"H":
+				grid.rh(array_pos)
+				grid.selected_qubit = -1
+			"S":
+				grid.rs(array_pos)
 				grid.selected_qubit = -1
 			"CX":
 				if grid.selected_qubit == -1:
