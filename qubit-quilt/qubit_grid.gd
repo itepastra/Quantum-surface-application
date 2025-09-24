@@ -11,7 +11,6 @@ extends Node3D
 @onready var codeEdit: CodeEdit = get_node("/root/Scene/HUD/CodeEdit")
 
 const qubit_size = 1
-const angle_90 = deg_to_rad(90)
 
 var button: Button
 var two_qubit_mode: bool = false
@@ -71,11 +70,11 @@ func handle_undo() -> void:
 		codeEdit.set_executing(operation_idx)
 		match selected_op.operation:
 			QubitOperation.Operation.RX:
-				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.x, -angle_90)
+				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.x, -PI)
 			QubitOperation.Operation.RY:
-				rq(grid_qubits[selected_op.index], -grid_qubits[selected_op.index].rot.z, -angle_90)
+				rq(grid_qubits[selected_op.index], -grid_qubits[selected_op.index].rot.z, -PI)
 			QubitOperation.Operation.RZ:
-				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.y, -angle_90)
+				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.y, -PI)
 			QubitOperation.Operation.ADD:
 				grid_qubits[selected_op.index].queue_free()
 				grid_qubits[selected_op.index] = null
@@ -92,11 +91,11 @@ func handle_redo() -> void:
 		var selected_op = operations[self.operation_idx]
 		match selected_op.operation:
 			QubitOperation.Operation.RX:
-				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.x, angle_90)
+				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.x, PI)
 			QubitOperation.Operation.RY:
-				rq(grid_qubits[selected_op.index], -grid_qubits[selected_op.index].rot.z, angle_90)
+				rq(grid_qubits[selected_op.index], -grid_qubits[selected_op.index].rot.z, PI)
 			QubitOperation.Operation.RZ:
-				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.y, angle_90)
+				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.y, PI)
 			QubitOperation.Operation.ADD:
 				var x: int = floori(selected_op.index % x_qubits)
 				var y: int = floori(selected_op.index / x_qubits)
@@ -158,7 +157,20 @@ func rz(qubit: int):
 	rq(q, q.rot.y)
 	append_or_update(QubitOperation.Operation.RZ, qubit)
 
-func rq(qubit: Qubit, axis: Vector3, angle=angle_90):
+func rh(qubit: int):
+	var q = grid_qubits[qubit]
+	# the qubit's z-axis is the y axis in godot
+	rq(q, (q.rot.x + q.rot.y).normalized())
+	append_or_update(QubitOperation.Operation.RH, qubit)
+
+func rs(qubit: int):
+	var q = grid_qubits[qubit]
+	# the qubit's z-axis is the y axis in godot
+	rq(q, q.rot.y, PI/2)
+	append_or_update(QubitOperation.Operation.RS, qubit)
+
+func rq(qubit: Qubit, axis: Vector3, angle=PI):
+	var bef = qubit.rot
 	qubit.rot = qubit.rot.rotated(axis, angle).orthonormalized()
 	qubit.is_rotating = true
 
