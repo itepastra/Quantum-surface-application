@@ -32,7 +32,7 @@ func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, targe
 var qec = Qec.new()
 
 func _on_ready() -> void:
-	self.button = get_node("/root/Scene/HUD/Hotbar/ADD")
+	self.button = get_node("/root/Scene/HUD/Spacer/Hotbar/ADD")
 	# Resize the camera to fit with the grid
 	var full_grid_size = Vector2(x_qubits * cell_size, y_qubits*cell_size)
 	var camera: Camera3D = %Camera
