@@ -33,6 +33,14 @@ var qec = Qec.new()
 
 func _on_ready() -> void:
 	self.button = get_node("/root/Scene/HUD/Spacer/Hotbar/ADD")
+	
+	# NOTE: maybe there is a nicer way, but not one I can quickly think of
+	(get_node("/root/Scene/HUD/Spacer/TimeControl/SkipBack") as Button).pressed.connect(_on_skip_back)
+	(get_node("/root/Scene/HUD/Spacer/TimeControl/StepBack") as Button).pressed.connect(_on_step_back)
+	(get_node("/root/Scene/HUD/Spacer/TimeControl/PlayPause") as Button).pressed.connect(_on_play_pause)
+	(get_node("/root/Scene/HUD/Spacer/TimeControl/StepForward") as Button).pressed.connect(_on_step_forward)
+	(get_node("/root/Scene/HUD/Spacer/TimeControl/SkipForward") as Button).pressed.connect(_on_skip_forward)
+	
 	# Resize the camera to fit with the grid
 	var full_grid_size = Vector2(x_qubits * cell_size, y_qubits*cell_size)
 	var camera: Camera3D = %Camera
@@ -45,6 +53,25 @@ func _on_ready() -> void:
 	for y in y_qubits:
 		for x in x_qubits:
 			make_qubit(x,y)
+
+func _on_skip_back() -> void:
+	while self.operation_idx > 0:
+		self.handle_undo()
+
+func _on_step_back() -> void:
+	self.handle_undo()
+
+func _on_play_pause() -> void:
+	pass
+	# I don't know exactly how to handle the playing, possibly by creating a timer where we do a `self.handle_redo()` every cycle?
+	# I think this is for discussing during the meeting and therefore implementing in a seperate PR.
+
+func _on_step_forward() -> void:
+	self.handle_redo()
+
+func _on_skip_forward() -> void:
+	while self.operation_idx < len(self.operations):
+		self.handle_redo()
 
 func make_qubit(x: int, y: int, basis: Basis = Basis(Vector3(-0,-1,-0), Vector3(0,-0,1), Vector3(-1,0,0))):
 	var nextQubit: Qubit = qubit_scene.instantiate()
