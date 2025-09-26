@@ -25,7 +25,8 @@
             pkgs.blender
             pkgs.inkscape
             (pkgs.writeScriptBin "export_images" ''
-              for filename in *.svg; do
+              find -type d -not -path "./godot_assets" -exec mkdir -p -- "./godot_assets/{}" \;
+              for filename in **/*.svg; do
                 basename="''${filename%.svg}"
                 inkscape "$filename" --export-filename="godot_assets/''${basename}.png"
               done

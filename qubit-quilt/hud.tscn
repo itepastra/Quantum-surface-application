@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://8h8kpjesx5mq"]
+[gd_scene load_steps=38 format=3 uid="uid://8h8kpjesx5mq"]
 
 [ext_resource type="Script" uid="uid://c16i7rw21hc40" path="res://hud.gd" id="1_1fv7p"]
 [ext_resource type="Texture2D" uid="uid://dmha0kcdynqvd" path="res://assets/button.png" id="1_640wx"]
@@ -6,11 +6,16 @@
 [ext_resource type="Texture2D" uid="uid://do0crxxqruog5" path="res://assets/rx.png" id="2_a2258"]
 [ext_resource type="Texture2D" uid="uid://cmnl46kc8b7hl" path="res://assets/ry.png" id="3_1xsix"]
 [ext_resource type="Texture2D" uid="uid://bgikwo68i1ocu" path="res://assets/rz.png" id="4_rftc2"]
+[ext_resource type="Texture2D" uid="uid://cnvmi1uegxewq" path="res://assets/media-controls/skip_backward.png" id="5_4q17s"]
 [ext_resource type="Texture2D" uid="uid://b7jvcvv7rji0y" path="res://assets/remove-qubit.png" id="6_1xsix"]
 [ext_resource type="Texture2D" uid="uid://bqg0xk827fxs2" path="res://assets/cx.png" id="6_g10ll"]
+[ext_resource type="Texture2D" uid="uid://dbq7u88ttrcho" path="res://assets/media-controls/step_back.png" id="6_pw7dr"]
+[ext_resource type="Texture2D" uid="uid://r1y06q6xthma" path="res://assets/media-controls/play.png" id="7_ap7yk"]
 [ext_resource type="Texture2D" uid="uid://dvns5f3gub7wt" path="res://assets/cz.png" id="7_gpiub"]
 [ext_resource type="Texture2D" uid="uid://ctgsrjsefmeqa" path="res://assets/create-qubit.png" id="7_rftc2"]
+[ext_resource type="Texture2D" uid="uid://diqjco81cgaaa" path="res://assets/media-controls/step_forward.png" id="8_5kc73"]
 [ext_resource type="Texture2D" uid="uid://cuxyhqt1qdu0p" path="res://assets/h.png" id="9_4u2vk"]
+[ext_resource type="Texture2D" uid="uid://by2p5qv8s5m2m" path="res://assets/media-controls/skip_forward.png" id="9_bp16l"]
 [ext_resource type="Script" uid="uid://c1vu2ywfadoqj" path="res://code_edit.gd" id="10_amv7k"]
 [ext_resource type="Texture2D" uid="uid://dbmdldt03p44i" path="res://assets/menu.png" id="10_gpiub"]
 
@@ -102,20 +107,89 @@ icon = ExtResource("10_gpiub")
 icon_alignment = 1
 expand_icon = true
 
-[node name="Hotbar" type="HBoxContainer" parent="."]
+[node name="Spacer" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1200.0
+offset_bottom = 900.0
+mouse_filter = 2
+
+[node name="TimeControl" type="HBoxContainer" parent="Spacer"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -108.0
+offset_right = 108.0
+offset_bottom = 40.0
+grow_horizontal = 2
+theme = SubResource("Theme_n2snw")
+
+[node name="SkipBack" type="Button" parent="Spacer/TimeControl"]
+custom_minimum_size = Vector2(40, 40)
+layout_direction = 2
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+icon = ExtResource("5_4q17s")
+icon_alignment = 1
+expand_icon = true
+
+[node name="StepBack" type="Button" parent="Spacer/TimeControl"]
+custom_minimum_size = Vector2(40, 40)
+layout_direction = 2
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+icon = ExtResource("6_pw7dr")
+icon_alignment = 1
+expand_icon = true
+
+[node name="PlayPause" type="Button" parent="Spacer/TimeControl"]
+custom_minimum_size = Vector2(40, 40)
+layout_direction = 2
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+icon = ExtResource("7_ap7yk")
+icon_alignment = 1
+expand_icon = true
+
+[node name="StepForward" type="Button" parent="Spacer/TimeControl"]
+custom_minimum_size = Vector2(40, 40)
+layout_direction = 2
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+icon = ExtResource("8_5kc73")
+icon_alignment = 1
+expand_icon = true
+
+[node name="SkipForward" type="Button" parent="Spacer/TimeControl"]
+custom_minimum_size = Vector2(40, 40)
+layout_direction = 2
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+icon = ExtResource("9_bp16l")
+icon_alignment = 1
+expand_icon = true
+
+[node name="Hotbar" type="HBoxContainer" parent="Spacer"]
+layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -205.0
+offset_left = -235.0
 offset_top = -56.0
-offset_right = 205.0
+offset_right = 235.0
 grow_horizontal = 2
 grow_vertical = 0
 theme = SubResource("Theme_n2snw")
 
-[node name="X" type="Button" parent="Hotbar"]
+[node name="X" type="Button" parent="Spacer/Hotbar"]
 layout_mode = 2
 theme = ExtResource("2_1xsix")
 toggle_mode = true
@@ -124,7 +198,7 @@ shortcut = SubResource("Shortcut_1xsix")
 icon = ExtResource("2_a2258")
 icon_alignment = 1
 
-[node name="Y" type="Button" parent="Hotbar"]
+[node name="Y" type="Button" parent="Spacer/Hotbar"]
 layout_mode = 2
 toggle_mode = true
 button_group = SubResource("ButtonGroup_640wx")
@@ -132,7 +206,7 @@ shortcut = SubResource("Shortcut_rftc2")
 icon = ExtResource("3_1xsix")
 icon_alignment = 1
 
-[node name="Z" type="Button" parent="Hotbar"]
+[node name="Z" type="Button" parent="Spacer/Hotbar"]
 layout_mode = 2
 toggle_mode = true
 button_group = SubResource("ButtonGroup_640wx")
@@ -140,7 +214,7 @@ shortcut = SubResource("Shortcut_61f8s")
 icon = ExtResource("4_rftc2")
 icon_alignment = 1
 
-[node name="H" type="Button" parent="Hotbar"]
+[node name="H" type="Button" parent="Spacer/Hotbar"]
 layout_mode = 2
 toggle_mode = true
 button_group = SubResource("ButtonGroup_640wx")
@@ -148,7 +222,7 @@ shortcut = SubResource("Shortcut_2d608")
 icon = ExtResource("9_4u2vk")
 icon_alignment = 1
 
-[node name="CX" type="Button" parent="Hotbar"]
+[node name="CX" type="Button" parent="Spacer/Hotbar"]
 layout_mode = 2
 toggle_mode = true
 button_group = SubResource("ButtonGroup_640wx")
@@ -156,14 +230,14 @@ shortcut = SubResource("Shortcut_gpiub")
 icon = ExtResource("6_g10ll")
 icon_alignment = 1
 
-[node name="CZ" type="Button" parent="Hotbar"]
+[node name="CZ" type="Button" parent="Spacer/Hotbar"]
 layout_mode = 2
 toggle_mode = true
 button_group = SubResource("ButtonGroup_640wx")
 shortcut = SubResource("Shortcut_amv7k")
 icon = ExtResource("7_gpiub")
 
-[node name="ADD" type="Button" parent="Hotbar"]
+[node name="ADD" type="Button" parent="Spacer/Hotbar"]
 layout_mode = 2
 theme = ExtResource("2_1xsix")
 toggle_mode = true
@@ -172,7 +246,7 @@ shortcut = SubResource("Shortcut_1fv7p")
 icon = ExtResource("7_rftc2")
 icon_alignment = 1
 
-[node name="REMOVE" type="Button" parent="Hotbar"]
+[node name="REMOVE" type="Button" parent="Spacer/Hotbar"]
 layout_mode = 2
 theme = ExtResource("2_1xsix")
 toggle_mode = true

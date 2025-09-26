@@ -15,8 +15,9 @@ var is_rotating: bool
 func _ready():
 	# this should be any of the buttons in the Hotbar, 
 	# they're all linked into a single button_group which gives an easy "select 1" option
-	var button = get_node("/root/Scene/HUD/Hotbar/X")
+	var button = get_node("/root/Scene/HUD/Spacer/Hotbar/X")
 	button_group = button.button_group
+	
 	self.sound = get_node("/root/Scene/SoundSource")
 
 	# connect to the qubit grid for applying the gates
