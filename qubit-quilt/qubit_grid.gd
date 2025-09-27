@@ -102,6 +102,10 @@ func handle_undo() -> void:
 				rq(grid_qubits[selected_op.index], -grid_qubits[selected_op.index].rot.z, -PI)
 			QubitOperation.Operation.RZ:
 				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.y, -PI)
+			QubitOperation.Operation.RH:
+				rq(grid_qubits[selected_op.index], (grid_qubits[selected_op.index].rot.x + grid_qubits[selected_op.index].rot.y).normalized(), -PI)
+			QubitOperation.Operation.RS:
+				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.y, -PI/2)
 			QubitOperation.Operation.ADD:
 				grid_qubits[selected_op.index].queue_free()
 				grid_qubits[selected_op.index] = null
@@ -123,6 +127,10 @@ func handle_redo() -> void:
 				rq(grid_qubits[selected_op.index], -grid_qubits[selected_op.index].rot.z, PI)
 			QubitOperation.Operation.RZ:
 				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.y, PI)
+			QubitOperation.Operation.RH:
+				rq(grid_qubits[selected_op.index], (grid_qubits[selected_op.index].rot.x+grid_qubits[selected_op.index].rot.y).normalized(), PI)
+			QubitOperation.Operation.RS:
+				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.y, PI/2)
 			QubitOperation.Operation.ADD:
 				var x: int = floori(selected_op.index % x_qubits)
 				var y: int = floori(selected_op.index / x_qubits)

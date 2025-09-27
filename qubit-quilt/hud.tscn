@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=3 uid="uid://8h8kpjesx5mq"]
+[gd_scene load_steps=39 format=3 uid="uid://8h8kpjesx5mq"]
 
 [ext_resource type="Script" uid="uid://c16i7rw21hc40" path="res://hud.gd" id="1_1fv7p"]
 [ext_resource type="Texture2D" uid="uid://dmha0kcdynqvd" path="res://assets/button.png" id="1_640wx"]
@@ -18,6 +18,7 @@
 [ext_resource type="Texture2D" uid="uid://by2p5qv8s5m2m" path="res://assets/media-controls/skip_forward.png" id="9_bp16l"]
 [ext_resource type="Script" uid="uid://c1vu2ywfadoqj" path="res://code_edit.gd" id="10_amv7k"]
 [ext_resource type="Texture2D" uid="uid://dbmdldt03p44i" path="res://assets/menu.png" id="10_gpiub"]
+[ext_resource type="Texture2D" uid="uid://da2w8t4egghnx" path="res://assets/rz-90.png" id="14_ap7yk"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_61f8s"]
 texture = ExtResource("1_640wx")
@@ -220,6 +221,14 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_640wx")
 shortcut = SubResource("Shortcut_2d608")
 icon = ExtResource("9_4u2vk")
+icon_alignment = 1
+
+[node name="S" type="Button" parent="Spacer/Hotbar"]
+layout_mode = 2
+toggle_mode = true
+button_group = SubResource("ButtonGroup_640wx")
+shortcut = SubResource("Shortcut_rftc2")
+icon = ExtResource("14_ap7yk")
 icon_alignment = 1
 
 [node name="CX" type="Button" parent="Spacer/Hotbar"]
