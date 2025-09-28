@@ -43,6 +43,8 @@ func update_qubit_operations(operations: Array[QubitOperation]) -> void:
 				self.text += "Z %s\n" % op.index
 			QubitOperation.Operation.RH:
 				self.text += "H %s\n" % op.index
+			QubitOperation.Operation.RS:
+				self.text += "S %s\n" % op.index
 			QubitOperation.Operation.CX:
 				self.text += "CNOT %s %s\n" % [op.index, op.other]
 			QubitOperation.Operation.CZ:
