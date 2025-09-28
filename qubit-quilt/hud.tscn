@@ -1,4 +1,4 @@
-[gd_scene load_steps=39 format=3 uid="uid://8h8kpjesx5mq"]
+[gd_scene load_steps=41 format=3 uid="uid://8h8kpjesx5mq"]
 
 [ext_resource type="Script" uid="uid://c16i7rw21hc40" path="res://hud.gd" id="1_1fv7p"]
 [ext_resource type="Texture2D" uid="uid://dmha0kcdynqvd" path="res://assets/button.png" id="1_640wx"]
@@ -59,6 +59,12 @@ action = &"h"
 
 [sub_resource type="Shortcut" id="Shortcut_2d608"]
 events = [SubResource("InputEventAction_4q17s")]
+
+[sub_resource type="InputEventAction" id="InputEventAction_ap7yk"]
+action = &"rz90"
+
+[sub_resource type="Shortcut" id="Shortcut_5kc73"]
+events = [SubResource("InputEventAction_ap7yk")]
 
 [sub_resource type="InputEventAction" id="InputEventAction_g10ll"]
 action = &"cx"
@@ -227,7 +233,7 @@ icon_alignment = 1
 layout_mode = 2
 toggle_mode = true
 button_group = SubResource("ButtonGroup_640wx")
-shortcut = SubResource("Shortcut_rftc2")
+shortcut = SubResource("Shortcut_5kc73")
 icon = ExtResource("14_ap7yk")
 icon_alignment = 1
 
