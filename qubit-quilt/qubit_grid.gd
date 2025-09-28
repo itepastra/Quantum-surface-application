@@ -9,12 +9,17 @@ extends Node3D
 @export var gate_scene: PackedScene
 
 @onready var codeEdit: CodeEdit = get_node("/root/Scene/HUD/CodeEdit")
+@onready var play_timer: Timer = Timer.new()
+@onready var play_pause: Button = get_node("/root/Scene/HUD/Spacer/TimeControl/PlayPause") as Button
+@onready var play_icon: Texture2D = preload("res://assets/media-controls/play.png")
+@onready var pause_icon: Texture2D = preload("res://assets/media-controls/pause.png")
 
 const qubit_size = 1
 
 var button: Button
 var two_qubit_mode: bool = false
 var selected_qubit: int = -1
+var is_playing: bool = false
 var two_qubit_gate_type: String = ""
 var grid_qubits: Array[Qubit] = []
 var start_pos: Vector3
@@ -53,6 +58,13 @@ func _on_ready() -> void:
 	for y in y_qubits:
 		for x in x_qubits:
 			make_qubit(x,y)
+			
+	#setup timer
+	play_timer.wait_time = 1
+	play_timer.one_shot = false
+	play_timer.autostart = false
+	add_child(play_timer)
+	play_timer.timeout.connect(_on_play_timer_timeout)
 
 func _on_skip_back() -> void:
 	while self.operation_idx > 0:
@@ -62,9 +74,27 @@ func _on_step_back() -> void:
 	self.handle_undo()
 
 func _on_play_pause() -> void:
-	pass
 	# I don't know exactly how to handle the playing, possibly by creating a timer where we do a `self.handle_redo()` every cycle?
 	# I think this is for discussing during the meeting and therefore implementing in a seperate PR.
+	if is_playing:
+		play_timer.stop()
+		is_playing = false
+		play_pause.icon = play_icon
+	else:
+		if self.operation_idx < len(self.operations):
+			play_timer.start()
+			is_playing = true
+			play_pause.icon = pause_icon
+			
+
+func _on_play_timer_timeout():
+	if self.operation_idx < len(self.operations):
+		self.handle_redo()
+	else:
+		play_timer.stop()
+		is_playing = false	
+		play_pause.icon = play_icon
+		
 
 func _on_step_forward() -> void:
 	self.handle_redo()
