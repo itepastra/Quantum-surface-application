@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://da2w8t4egghnx"
-path="res://.godot/imported/rz-90.png-1ec8f8039f721c357c6970780aff2df5.ctex"
+uid="uid://v36p0jgauwgu"
+path="res://.godot/imported/bloch sphere.png-5f2931eb933ce5577390e678b49193af.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/rz-90.png"
-dest_files=["res://.godot/imported/rz-90.png-1ec8f8039f721c357c6970780aff2df5.ctex"]
+source_file="res://assets/bloch sphere.png"
+dest_files=["res://.godot/imported/bloch sphere.png-5f2931eb933ce5577390e678b49193af.ctex"]
 
 [params]
 
