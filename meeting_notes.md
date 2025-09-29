@@ -78,6 +78,19 @@
 
 ## Week 4
 
+### Friday meeting notes
+
+#### Change to https://arxiv.org/pdf/quant-ph/0406196 instead of STIM
+
+Since we haven't gotten STIM working yet we decided to instead pivot to writing a
+Tableau simulator ourselves based on [this paper](https://arxiv.org/pdf/quant-ph/0406196) and
+[this code](https://www.scottaaronson.com/chp/chp.c)
+
+#### Time Controls
+
+Works nicely, though play-pause needs to be added still. We decided that it should start
+at the current instruction step, and stop once the end is reached.
+If the simulation is already at the end however, clicking Play should start from the beginning.
 
 ### Questions for Sean for next week:
 - Exact dates of holidays
