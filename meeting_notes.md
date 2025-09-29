@@ -95,4 +95,15 @@
 
 #### Alex
 
+#### Task devision
 
+Adelina:
+- start making the midterm presentation
+
+Noa:
+- returning a random "valid" qubit state from the superposition
+- splitting the state into entangled "groups"
+
+Daglar:
+- Modify measure to eliminate the gaussian-elimination step
+- help Noa with the returning
