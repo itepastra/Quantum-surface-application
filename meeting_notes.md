@@ -81,3 +81,18 @@
 
 ### Questions for Sean for next week:
 - Exact dates of holidays
+
+
+## Week 5
+
+### Meeting Monday
+
+#### Sean
+
+- Holiday: from okt 4 till okt 28 (Japan, so 7 hours ahead)
+- Will be watching online on midterm presentations
+- Will be present on final presentations
+
+#### Alex
+
+
