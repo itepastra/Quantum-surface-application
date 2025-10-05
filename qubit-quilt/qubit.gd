@@ -11,6 +11,17 @@ var sound: AudioStreamPlayer
 var array_pos: int # what position this qubit has in the grid array
 var rot: Basis # the "target" rotation
 var is_rotating: bool
+var eff_rot: Basis = Basis.IDENTITY # the overlay target rotation
+
+func start_rotating_random(interval: float):
+	var timer = (get_node("Timer") as Timer)
+	timer.wait_time = interval
+	timer.start(0)
+	
+func stop_rotating_random():
+	var timer = (get_node("Timer") as Timer)
+	timer.stop()
+	self.eff_rot = Basis.IDENTITY
 
 func _ready():
 	# this should be any of the buttons in the Hotbar, 
@@ -30,13 +41,13 @@ func _process(delta: float) -> void:
 	if not self.is_rotating:
 		return
 	# interpolate between the current and the target rotations and update the current rotation
-	self.transform.basis = self.transform.basis.slerp(rot, 1 - DECAY_SPEED ** delta).orthonormalized()
+	self.transform.basis = self.transform.basis.slerp(eff_rot * rot, 1 - DECAY_SPEED ** delta).orthonormalized()
 	# if the target rotation is reached, stop updating the qubit
-	if self.transform.basis.is_equal_approx(rot):
+	if self.transform.basis.is_equal_approx(eff_rot*rot):
 		self.is_rotating = false
 
 func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _normal: Vector3, _shape_idx: int) -> void:
-	# the user clicked on the qubit
+	# the user clicked on the qubitg
 	
 	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT:
 		# find the selected rotation direction from the buttongroup
@@ -79,3 +90,12 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 			_:
 				return
 		sound.play()
+
+
+func _on_timer_timeout() -> void:
+	var rand = RandomNumberGenerator.new()
+	var theta = rand.randf_range(0, PI*2)
+	var phi = rand.randf_range(0, PI*2)
+	var psi = rand.randf_range(0, PI*2)
+	self.eff_rot = Basis.from_euler(Vector3(theta, phi, psi))
+	self.is_rotating = true

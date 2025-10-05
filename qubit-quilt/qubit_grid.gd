@@ -36,9 +36,15 @@ func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, targe
 
 var qec = Qec.new()
 
+func print_qec_state():
+	print("\nQubit state:")
+	for i in x_qubits*y_qubits:
+		print("qubit: ", i, " vop: ", qec.get_vop(i), " adjacent: ", qec.get_adjacent(i))
+
 func _on_ready() -> void:
 	self.button = get_node("/root/Scene/HUD/Spacer/Hotbar/ADD")
-	
+	qec.init(x_qubits*y_qubits);
+	print_qec_state()
 	# NOTE: maybe there is a nicer way, but not one I can quickly think of
 	(get_node("/root/Scene/HUD/Spacer/TimeControl/SkipBack") as Button).pressed.connect(_on_skip_back)
 	(get_node("/root/Scene/HUD/Spacer/TimeControl/StepBack") as Button).pressed.connect(_on_step_back)
@@ -206,37 +212,86 @@ func _input(event: InputEvent) -> void:
 
 func rx(qubit: int):
 	var q = grid_qubits[qubit]
-	rq(q, q.rot.x)
+	qec.xgate(qubit)
+	q.rot = bases[qec.get_vop(qubit)]
+	q.is_rotating = true;
+	print_qec_state()
 	append_or_update(QubitOperation.Operation.RX, qubit)
 
 
 func ry(qubit: int):
 	var q = grid_qubits[qubit]
-	# the qubit's y-axis is the -z axis in godot
-	rq(q, -q.rot.z)
+	qec.ygate(qubit)
+	q.rot = bases[qec.get_vop(qubit)]
+	q.is_rotating = true;
+	print_qec_state()
 	append_or_update(QubitOperation.Operation.RY, qubit)
 
 func rz(qubit: int):
 	var q = grid_qubits[qubit]
 	# the qubit's z-axis is the y axis in godot
-	rq(q, q.rot.y)
+	qec.zgate(qubit)
+	q.rot = bases[qec.get_vop(qubit)]
+	q.is_rotating = true;
+	print_qec_state()
 	append_or_update(QubitOperation.Operation.RZ, qubit)
 
 func rh(qubit: int):
 	var q = grid_qubits[qubit]
-	# the qubit's z-axis is the y axis in godot
-	rq(q, (q.rot.x + q.rot.y).normalized())
+	qec.hadamard(qubit)
+	q.rot = bases[qec.get_vop(qubit)]
+	q.is_rotating = true;
+	print_qec_state()
 	append_or_update(QubitOperation.Operation.RH, qubit)
 
 func rs(qubit: int):
 	var q = grid_qubits[qubit]
-	# the qubit's z-axis is the y axis in godot
-	rq(q, q.rot.y, PI/2)
+	qec.phase(qubit)
+	q.rot = bases[qec.get_vop(qubit)]
+	q.is_rotating = true;
+	print_qec_state()
 	append_or_update(QubitOperation.Operation.RS, qubit)
+
+func set_to_qec_state():
+	for i in x_qubits*y_qubits:
+		if qec.get_adjacent(i).size() == 0:
+			grid_qubits[i].stop_rotating_random()
+			grid_qubits[i].rot = bases[qec.get_vop(i)]
+			grid_qubits[i].is_rotating = true
+		else:
+			grid_qubits[i].start_rotating_random(randf_range(0.5, 1.0))
+
+const bases = {
+	0: Basis(Vector3(0,0,1),Vector3(0,-1,0), Vector3(1,0,0)),
+	1: Basis(Vector3(0,0,1),Vector3(0,1,0),Vector3(-1,0,0)),
+	2: Basis(Vector3(0,0,-1),Vector3(0,1,0),Vector3(1,0,0)),
+	3: Basis(Vector3(0,0,-1),Vector3(0,-1,0), Vector3(-1,0,0)),
+	4: Basis(Vector3(1,0,0),Vector3(0,1,0),Vector3(0,0,1)),
+	5: Basis(Vector3(-1,0,0),Vector3(0,-1,0), Vector3(0,0,1)),
+	6: Basis(Vector3(1,0,0),Vector3(0,-1,0), Vector3(0,0,-1)),
+	7: Basis(Vector3(-1,0,0),Vector3(0,1,0), Vector3(0,0,-1)),
+	8: Basis(Vector3(0,1,0), Vector3(0,0,-1), Vector3(-1,0,0)),
+	9: Basis(Vector3(0,-1,0), Vector3(0,0,-1), Vector3(1,0,0)),
+	10: Basis(Vector3(0,-1,0), Vector3(0,0,1), Vector3(-1,0,0)),
+	11: Basis(Vector3(0,1,0), Vector3(0,0,1), Vector3(1,0,0)),
+	12: Basis(Vector3(0,0,-1), Vector3(1,0,0), Vector3(0,-1,0)),
+	13: Basis(Vector3(0,0,-1), Vector3(-1,0,0), Vector3(0,1,0)),
+	14: Basis(Vector3(0,0,1), Vector3(1,0,0), Vector3(0,1,0)),
+	15: Basis(Vector3(0,0,1), Vector3(-1,0,0), Vector3(0,-1,0)),
+	16: Basis(Vector3(0,-1,0), Vector3(-1,0,0), Vector3(0,0,-1)),
+	17: Basis(Vector3(0,1,0), Vector3(1,0,0), Vector3(0,0,-1)),
+	18: Basis(Vector3(0,1,0), Vector3(-1,0,0), Vector3(0,0,1)),
+	19: Basis(Vector3(0,-1,0), Vector3(1,0,0), Vector3(0,0,1)),
+	20: Basis(Vector3(-1,0,0), Vector3(0,0,1), Vector3(0,1,0)),
+	21: Basis(Vector3(1,0,0), Vector3(0,0,1), Vector3(0,-1,0)),
+	22: Basis(Vector3(-1,0,0),Vector3(0,0,-1), Vector3(0,-1,0)),
+	23: Basis(Vector3(1,0,0),Vector3(0,0,-1), Vector3(0,1,0)),
+}
 
 func rq(qubit: Qubit, axis: Vector3, angle=PI):
 	var bef = qubit.rot
 	qubit.rot = qubit.rot.rotated(axis, angle).orthonormalized()
+	print(qubit.rot)
 	qubit.is_rotating = true
 
 func cx(control: int, target: int):
@@ -249,29 +304,28 @@ func cx(control: int, target: int):
 	# apply cx between control and target
 	var qc = grid_qubits[control]
 	var qt = grid_qubits[target]
-	# TODO DO STIM STUFF HERE
+	qec.cnot(control, target)
+	print_qec_state()
+	set_to_qec_state()
 	append_or_update(QubitOperation.Operation.CX, control, target)
-	
-	print_debug("control basis", qc.basis)
-	print_debug("target basis", qt.basis)
 
 func cz(control: int, target: int):
 	if not check_orthogonal_neighbors(control, target, x_qubits):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
-		
+	
 	add_cx_cz_visuals(control, target, true)
 	
 	# apply cz between control and target
 	var qc = grid_qubits[control]
 	var qt = grid_qubits[target]
-	# TODO DO STIM STUFF HERE
+	qec.cphase(control, target)
+	print_qec_state()
+	set_to_qec_state()
 	append_or_update(QubitOperation.Operation.CZ, control, target)
 
-	print_debug("control basis", qc.basis)
-	print_debug("target basis", qt.basis)
-
 func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
+	return true
 	# Calculate row and column positions
 	var row1: int = qubit1_pos / width
 	var col1: int = qubit1_pos % width

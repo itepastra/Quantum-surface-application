@@ -19,26 +19,23 @@
     "godot_src": {
       "flake": false,
       "locked": {
-        "lastModified": 1758561194,
-        "narHash": "sha256-WqdyMusfnyjRrZTeSwTY85lL5Uqg4j3KkE71epZavxU=",
-        "owner": "itepastra",
-        "repo": "godot",
-        "rev": "2ee8451f975c4f49f95bb67bba4b2fc5809809a3",
-        "type": "github"
+        "lastModified": 1759487931,
+        "narHash": "sha256-2wLKQy2aSZBGwY4zQdNbq3ZBGGTbuWMMLrDmtqXlFIQ=",
+        "path": "/home/noa/Documents/programming/godot",
+        "type": "path"
       },
       "original": {
-        "owner": "itepastra",
-        "repo": "godot",
-        "type": "github"
+        "path": "/home/noa/Documents/programming/godot",
+        "type": "path"
       }
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1758262103,
-        "narHash": "sha256-aBGl3XEOsjWw6W3AHiKibN7FeoG73dutQQEqnd/etR8=",
+        "lastModified": 1759417375,
+        "narHash": "sha256-O7eHcgkQXJNygY6AypkF9tFhsoDQjpNEojw3eFs73Ow=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "12bd230118a1901a4a5d393f9f56b6ad7e571d01",
+        "rev": "dc704e6102e76aad573f63b74c742cd96f8f1e6c",
         "type": "github"
       },
       "original": {

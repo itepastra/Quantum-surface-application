@@ -6,7 +6,7 @@
       flake = false;
     };
     godot_src = {
-      url = "github:itepastra/godot";
+      url = "/home/noa/Documents/programming/godot";
       flake = false;
     };
   };
