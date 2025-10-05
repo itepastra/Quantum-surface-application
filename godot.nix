@@ -290,29 +290,28 @@ let
         pname = "godot${suffix}";
         inherit version;
 
-        src = /home/noa/Documents/programming/godot;
-        #   fetchFromGitHub {
-        #   owner = "itepastra";
-        #   repo = "godot";
-        #   rev = "6a97402b67da36f84ba2b097d89b3d42312b0283";
-        #   hash = "sha256-AMf/MvgOxmzNjxG1svV3yu1Th86cli5+AYWAnqgfk7A=";
-        #   # Required for the commit hash to be included in the version number.
-        #   #
-        #   # `methods.py` reads the commit hash from `.git/HEAD` and manually follows
-        #   # refs.
-        #   #
-        #   # See also 'hash' in
-        #   # https://docs.godotengine.org/en/stable/classes/class_engine.html#class-engine-method-get-version-info
-        #   leaveDotGit = true;
-        #   # Only keep HEAD, because leaveDotGit is non-deterministic:
-        #   # https://github.com/NixOS/nixpkgs/issues/8567
-        #   postFetch = ''
-        #     hash=$(git -C "$out" rev-parse HEAD)
-        #     rm -r "$out"/.git
-        #     mkdir "$out"/.git
-        #     echo "$hash" > "$out"/.git/HEAD
-        #   '';
-        # };
+        src = fetchFromGitHub {
+          owner = "itepastra";
+          repo = "godot";
+          rev = "b2aaf94db4685e9b862ddeec2274c31a8df74332";
+          hash = "sha256-jUKYudzoYbxxtyWuww+6pyFUpwq0h7bUq6dChdHWHoY=";
+          # Required for the commit hash to be included in the version number.
+          #
+          # `methods.py` reads the commit hash from `.git/HEAD` and manually follows
+          # refs.
+          #
+          # See also 'hash' in
+          # https://docs.godotengine.org/en/stable/classes/class_engine.html#class-engine-method-get-version-info
+          leaveDotGit = true;
+          # Only keep HEAD, because leaveDotGit is non-deterministic:
+          # https://github.com/NixOS/nixpkgs/issues/8567
+          postFetch = ''
+            hash=$(git -C "$out" rev-parse HEAD)
+            rm -r "$out"/.git
+            mkdir "$out"/.git
+            echo "$hash" > "$out"/.git/HEAD
+          '';
+        };
 
         outputs = [
           "out"
