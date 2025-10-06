@@ -13,16 +13,6 @@ var rot: Basis # the "target" rotation
 var is_rotating: bool
 var eff_rot: Basis = Basis.IDENTITY # the overlay target rotation
 
-func start_rotating_random(interval: float):
-	var timer = (get_node("Timer") as Timer)
-	timer.wait_time = interval
-	timer.start(0)
-	
-func stop_rotating_random():
-	var timer = (get_node("Timer") as Timer)
-	timer.stop()
-	self.eff_rot = Basis.IDENTITY
-
 func _ready():
 	# this should be any of the buttons in the Hotbar, 
 	# they're all linked into a single button_group which gives an easy "select 1" option
