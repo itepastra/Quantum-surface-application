@@ -74,7 +74,6 @@ func set_to_qec_state():
 		grid_qubits[i].is_rotating = true
 		graph.get_or_add(i, PackedInt32Array())
 		graph[i].append_array(qec.get_adjacent(i))
-	print_debug(graph)
 	
 	var visited: Dictionary[int, bool] = {};
 	var egroups: Array[PackedInt32Array] = [];
@@ -93,8 +92,7 @@ func set_to_qec_state():
 						visited.set(neighbor, true)
 						queue.append(neighbor)
 			egroups.append(group)
-	print_debug("ended up with groups: ", egroups)
-	
+
 	for eg in entanglement_groups:
 		eg.reset()
 	entanglement_groups.clear()
@@ -114,11 +112,6 @@ func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, targe
 	codeEdit.set_executing(operation_idx)
 
 var qec = Qec.new()
-
-func print_qec_state():
-	print("\nQubit state:")
-	for i in x_qubits*y_qubits:
-		print("qubit: ", i, " vop: ", qec.get_vop(i), " adjacent: ", qec.get_adjacent(i))
 
 func _on_ready() -> void:
 	self.button = get_node("/root/Scene/HUD/Spacer/Hotbar/ADD")
@@ -377,12 +370,6 @@ const bases = {
 	23: Basis(Vector3(1,0,0),Vector3(0,0,-1), Vector3(0,1,0)),
 }
 
-func rq(qubit: Qubit, axis: Vector3, angle=PI):
-	var bef = qubit.rot
-	qubit.rot = qubit.rot.rotated(axis, angle).orthonormalized()
-	print(qubit.rot)
-	qubit.is_rotating = true
-
 func cx(control: int, target: int, update: bool = true):
 	if not check_orthogonal_neighbors(control, target, x_qubits):
 		print_debug("Not nearest neighbors in this grid configuration")
@@ -394,7 +381,6 @@ func cx(control: int, target: int, update: bool = true):
 	var qc = grid_qubits[control]
 	var qt = grid_qubits[target]
 	qec.cnot(control, target)
-	print_qec_state()
 	set_to_qec_state()
 	if update:
 		append_or_update(QubitOperation.Operation.CX, control, target)
@@ -410,7 +396,6 @@ func cz(control: int, target: int, update: bool = true):
 	var qc = grid_qubits[control]
 	var qt = grid_qubits[target]
 	qec.cphase(control, target)
-	print_qec_state()
 	set_to_qec_state()
 	if update:
 		append_or_update(QubitOperation.Operation.CZ, control, target)
