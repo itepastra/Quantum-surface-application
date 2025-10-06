@@ -77,6 +77,9 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 				grid.grid_qubits[array_pos] = null
 				grid.append_or_update(QubitOperation.Operation.DELETE, array_pos, -1, self.rot)
 				self.queue_free()
+			"MZ":
+				grid.measure_z(array_pos)
+				grid.selected_qubit = -1
 			_:
 				return
 		sound.play()

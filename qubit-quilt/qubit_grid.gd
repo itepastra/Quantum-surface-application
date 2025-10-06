@@ -374,6 +374,10 @@ func cz(control: int, target: int, update: bool = true):
 	if update:
 		append_or_update(QubitOperation.Operation.CZ, control, target)
 
+func measure_z(qubit: int):
+	qec.mz(qubit)
+	set_to_qec_state()
+
 func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
 	return true
 	# Calculate row and column positions

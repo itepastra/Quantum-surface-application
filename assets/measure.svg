@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="180.00804"
+   height="180.25201"
+   viewBox="0 0 180.00804 180.25201"
+   version="1.1"
+   id="svg1"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient8">
+      <stop
+         style="stop-color:#0000ff;stop-opacity:1;"
+         offset="0"
+         id="stop1" />
+      <stop
+         style="stop-color:#0000ff;stop-opacity:0.75461209;"
+         offset="0.44853833"
+         id="stop6" />
+      <stop
+         style="stop-color:#0000ff;stop-opacity:0.11383236;"
+         offset="0.89776939"
+         id="stop7" />
+      <stop
+         style="stop-color:#0000ff;stop-opacity:0;"
+         offset="1"
+         id="stop8" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient2">
+      <stop
+         style="stop-color:#ffff00;stop-opacity:1;"
+         offset="0"
+         id="stop2" />
+      <stop
+         style="stop-color:#ffff00;stop-opacity:0.75461209;"
+         offset="0.44853833"
+         id="stop4" />
+      <stop
+         style="stop-color:#ffff00;stop-opacity:0.11383236;"
+         offset="0.89776939"
+         id="stop5" />
+      <stop
+         style="stop-color:#ffff00;stop-opacity:0;"
+         offset="1"
+         id="stop3" />
+    </linearGradient>
+    <radialGradient
+       xlink:href="#linearGradient8"
+       id="radialGradient3"
+       cx="90"
+       cy="38.354431"
+       fx="90"
+       fy="38.354431"
+       r="90"
+       gradientUnits="userSpaceOnUse"
+       spreadMethod="pad"
+       gradientTransform="matrix(1,0,0,0.63538874,0,32.815013)" />
+    <radialGradient
+       xlink:href="#linearGradient2"
+       id="radialGradient3-7"
+       cx="88.713135"
+       cy="160.12659"
+       fx="88.713135"
+       fy="160.12659"
+       r="90"
+       gradientUnits="userSpaceOnUse"
+       spreadMethod="pad"
+       gradientTransform="matrix(1,0,0,0.63538874,-0.0080429,33.067024)" />
+  </defs>
+  <g
+     id="layer1"
+     transform="translate(0.00804138)">
+    <circle
+       style="fill:url(#radialGradient3);stroke:none"
+       id="path1"
+       cx="90"
+       cy="90"
+       r="90" />
+    <circle
+       style="fill:url(#radialGradient3-7);stroke:none"
+       id="path1-1"
+       cx="89.991959"
+       cy="90.252014"
+       r="90" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:9;stroke-dasharray:none;stroke-opacity:1"
+       id="path5-0"
+       d="M 58.567372,71.313086 C 53.465184,45.693581 95.42455,10.776932 120.3294,43.667477 c 17.58934,23.229341 -17.97793,40.00467 -28.32087,67.903093 -3.914344,10.55831 -3.544223,10.83829 -3.908161,24.78143" />
+    <circle
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:9"
+       id="path2"
+       cx="88.865959"
+       cy="154.66487"
+       r="6.1930294" />
+  </g>
+</svg>
