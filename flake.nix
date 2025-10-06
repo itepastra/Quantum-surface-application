@@ -6,7 +6,7 @@
       flake = false;
     };
     godot_src = {
-      url = "github:itepastra/godot";
+      url = "github:itepastra/godot/graph";
       flake = false;
     };
   };

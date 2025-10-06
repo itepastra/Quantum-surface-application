@@ -293,8 +293,8 @@ let
         src = fetchFromGitHub {
           owner = "itepastra";
           repo = "godot";
-          rev = "3f72eee089bc5704648c10d892f6ddab8d6e70e1";
-          hash = "sha256-aCGxRfxeHxHLjWf7E6yj/16FzLK6zZeCoZiYTOQUKZk=";
+          rev = "b2aaf94db4685e9b862ddeec2274c31a8df74332";
+          hash = "sha256-jUKYudzoYbxxtyWuww+6pyFUpwq0h7bUq6dChdHWHoY=";
           # Required for the commit hash to be included in the version number.
           #
           # `methods.py` reads the commit hash from `.git/HEAD` and manually follows
