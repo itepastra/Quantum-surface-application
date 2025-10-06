@@ -344,33 +344,6 @@ func rsd(qubit: int, update: bool = true):
 	if update:
 		append_or_update(QubitOperation.Operation.RSD, qubit)
 
-const bases = {
-	0: Basis(Vector3(0,0,1),Vector3(0,-1,0), Vector3(1,0,0)),
-	1: Basis(Vector3(0,0,1),Vector3(0,1,0),Vector3(-1,0,0)),
-	2: Basis(Vector3(0,0,-1),Vector3(0,1,0),Vector3(1,0,0)),
-	3: Basis(Vector3(0,0,-1),Vector3(0,-1,0), Vector3(-1,0,0)),
-	4: Basis(Vector3(1,0,0),Vector3(0,1,0),Vector3(0,0,1)),
-	5: Basis(Vector3(-1,0,0),Vector3(0,-1,0), Vector3(0,0,1)),
-	6: Basis(Vector3(1,0,0),Vector3(0,-1,0), Vector3(0,0,-1)),
-	7: Basis(Vector3(-1,0,0),Vector3(0,1,0), Vector3(0,0,-1)),
-	8: Basis(Vector3(0,1,0), Vector3(0,0,-1), Vector3(-1,0,0)),
-	9: Basis(Vector3(0,-1,0), Vector3(0,0,-1), Vector3(1,0,0)),
-	10: Basis(Vector3(0,-1,0), Vector3(0,0,1), Vector3(-1,0,0)),
-	11: Basis(Vector3(0,1,0), Vector3(0,0,1), Vector3(1,0,0)),
-	12: Basis(Vector3(0,0,-1), Vector3(1,0,0), Vector3(0,-1,0)),
-	13: Basis(Vector3(0,0,-1), Vector3(-1,0,0), Vector3(0,1,0)),
-	14: Basis(Vector3(0,0,1), Vector3(1,0,0), Vector3(0,1,0)),
-	15: Basis(Vector3(0,0,1), Vector3(-1,0,0), Vector3(0,-1,0)),
-	16: Basis(Vector3(0,-1,0), Vector3(-1,0,0), Vector3(0,0,-1)),
-	17: Basis(Vector3(0,1,0), Vector3(1,0,0), Vector3(0,0,-1)),
-	18: Basis(Vector3(0,1,0), Vector3(-1,0,0), Vector3(0,0,1)),
-	19: Basis(Vector3(0,-1,0), Vector3(1,0,0), Vector3(0,0,1)),
-	20: Basis(Vector3(-1,0,0), Vector3(0,0,1), Vector3(0,1,0)),
-	21: Basis(Vector3(1,0,0), Vector3(0,0,1), Vector3(0,-1,0)),
-	22: Basis(Vector3(-1,0,0),Vector3(0,0,-1), Vector3(0,-1,0)),
-	23: Basis(Vector3(1,0,0),Vector3(0,0,-1), Vector3(0,1,0)),
-}
-
 func cx(control: int, target: int, update: bool = true):
 	if not check_orthogonal_neighbors(control, target, x_qubits):
 		print_debug("Not nearest neighbors in this grid configuration")
@@ -466,3 +439,30 @@ func add_cx_cz_visuals(control: int, target: int, gate_is_cz: bool) -> void:
 	
 	if gate_is_cz:
 		gate_instance.texture = preload("res://assets/cz.png")
+
+const bases = {
+	0: Basis(Vector3(0,0,1),Vector3(0,-1,0), Vector3(1,0,0)),
+	1: Basis(Vector3(0,0,1),Vector3(0,1,0),Vector3(-1,0,0)),
+	2: Basis(Vector3(0,0,-1),Vector3(0,1,0),Vector3(1,0,0)),
+	3: Basis(Vector3(0,0,-1),Vector3(0,-1,0), Vector3(-1,0,0)),
+	4: Basis(Vector3(1,0,0),Vector3(0,1,0),Vector3(0,0,1)),
+	5: Basis(Vector3(-1,0,0),Vector3(0,-1,0), Vector3(0,0,1)),
+	6: Basis(Vector3(1,0,0),Vector3(0,-1,0), Vector3(0,0,-1)),
+	7: Basis(Vector3(-1,0,0),Vector3(0,1,0), Vector3(0,0,-1)),
+	8: Basis(Vector3(0,1,0), Vector3(0,0,-1), Vector3(-1,0,0)),
+	9: Basis(Vector3(0,-1,0), Vector3(0,0,-1), Vector3(1,0,0)),
+	10: Basis(Vector3(0,-1,0), Vector3(0,0,1), Vector3(-1,0,0)),
+	11: Basis(Vector3(0,1,0), Vector3(0,0,1), Vector3(1,0,0)),
+	12: Basis(Vector3(0,0,-1), Vector3(1,0,0), Vector3(0,-1,0)),
+	13: Basis(Vector3(0,0,-1), Vector3(-1,0,0), Vector3(0,1,0)),
+	14: Basis(Vector3(0,0,1), Vector3(1,0,0), Vector3(0,1,0)),
+	15: Basis(Vector3(0,0,1), Vector3(-1,0,0), Vector3(0,-1,0)),
+	16: Basis(Vector3(0,-1,0), Vector3(-1,0,0), Vector3(0,0,-1)),
+	17: Basis(Vector3(0,1,0), Vector3(1,0,0), Vector3(0,0,-1)),
+	18: Basis(Vector3(0,1,0), Vector3(-1,0,0), Vector3(0,0,1)),
+	19: Basis(Vector3(0,-1,0), Vector3(1,0,0), Vector3(0,0,1)),
+	20: Basis(Vector3(-1,0,0), Vector3(0,0,1), Vector3(0,1,0)),
+	21: Basis(Vector3(1,0,0), Vector3(0,0,1), Vector3(0,-1,0)),
+	22: Basis(Vector3(-1,0,0),Vector3(0,0,-1), Vector3(0,-1,0)),
+	23: Basis(Vector3(1,0,0),Vector3(0,0,-1), Vector3(0,1,0)),
+}
