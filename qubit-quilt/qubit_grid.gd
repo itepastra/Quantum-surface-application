@@ -117,11 +117,12 @@ func _on_ready() -> void:
 	self.button = get_node("/root/Scene/HUD/Spacer/Hotbar/ADD")
 	qec.init(x_qubits*y_qubits);
 	# NOTE: maybe there is a nicer way, but not one I can quickly think of
-	(get_node("/root/Scene/HUD/Spacer/TimeControl/SkipBack") as Button).pressed.connect(_on_skip_back)
-	(get_node("/root/Scene/HUD/Spacer/TimeControl/StepBack") as Button).pressed.connect(_on_step_back)
-	(get_node("/root/Scene/HUD/Spacer/TimeControl/PlayPause") as Button).pressed.connect(_on_play_pause)
-	(get_node("/root/Scene/HUD/Spacer/TimeControl/StepForward") as Button).pressed.connect(_on_step_forward)
-	(get_node("/root/Scene/HUD/Spacer/TimeControl/SkipForward") as Button).pressed.connect(_on_skip_forward)
+	var timecontrol = get_node("/root/Scene/HUD/Spacer/TimeControl")
+	(timecontrol.get_node("SkipBack") as Button).pressed.connect(_on_skip_back)
+	(timecontrol.get_node("StepBack") as Button).pressed.connect(_on_step_back)
+	(timecontrol.get_node("PlayPause") as Button).pressed.connect(_on_play_pause)
+	(timecontrol.get_node("StepForward") as Button).pressed.connect(_on_step_forward)
+	(timecontrol.get_node("SkipForward") as Button).pressed.connect(_on_skip_forward)
 	
 	# Resize the camera to fit with the grid
 	var full_grid_size = Vector2(x_qubits * cell_size, y_qubits*cell_size)
