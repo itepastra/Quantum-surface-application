@@ -211,15 +211,17 @@ func handle_undo() -> void:
 		codeEdit.set_executing(operation_idx)
 		match selected_op.operation:
 			QubitOperation.Operation.RX:
-				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.x, -PI)
+				rx(selected_op.index, false)
 			QubitOperation.Operation.RY:
-				rq(grid_qubits[selected_op.index], -grid_qubits[selected_op.index].rot.z, -PI)
+				ry(selected_op.index, false)
 			QubitOperation.Operation.RZ:
-				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.y, -PI)
+				rz(selected_op.index, false)
 			QubitOperation.Operation.RH:
-				rq(grid_qubits[selected_op.index], (grid_qubits[selected_op.index].rot.x + grid_qubits[selected_op.index].rot.y).normalized(), -PI)
+				rh(selected_op.index, false)
 			QubitOperation.Operation.RS:
-				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.y, -PI/2)
+				rsd(selected_op.index, false)
+			QubitOperation.Operation.RSD:
+				rs(selected_op.index, false)
 			QubitOperation.Operation.ADD:
 				grid_qubits[selected_op.index].queue_free()
 				grid_qubits[selected_op.index] = null
@@ -227,6 +229,10 @@ func handle_undo() -> void:
 				var x: int = selected_op.index % x_qubits
 				var y: int = selected_op.index / x_qubits
 				make_qubit(x, y, selected_op.basis)
+			QubitOperation.Operation.CX:
+				cx(selected_op.index, selected_op.other, false)
+			QubitOperation.Operation.CZ:
+				cz(selected_op.index, selected_op.other, false)
 
 func handle_redo() -> void:
 	if self.operation_idx >= len(operations):
@@ -236,15 +242,17 @@ func handle_redo() -> void:
 		var selected_op = operations[self.operation_idx]
 		match selected_op.operation:
 			QubitOperation.Operation.RX:
-				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.x, PI)
+				rx(selected_op.index, false)
 			QubitOperation.Operation.RY:
-				rq(grid_qubits[selected_op.index], -grid_qubits[selected_op.index].rot.z, PI)
+				ry(selected_op.index, false)
 			QubitOperation.Operation.RZ:
-				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.y, PI)
+				rz(selected_op.index, false)
 			QubitOperation.Operation.RH:
-				rq(grid_qubits[selected_op.index], (grid_qubits[selected_op.index].rot.x+grid_qubits[selected_op.index].rot.y).normalized(), PI)
+				rh(selected_op.index, false)
 			QubitOperation.Operation.RS:
-				rq(grid_qubits[selected_op.index], grid_qubits[selected_op.index].rot.y, PI/2)
+				rs(selected_op.index, false)
+			QubitOperation.Operation.RSD:
+				rsd(selected_op.index, false)
 			QubitOperation.Operation.ADD:
 				var x: int = floori(selected_op.index % x_qubits)
 				var y: int = floori(selected_op.index / x_qubits)
@@ -252,6 +260,10 @@ func handle_redo() -> void:
 			QubitOperation.Operation.DELETE:
 				grid_qubits[selected_op.index].queue_free()
 				grid_qubits[selected_op.index] = null
+			QubitOperation.Operation.CX:
+				cx(selected_op.index, selected_op.other, false)
+			QubitOperation.Operation.CZ:
+				cz(selected_op.index, selected_op.other, false)
 		operation_idx += 1 # redo "what the user will be doing"
 		codeEdit.set_executing(operation_idx)
 
@@ -288,42 +300,55 @@ func _input(event: InputEvent) -> void:
 			append_or_update(QubitOperation.Operation.ADD, y*x_qubits + x)
 
 
-func rx(qubit: int):
+func rx(qubit: int, update: bool = true):
 	var q = grid_qubits[qubit]
 	qec.xgate(qubit)
 	q.rot = bases[qec.get_vop(qubit)]
 	q.is_rotating = true;
-	append_or_update(QubitOperation.Operation.RX, qubit)
+	if update:
+		append_or_update(QubitOperation.Operation.RX, qubit)
 
 
-func ry(qubit: int):
+func ry(qubit: int, update: bool = true):
 	var q = grid_qubits[qubit]
 	qec.ygate(qubit)
 	q.rot = bases[qec.get_vop(qubit)]
 	q.is_rotating = true;
-	append_or_update(QubitOperation.Operation.RY, qubit)
+	if update:
+		append_or_update(QubitOperation.Operation.RY, qubit)
 
-func rz(qubit: int):
+func rz(qubit: int, update: bool = true):
 	var q = grid_qubits[qubit]
 	# the qubit's z-axis is the y axis in godot
 	qec.zgate(qubit)
 	q.rot = bases[qec.get_vop(qubit)]
 	q.is_rotating = true;
-	append_or_update(QubitOperation.Operation.RZ, qubit)
+	if update:
+		append_or_update(QubitOperation.Operation.RZ, qubit)
 
-func rh(qubit: int):
+func rh(qubit: int, update: bool = true):
 	var q = grid_qubits[qubit]
 	qec.hadamard(qubit)
 	q.rot = bases[qec.get_vop(qubit)]
 	q.is_rotating = true;
-	append_or_update(QubitOperation.Operation.RH, qubit)
+	if update:
+		append_or_update(QubitOperation.Operation.RH, qubit)
 
-func rs(qubit: int):
+func rs(qubit: int, update: bool = true):
 	var q = grid_qubits[qubit]
 	qec.phase(qubit)
 	q.rot = bases[qec.get_vop(qubit)]
 	q.is_rotating = true;
-	append_or_update(QubitOperation.Operation.RS, qubit)
+	if update:
+		append_or_update(QubitOperation.Operation.RS, qubit)
+
+func rsd(qubit: int, update: bool = true):
+	var q = grid_qubits[qubit]
+	qec.phase_dag(qubit)
+	q.rot = bases[qec.get_vop(qubit)]
+	q.is_rotating = true;
+	if update:
+		append_or_update(QubitOperation.Operation.RSD, qubit)
 
 const bases = {
 	0: Basis(Vector3(0,0,1),Vector3(0,-1,0), Vector3(1,0,0)),
@@ -358,7 +383,7 @@ func rq(qubit: Qubit, axis: Vector3, angle=PI):
 	print(qubit.rot)
 	qubit.is_rotating = true
 
-func cx(control: int, target: int):
+func cx(control: int, target: int, update: bool = true):
 	if not check_orthogonal_neighbors(control, target, x_qubits):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
@@ -371,9 +396,10 @@ func cx(control: int, target: int):
 	qec.cnot(control, target)
 	print_qec_state()
 	set_to_qec_state()
-	append_or_update(QubitOperation.Operation.CX, control, target)
+	if update:
+		append_or_update(QubitOperation.Operation.CX, control, target)
 
-func cz(control: int, target: int):
+func cz(control: int, target: int, update: bool = true):
 	if not check_orthogonal_neighbors(control, target, x_qubits):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
@@ -386,7 +412,8 @@ func cz(control: int, target: int):
 	qec.cphase(control, target)
 	print_qec_state()
 	set_to_qec_state()
-	append_or_update(QubitOperation.Operation.CZ, control, target)
+	if update:
+		append_or_update(QubitOperation.Operation.CZ, control, target)
 
 func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
 	return true
