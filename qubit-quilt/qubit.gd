@@ -80,12 +80,3 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 			_:
 				return
 		sound.play()
-
-
-func _on_timer_timeout() -> void:
-	var rand = RandomNumberGenerator.new()
-	var theta = rand.randf_range(0, PI*2)
-	var phi = rand.randf_range(0, PI*2)
-	var psi = rand.randf_range(0, PI*2)
-	self.eff_rot = Basis.from_euler(Vector3(theta, phi, psi))
-	self.is_rotating = true
