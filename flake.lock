@@ -19,14 +19,17 @@
     "godot_src": {
       "flake": false,
       "locked": {
-        "lastModified": 1759774206,
-        "narHash": "sha256-GIE3P6GMXedin1BT7S/ykfbxjW/8gWgUs/d+KmTVroo=",
-        "path": "/home/noa/Documents/programming/godot",
-        "type": "path"
+        "lastModified": 1759783955,
+        "narHash": "sha256-/1iLAb9IdDhuB6qjWWinLEjKq/peYCuKwEO0c5xwu/w=",
+        "owner": "itepastra",
+        "repo": "godot",
+        "rev": "6e33357cc13b064cf4b59aaf0f80110a27edf1cb",
+        "type": "github"
       },
       "original": {
-        "path": "/home/noa/Documents/programming/godot",
-        "type": "path"
+        "owner": "itepastra",
+        "repo": "godot",
+        "type": "github"
       }
     },
     "nixpkgs": {
