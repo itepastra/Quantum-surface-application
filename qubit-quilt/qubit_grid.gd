@@ -13,9 +13,11 @@ class Egroup:
 	var qubits: Array[Qubit] = []
 	var eff: Basis
 	var timer: Timer
+	var qec: Qec
 	
-	func _init(qubits: Array[Qubit], grid: QubitGrid, period: float = 1) -> void:
+	func _init(qubits: Array[Qubit], grid: QubitGrid, qec: Qec, period: float = 1) -> void:
 		self.qubits = qubits
+		self.qec = qec
 		grid.add_child(self)
 		timer = Timer.new()
 		timer.autostart = true
@@ -24,26 +26,28 @@ class Egroup:
 		self.add_child(timer)
 	
 	func _on_timer_timeout():
-		random_rotate()
+		var qubit_idxs:PackedInt32Array  = []
+		for q in qubits:
+			qubit_idxs.append(q.array_pos)
+		var results = qec.peek_measurement_random(qubit_idxs)
+		for i in len(results):
+			qubits[i].rot = bases[results[i] & 0b11111]
+			qubits[i].is_rotating = true
+		#random_rotate()
 	
 	func reset():
-		for qubit in qubits:
-			qubit.eff_rot = Basis.IDENTITY
 		if timer:
 			timer.stop()
 			timer.queue_free()
 		self.queue_free()
 	
 	func random_rotate():
-		#if len(qubits) <= 1:
-			#qubits.map(func (qubit): qubit.eff_rot = Basis.IDENTITY)
-			#return
 		var rand = RandomNumberGenerator.new()
 		var theta = rand.randf_range(0, PI*2)
 		var phi = rand.randf_range(0, PI*2)
 		var psi = rand.randf_range(0, PI*2)
 		eff = Basis.from_euler(Vector3(theta, phi, psi))
-		qubits.map(func (qubit): qubit.eff_rot = eff)
+		qubits.map(func (qubit): qubit.rot = eff)
 		qubits.map(func (qubit): qubit.is_rotating = true)
 
 @onready var codeEdit: CodeEdit = get_node("/root/Scene/HUD/CodeEdit")
@@ -61,6 +65,7 @@ var is_playing: bool = false
 var two_qubit_gate_type: String = ""
 var grid_qubits: Array[Qubit] = []
 var start_pos: Vector3
+var qec = Qec.new()
 
 var operation_idx: int = 0 # index of the operation that the user will be doing
 var operations: Array[QubitOperation] = []
@@ -102,7 +107,7 @@ func set_to_qec_state():
 		var qubits: Array[Qubit] = [];
 		for i in group:
 			qubits.append(grid_qubits[i])
-		entanglement_groups.append(Egroup.new(qubits, self, randf_range(0.4, 1.0)))
+		entanglement_groups.append(Egroup.new(qubits, self, qec, randf_range(1.5, 3)))
 
 func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, target_idx: int=-1, basis: Basis = Basis.IDENTITY) -> void:
 	operations.resize(operation_idx + 1)
@@ -111,7 +116,6 @@ func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, targe
 	codeEdit.update_qubit_operations(operations)
 	codeEdit.set_executing(operation_idx)
 
-var qec = Qec.new()
 
 func _on_ready() -> void:
 	self.button = get_node("/root/Scene/HUD/Spacer/Hotbar/ADD")

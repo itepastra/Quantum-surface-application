@@ -11,7 +11,6 @@ var sound: AudioStreamPlayer
 var array_pos: int # what position this qubit has in the grid array
 var rot: Basis # the "target" rotation
 var is_rotating: bool
-var eff_rot: Basis = Basis.IDENTITY # the overlay target rotation
 
 func _ready():
 	# this should be any of the buttons in the Hotbar, 
@@ -31,9 +30,9 @@ func _process(delta: float) -> void:
 	if not self.is_rotating:
 		return
 	# interpolate between the current and the target rotations and update the current rotation
-	self.transform.basis = self.transform.basis.slerp(eff_rot * rot, 1 - DECAY_SPEED ** delta).orthonormalized()
+	self.transform.basis = self.transform.basis.slerp(rot, 1 - DECAY_SPEED ** delta).orthonormalized()
 	# if the target rotation is reached, stop updating the qubit
-	if self.transform.basis.is_equal_approx(eff_rot*rot):
+	if self.transform.basis.is_equal_approx(rot):
 		self.is_rotating = false
 
 func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _normal: Vector3, _shape_idx: int) -> void:

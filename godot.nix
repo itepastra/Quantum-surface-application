@@ -54,9 +54,6 @@ let
 
   arch = stdenv.hostPlatform.linuxArch;
 
-  dotnet-sdk = null;
-  dotnet-sdk_alt = null;
-
   dottedVersion = lib.replaceStrings [ "-" ] [ "." ] version;
 
   mkTarget =
@@ -114,14 +111,14 @@ let
           wayland = withWayland; # Compile with Wayland support
           x11 = withX11; # Compile with X11 support
 
-          module_mono_enabled = false;
-
           # aliasing bugs exist with hardening+LTO
           # https://github.com/godotengine/godot/pull/104501
           ccflags = "-fno-strict-aliasing";
           linkflags = "-Wl,--build-id";
 
           use_sowrap = false;
+
+          module_mono_enabled = false;
         };
 
         enableParallelBuilding = true;

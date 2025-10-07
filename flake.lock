@@ -19,8 +19,8 @@
     "godot_src": {
       "flake": false,
       "locked": {
-        "lastModified": 1759827523,
-        "narHash": "sha256-MDa4EXWBBiOAtXx6DjQGoa+CFDkpGcooV2QC8hf6Uxo=",
+        "lastModified": 1759842877,
+        "narHash": "sha256-ssjKomRp7OXvjw6QYm0sBNEpderS3jhMTeHJZYjcbPM=",
         "path": "/home/noa/Documents/programming/godot",
         "type": "path"
       },
