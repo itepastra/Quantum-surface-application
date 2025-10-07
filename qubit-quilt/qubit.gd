@@ -1,5 +1,5 @@
 class_name Qubit
-extends StaticBody3D
+extends Node3D
 
 var button_group: ButtonGroup
 
@@ -13,6 +13,9 @@ var rot: Basis # the "target" rotation
 var is_rotating: bool
 var eff_rot: Basis = Basis.IDENTITY # the overlay target rotation
 
+@onready var qb: StaticBody3D = get_node("QubitBody")
+@onready var label: Label3D = get_node("QubitText")
+
 func _ready():
 	# this should be any of the buttons in the Hotbar, 
 	# they're all linked into a single button_group which gives an easy "select 1" option
@@ -23,17 +26,22 @@ func _ready():
 
 	# connect to the qubit grid for applying the gates
 	
-	self.rot = self.transform.basis
+	self.rot = qb.transform.basis
 	self.is_rotating = false
+
+func set_base(num: int) -> void:
+	self.rot = bases[num]
+	self.is_rotating = true
+	self.label.text = labels[num]
 
 func _process(delta: float) -> void:
 	# don't do the calculations if the qubit is in a stationary state
 	if not self.is_rotating:
 		return
 	# interpolate between the current and the target rotations and update the current rotation
-	self.transform.basis = self.transform.basis.slerp(eff_rot * rot, 1 - DECAY_SPEED ** delta).orthonormalized()
+	qb.transform.basis = qb.transform.basis.slerp(rot, 1 - DECAY_SPEED ** delta).orthonormalized()
 	# if the target rotation is reached, stop updating the qubit
-	if self.transform.basis.is_equal_approx(eff_rot*rot):
+	if qb.transform.basis.is_equal_approx(rot):
 		self.is_rotating = false
 
 func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _normal: Vector3, _shape_idx: int) -> void:
@@ -75,7 +83,7 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 					grid.selected_qubit = -1
 			"REMOVE":
 				grid.grid_qubits[array_pos] = null
-				grid.append_or_update(QubitOperation.Operation.DELETE, array_pos, -1, self.rot)
+				grid.append_or_update(QubitOperation.Operation.DELETE, array_pos, -1, grid.qec.get_vop(self.array_pos))
 				self.queue_free()
 			"MZ":
 				grid.measure_z(array_pos)
@@ -83,3 +91,58 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 			_:
 				return
 		sound.play()
+
+const labels: Dictionary[int, String] = {
+	0: "+",
+	1: "+",
+	2: "-",
+	3: "-",
+	4: "-i",
+	5: "-i",
+	6: "+i",
+	7: "+i",
+	8: "1",
+	9: "1",
+	10: "0",
+	11: "0",
+	12: "-",
+	13: "-",
+	14: "+",
+	15: "+",
+	16: "+i",
+	17: "+i",
+	18: "-i",
+	19: "-i",
+	20: "0",
+	21: "0",
+	22: "1",
+	23: "1"
+}
+
+
+const bases: Dictionary[int, Basis] = {
+	0: Basis(Vector3(0,0,1),Vector3(0,-1,0), Vector3(1,0,0)),
+	1: Basis(Vector3(0,0,1),Vector3(0,1,0),Vector3(-1,0,0)),
+	2: Basis(Vector3(0,0,-1),Vector3(0,1,0),Vector3(1,0,0)),
+	3: Basis(Vector3(0,0,-1),Vector3(0,-1,0), Vector3(-1,0,0)),
+	4: Basis(Vector3(1,0,0),Vector3(0,1,0),Vector3(0,0,1)),
+	5: Basis(Vector3(-1,0,0),Vector3(0,-1,0), Vector3(0,0,1)),
+	6: Basis(Vector3(1,0,0),Vector3(0,-1,0), Vector3(0,0,-1)),
+	7: Basis(Vector3(-1,0,0),Vector3(0,1,0), Vector3(0,0,-1)),
+	8: Basis(Vector3(0,1,0), Vector3(0,0,-1), Vector3(-1,0,0)),
+	9: Basis(Vector3(0,-1,0), Vector3(0,0,-1), Vector3(1,0,0)),
+	10: Basis(Vector3(0,-1,0), Vector3(0,0,1), Vector3(-1,0,0)),
+	11: Basis(Vector3(0,1,0), Vector3(0,0,1), Vector3(1,0,0)),
+	12: Basis(Vector3(0,0,-1), Vector3(1,0,0), Vector3(0,-1,0)),
+	13: Basis(Vector3(0,0,-1), Vector3(-1,0,0), Vector3(0,1,0)),
+	14: Basis(Vector3(0,0,1), Vector3(1,0,0), Vector3(0,1,0)),
+	15: Basis(Vector3(0,0,1), Vector3(-1,0,0), Vector3(0,-1,0)),
+	16: Basis(Vector3(0,-1,0), Vector3(-1,0,0), Vector3(0,0,-1)),
+	17: Basis(Vector3(0,1,0), Vector3(1,0,0), Vector3(0,0,-1)),
+	18: Basis(Vector3(0,1,0), Vector3(-1,0,0), Vector3(0,0,1)),
+	19: Basis(Vector3(0,-1,0), Vector3(1,0,0), Vector3(0,0,1)),
+	20: Basis(Vector3(-1,0,0), Vector3(0,0,1), Vector3(0,1,0)),
+	21: Basis(Vector3(1,0,0), Vector3(0,0,1), Vector3(0,-1,0)),
+	22: Basis(Vector3(-1,0,0),Vector3(0,0,-1), Vector3(0,-1,0)),
+	23: Basis(Vector3(1,0,0),Vector3(0,0,-1), Vector3(0,1,0)),
+}
