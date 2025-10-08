@@ -25,7 +25,7 @@
             pkgs.blender
             pkgs.inkscape
             (pkgs.writeScriptBin "export_images" ''
-              find -type d -not -path "*godot_assets*" -exec mkdir -p -- "./godot_assets/{}" \;
+              find -type d -not -path "./godot_assets" -exec mkdir -p -- "./godot_assets/{}" \;
               for filename in **/*.svg; do
                 basename="''${filename%.svg}"
                 inkscape "$filename" --export-filename="godot_assets/''${basename}.png"
@@ -39,7 +39,7 @@
           fs = pkgs.lib.fileset;
         in
         rec {
-          godot = pkgs.callPackage ./godot.nix { };
+          godot = pkgs.callPackage ./godot.nix { inherit (inputs) godot_src; };
 
           default = pkgs.stdenv.mkDerivation {
             name = "Qubit Quilt website";

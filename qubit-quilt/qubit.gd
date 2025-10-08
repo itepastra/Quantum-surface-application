@@ -11,7 +11,6 @@ var sound: AudioStreamPlayer
 var array_pos: int # what position this qubit has in the grid array
 var rot: Basis # the "target" rotation
 var is_rotating: bool
-var eff_rot: Basis = Basis.IDENTITY # the overlay target rotation
 
 @onready var qb: StaticBody3D = get_node("QubitBody")
 @onready var label: Label3D = get_node("QubitText")
