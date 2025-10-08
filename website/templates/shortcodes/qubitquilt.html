@@ -2,6 +2,11 @@
 	<canvas id="canvas" style="width: 100%;aspect-ratio: 4/3;"></canvas>
 	<script src="/qubit-quilt.js"></script>
 	<script>
+		window.qubits = {
+			width: "{{w}}",
+			height: "{{h}}"
+		};
+
 		function printProgress(current, total) {
 			console.log("Loaded " + current + " of " + total + " bytes");
 		}
