@@ -114,8 +114,19 @@ func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, targe
 	codeEdit.update_qubit_operations(operations)
 	codeEdit.set_executing(operation_idx)
 
+func parse_js_args() -> void:
+	print("testing for feature")
+	if OS.has_feature("web"):
+		print("parsing js args")
+		var iface = JavaScriptBridge.get_interface("qubits")
+		if iface:
+			self.x_qubits = iface.width
+			self.y_qubits = iface.height
+			print("set qubits to %s by %s" % [self.x_qubits, self.y_qubits])
 
 func _on_ready() -> void:
+	parse_js_args()
+	
 	self.button = get_node("/root/Scene/HUD/Spacer/Hotbar/ADD")
 	qec.init(x_qubits*y_qubits);
 	# NOTE: maybe there is a nicer way, but not one I can quickly think of
