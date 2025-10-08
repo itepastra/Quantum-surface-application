@@ -5,6 +5,7 @@ extends Node3D
 @export var y_qubits: int = 4
 @export var cell_size: float = 1.5
 
+
 @export var qubit_scene: PackedScene
 @export var gate_scene: PackedScene
 
@@ -55,12 +56,17 @@ class Egroup:
 const qubit_size = 1
 
 var button: Button
+var group: Button
 var two_qubit_mode: bool = false
 var selected_qubit: int = -1
 var is_playing: bool = false
 var two_qubit_gate_type: String = ""
 var grid_qubits: Array[Qubit] = []
 var start_pos: Vector3
+var outline: Line2D
+var is_outline: bool = false
+var outline_points: Array[Vector2] = []
+var selected_qubits: Array[int] = []
 
 var operation_idx: int = 0 # index of the operation that the user will be doing
 var operations: Array[QubitOperation] = []
@@ -115,7 +121,7 @@ var qec = Qec.new()
 
 func _on_ready() -> void:
 	self.button = get_node("/root/Scene/HUD/Spacer/Hotbar/ADD")
-	qec.init(x_qubits*y_qubits);
+#	qec.init(x_qubits*y_qubits);
 	# NOTE: maybe there is a nicer way, but not one I can quickly think of
 	var timecontrol = get_node("/root/Scene/HUD/Spacer/TimeControl")
 	(timecontrol.get_node("SkipBack") as Button).pressed.connect(_on_skip_back)
@@ -143,6 +149,26 @@ func _on_ready() -> void:
 	play_timer.autostart = false
 	add_child(play_timer)
 	play_timer.timeout.connect(_on_play_timer_timeout)
+	
+	self.outline = get_node("/root/Scene/HUD/OUTLINE")
+	
+	var dash_texture := GradientTexture1D.new()
+	var gradient := Gradient.new()
+	gradient.colors = [Color(1,1,1,1), Color(1,1,1,0)]  # white-to-transparent
+	dash_texture.gradient = gradient
+	dash_texture.width = 32
+
+	outline.texture = dash_texture
+	outline.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+	
+	outline.width = 2
+	outline.default_color = Color(0, 0, 0, 1)
+	outline.texture_mode = Line2D.LINE_TEXTURE_TILE
+	outline.visible = false
+	
+	self.group = get_node("/root/Scene/HUD/Spacer/Hotbar/GROUP")
+	group.toggle_mode = true
+
 
 func _on_skip_back() -> void:
 	while self.operation_idx > 0:
@@ -180,6 +206,7 @@ func _on_step_forward() -> void:
 func _on_skip_forward() -> void:
 	while self.operation_idx < len(self.operations):
 		self.handle_redo()
+		
 
 func make_qubit(x: int, y: int, basis: Basis = Basis(Vector3(-0,-1,-0), Vector3(0,-0,1), Vector3(-1,0,0))):
 	var nextQubit: Qubit = qubit_scene.instantiate()
@@ -292,6 +319,32 @@ func _input(event: InputEvent) -> void:
 			var y = roundi(snapped_pos.y)
 			make_qubit(x, y)
 			append_or_update(QubitOperation.Operation.ADD, y*x_qubits + x)
+		
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and self.group.button_pressed:
+		if event.is_pressed():
+			is_outline = true
+			outline.visible = true
+			outline_points.clear()
+			outline_points.append(event.position)
+			get_viewport().set_input_as_handled()
+			return
+		
+		elif not event.is_pressed() and is_outline:
+			outline.points = outline_points
+			is_outline = false
+			outline.visible = false
+			_select_qubits_in_outline(outline_points)
+			get_viewport().set_input_as_handled()
+			group.toggle_mode = false
+			return 
+	
+	if event is InputEventMouseMotion and is_outline and self.group.button_pressed:
+		outline.visible = true
+		outline_points.append(event.position)
+		outline.points = outline_points
+		get_viewport().set_input_as_handled()
+		return
+		
 
 
 func rx(qubit: int, update: bool = true):
@@ -439,6 +492,33 @@ func add_cx_cz_visuals(control: int, target: int, gate_is_cz: bool) -> void:
 	
 	if gate_is_cz:
 		gate_instance.texture = preload("res://assets/cz.png")
+
+
+
+func _select_qubits_in_outline(points: Array[Vector2]):
+	selected_qubits.clear()
+	var camera: Camera3D = %Camera
+	
+	for q in grid_qubits:
+		if q == null:
+			continue
+		
+		var screen_pos = camera.unproject_position(q.global_transform.origin)
+		var inside = Geometry2D.is_point_in_polygon(screen_pos, points)
+		
+		var mesh = q.get_node("MeshInstance3D")
+		# make sure we have a material to modify emission
+		if mesh.material_override == null:
+			mesh.material_override = mesh.mesh.surface_get_material(0).duplicate() as StandardMaterial3D
+		
+		var mat = mesh.material_override as StandardMaterial3D
+		
+		if inside:
+			mat.emission_enabled = true
+			mat.emission = Color(0.8, 0.8, 0.8)
+			mat.emission_energy = 0.8 # adjust brightness
+		else:
+			mat.emission_enabled = false
 
 const bases = {
 	0: Basis(Vector3(0,0,1),Vector3(0,-1,0), Vector3(1,0,0)),

@@ -6,6 +6,7 @@ var codeEditor: CodeEdit
 var codeToggle: Button
 var whole: Control
 
+
 func _ready() -> void:
 	# when the viewport changes size we need to move the editor around
 	vport.size_changed.connect(_on_size_changed)

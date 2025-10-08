@@ -80,3 +80,4 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 			_:
 				return
 		sound.play()
+		
