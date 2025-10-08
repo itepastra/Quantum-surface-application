@@ -32,8 +32,7 @@ class Egroup:
 			qubit_idxs.append(q.array_pos)
 		var results = qec.peek_measurement_random(qubit_idxs)
 		for i in len(results):
-			qubits[i].rot = bases[results[i] & 0b11111]
-			qubits[i].is_rotating = true
+			qubits[i].set_base(results[i] & 0b11111)
 		#random_rotate()
 	
 	func reset():
