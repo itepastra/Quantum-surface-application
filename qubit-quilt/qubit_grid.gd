@@ -11,7 +11,7 @@ extends Node3D
 class Egroup:
 	extends Node
 	var qubits: Array[Qubit] = []
-	var eff: Basis
+	var eff: int
 	var timer: Timer
 	var qec: Qec
 	
@@ -19,6 +19,7 @@ class Egroup:
 		self.qubits = qubits
 		self.qec = qec
 		grid.add_child(self)
+		random_rotate()
 		timer = Timer.new()
 		timer.autostart = true
 		timer.wait_time = period
@@ -42,13 +43,12 @@ class Egroup:
 		self.queue_free()
 	
 	func random_rotate():
-		var rand = RandomNumberGenerator.new()
-		var theta = rand.randf_range(0, PI*2)
-		var phi = rand.randf_range(0, PI*2)
-		var psi = rand.randf_range(0, PI*2)
-		eff = Basis.from_euler(Vector3(theta, phi, psi))
-		qubits.map(func (qubit): qubit.rot = eff)
-		qubits.map(func (qubit): qubit.is_rotating = true)
+		var qubit_idxs:PackedInt32Array  = []
+		for q in qubits:
+			qubit_idxs.append(q.array_pos)
+		var results = qec.peek_measurement_random(qubit_idxs)
+		for i in len(results):
+			qubits[i].set_base(results[i]&0b11111)
 
 @onready var codeEdit: CodeEdit = get_node("/root/Scene/HUD/CodeEdit")
 @onready var play_timer: Timer = Timer.new()
@@ -75,8 +75,7 @@ var entanglement_groups: Array[Egroup] = []
 func set_to_qec_state():
 	var graph: Dictionary[int,PackedInt32Array] = {};
 	for i in x_qubits*y_qubits:
-		grid_qubits[i].rot = bases[qec.get_vop(i)]
-		grid_qubits[i].is_rotating = true
+		grid_qubits[i].set_base(qec.get_vop(i))
 		graph.get_or_add(i, PackedInt32Array())
 		graph[i].append_array(qec.get_adjacent(i))
 	
@@ -109,7 +108,7 @@ func set_to_qec_state():
 			qubits.append(grid_qubits[i])
 		entanglement_groups.append(Egroup.new(qubits, self, qec, randf_range(1.5, 3)))
 
-func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, target_idx: int=-1, basis: Basis = Basis.IDENTITY) -> void:
+func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, target_idx: int=-1, basis: int = 10) -> void:
 	operations.resize(operation_idx + 1)
 	operations[operation_idx] = QubitOperation.new(operation, qubit_idx, target_idx, basis)
 	operation_idx += 1
@@ -140,7 +139,7 @@ func _on_ready() -> void:
 	for y in y_qubits:
 		for x in x_qubits:
 			make_qubit(x,y)
-			
+	set_to_qec_state()
 	#setup timer
 	play_timer.wait_time = 1
 	play_timer.one_shot = false
@@ -185,14 +184,13 @@ func _on_skip_forward() -> void:
 	while self.operation_idx < len(self.operations):
 		self.handle_redo()
 
-func make_qubit(x: int, y: int, basis: Basis = Basis(Vector3(-0,-1,-0), Vector3(0,-0,1), Vector3(-1,0,0))):
+func make_qubit(x: int, y: int, basis: int = 10):
 	var nextQubit: Qubit = qubit_scene.instantiate()
 	nextQubit.name = "Qubit (%d, %d)" % [x,y]
 	nextQubit.position.x = x + start_pos.x
 	nextQubit.position.y = y + start_pos.y
 	nextQubit.position *= cell_size
 	nextQubit.array_pos = y*x_qubits + x
-	nextQubit.transform.basis = basis
 	if len(grid_qubits) <= nextQubit.array_pos:
 		grid_qubits.append(nextQubit)
 	else:
@@ -301,8 +299,7 @@ func _input(event: InputEvent) -> void:
 func rx(qubit: int, update: bool = true):
 	var q = grid_qubits[qubit]
 	qec.xgate(qubit)
-	q.rot = bases[qec.get_vop(qubit)]
-	q.is_rotating = true;
+	q.set_base(qec.get_vop(qubit))
 	if update:
 		append_or_update(QubitOperation.Operation.RX, qubit)
 
@@ -310,8 +307,7 @@ func rx(qubit: int, update: bool = true):
 func ry(qubit: int, update: bool = true):
 	var q = grid_qubits[qubit]
 	qec.ygate(qubit)
-	q.rot = bases[qec.get_vop(qubit)]
-	q.is_rotating = true;
+	q.set_base(qec.get_vop(qubit))
 	if update:
 		append_or_update(QubitOperation.Operation.RY, qubit)
 
@@ -319,32 +315,28 @@ func rz(qubit: int, update: bool = true):
 	var q = grid_qubits[qubit]
 	# the qubit's z-axis is the y axis in godot
 	qec.zgate(qubit)
-	q.rot = bases[qec.get_vop(qubit)]
-	q.is_rotating = true;
+	q.set_base(qec.get_vop(qubit))
 	if update:
 		append_or_update(QubitOperation.Operation.RZ, qubit)
 
 func rh(qubit: int, update: bool = true):
 	var q = grid_qubits[qubit]
 	qec.hadamard(qubit)
-	q.rot = bases[qec.get_vop(qubit)]
-	q.is_rotating = true;
+	q.set_base(qec.get_vop(qubit))
 	if update:
 		append_or_update(QubitOperation.Operation.RH, qubit)
 
 func rs(qubit: int, update: bool = true):
 	var q = grid_qubits[qubit]
 	qec.phase(qubit)
-	q.rot = bases[qec.get_vop(qubit)]
-	q.is_rotating = true;
+	q.set_base(qec.get_vop(qubit))
 	if update:
 		append_or_update(QubitOperation.Operation.RS, qubit)
 
 func rsd(qubit: int, update: bool = true):
 	var q = grid_qubits[qubit]
 	qec.phase_dag(qubit)
-	q.rot = bases[qec.get_vop(qubit)]
-	q.is_rotating = true;
+	q.set_base(qec.get_vop(qubit))
 	if update:
 		append_or_update(QubitOperation.Operation.RSD, qubit)
 
@@ -447,30 +439,3 @@ func add_cx_cz_visuals(control: int, target: int, gate_is_cz: bool) -> void:
 	
 	if gate_is_cz:
 		gate_instance.texture = preload("res://assets/cz.png")
-
-const bases = {
-	0: Basis(Vector3(0,0,1),Vector3(0,-1,0), Vector3(1,0,0)),
-	1: Basis(Vector3(0,0,1),Vector3(0,1,0),Vector3(-1,0,0)),
-	2: Basis(Vector3(0,0,-1),Vector3(0,1,0),Vector3(1,0,0)),
-	3: Basis(Vector3(0,0,-1),Vector3(0,-1,0), Vector3(-1,0,0)),
-	4: Basis(Vector3(1,0,0),Vector3(0,1,0),Vector3(0,0,1)),
-	5: Basis(Vector3(-1,0,0),Vector3(0,-1,0), Vector3(0,0,1)),
-	6: Basis(Vector3(1,0,0),Vector3(0,-1,0), Vector3(0,0,-1)),
-	7: Basis(Vector3(-1,0,0),Vector3(0,1,0), Vector3(0,0,-1)),
-	8: Basis(Vector3(0,1,0), Vector3(0,0,-1), Vector3(-1,0,0)),
-	9: Basis(Vector3(0,-1,0), Vector3(0,0,-1), Vector3(1,0,0)),
-	10: Basis(Vector3(0,-1,0), Vector3(0,0,1), Vector3(-1,0,0)),
-	11: Basis(Vector3(0,1,0), Vector3(0,0,1), Vector3(1,0,0)),
-	12: Basis(Vector3(0,0,-1), Vector3(1,0,0), Vector3(0,-1,0)),
-	13: Basis(Vector3(0,0,-1), Vector3(-1,0,0), Vector3(0,1,0)),
-	14: Basis(Vector3(0,0,1), Vector3(1,0,0), Vector3(0,1,0)),
-	15: Basis(Vector3(0,0,1), Vector3(-1,0,0), Vector3(0,-1,0)),
-	16: Basis(Vector3(0,-1,0), Vector3(-1,0,0), Vector3(0,0,-1)),
-	17: Basis(Vector3(0,1,0), Vector3(1,0,0), Vector3(0,0,-1)),
-	18: Basis(Vector3(0,1,0), Vector3(-1,0,0), Vector3(0,0,1)),
-	19: Basis(Vector3(0,-1,0), Vector3(1,0,0), Vector3(0,0,1)),
-	20: Basis(Vector3(-1,0,0), Vector3(0,0,1), Vector3(0,1,0)),
-	21: Basis(Vector3(1,0,0), Vector3(0,0,1), Vector3(0,-1,0)),
-	22: Basis(Vector3(-1,0,0),Vector3(0,0,-1), Vector3(0,-1,0)),
-	23: Basis(Vector3(1,0,0),Vector3(0,0,-1), Vector3(0,1,0)),
-}
