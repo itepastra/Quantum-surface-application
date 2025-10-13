@@ -19,11 +19,11 @@
     "godot_src": {
       "flake": false,
       "locked": {
-        "lastModified": 1759913820,
-        "narHash": "sha256-tXFTXcXZjDG4Z2DiuyIcGI0TKxCeIWKJ/hD/C086lu8=",
+        "lastModified": 1760299798,
+        "narHash": "sha256-tPC9QtagNjx5XVWr1Ag9Ms+mFaSPqIOYbCGWanotAZI=",
         "owner": "itepastra",
         "repo": "godot",
-        "rev": "334a06e0c1d3b959fca1ef3c7e83dbc30b3884d1",
+        "rev": "c9ff583c0b2b87081189904554c2326b223e228a",
         "type": "github"
       },
       "original": {
@@ -34,11 +34,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1759417375,
-        "narHash": "sha256-O7eHcgkQXJNygY6AypkF9tFhsoDQjpNEojw3eFs73Ow=",
+        "lastModified": 1760256791,
+        "narHash": "sha256-uTpzDHRASEDeFUuToWSQ46Re8beXyG9dx4W36FQa0/c=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "dc704e6102e76aad573f63b74c742cd96f8f1e6c",
+        "rev": "832e3b6db48508ae436c2c7bfc0cf914eac6938e",
         "type": "github"
       },
       "original": {
