@@ -1,4 +1,4 @@
-[gd_scene load_steps=42 format=3 uid="uid://8h8kpjesx5mq"]
+[gd_scene load_steps=44 format=3 uid="uid://8h8kpjesx5mq"]
 
 [ext_resource type="Script" uid="uid://c16i7rw21hc40" path="res://hud.gd" id="1_1fv7p"]
 [ext_resource type="Texture2D" uid="uid://dmha0kcdynqvd" path="res://assets/button.png" id="1_640wx"]
@@ -78,6 +78,12 @@ action = &"cz"
 
 [sub_resource type="Shortcut" id="Shortcut_amv7k"]
 events = [SubResource("InputEventAction_gpiub")]
+
+[sub_resource type="InputEventAction" id="InputEventAction_5kc73"]
+action = &"measure"
+
+[sub_resource type="Shortcut" id="Shortcut_bp16l"]
+events = [SubResource("InputEventAction_5kc73")]
 
 [sub_resource type="InputEventAction" id="InputEventAction_amv7k"]
 action = &"add"
@@ -199,6 +205,7 @@ theme = SubResource("Theme_n2snw")
 
 [node name="X" type="Button" parent="Spacer/Hotbar"]
 layout_mode = 2
+tooltip_text = "X-gate"
 theme = ExtResource("2_1xsix")
 toggle_mode = true
 button_group = SubResource("ButtonGroup_640wx")
@@ -208,6 +215,7 @@ icon_alignment = 1
 
 [node name="Y" type="Button" parent="Spacer/Hotbar"]
 layout_mode = 2
+tooltip_text = "Y-gate"
 toggle_mode = true
 button_group = SubResource("ButtonGroup_640wx")
 shortcut = SubResource("Shortcut_rftc2")
@@ -216,6 +224,7 @@ icon_alignment = 1
 
 [node name="Z" type="Button" parent="Spacer/Hotbar"]
 layout_mode = 2
+tooltip_text = "Z-gate"
 toggle_mode = true
 button_group = SubResource("ButtonGroup_640wx")
 shortcut = SubResource("Shortcut_61f8s")
@@ -224,6 +233,7 @@ icon_alignment = 1
 
 [node name="H" type="Button" parent="Spacer/Hotbar"]
 layout_mode = 2
+tooltip_text = "H-gate (Hadamard)"
 toggle_mode = true
 button_group = SubResource("ButtonGroup_640wx")
 shortcut = SubResource("Shortcut_2d608")
@@ -232,6 +242,7 @@ icon_alignment = 1
 
 [node name="S" type="Button" parent="Spacer/Hotbar"]
 layout_mode = 2
+tooltip_text = "S-gate (√Z)"
 toggle_mode = true
 button_group = SubResource("ButtonGroup_640wx")
 shortcut = SubResource("Shortcut_5kc73")
@@ -240,6 +251,7 @@ icon_alignment = 1
 
 [node name="CX" type="Button" parent="Spacer/Hotbar"]
 layout_mode = 2
+tooltip_text = "CNOT (Controlled X)"
 toggle_mode = true
 button_group = SubResource("ButtonGroup_640wx")
 shortcut = SubResource("Shortcut_gpiub")
@@ -248,6 +260,7 @@ icon_alignment = 1
 
 [node name="CZ" type="Button" parent="Spacer/Hotbar"]
 layout_mode = 2
+tooltip_text = "CPhase (Controlled Z)"
 toggle_mode = true
 button_group = SubResource("ButtonGroup_640wx")
 shortcut = SubResource("Shortcut_amv7k")
@@ -255,12 +268,15 @@ icon = ExtResource("7_gpiub")
 
 [node name="MZ" type="Button" parent="Spacer/Hotbar"]
 layout_mode = 2
+tooltip_text = "Measure Z basis"
 toggle_mode = true
 button_group = SubResource("ButtonGroup_640wx")
+shortcut = SubResource("Shortcut_bp16l")
 icon = ExtResource("18_5kc73")
 
 [node name="ADD" type="Button" parent="Spacer/Hotbar"]
 layout_mode = 2
+tooltip_text = "Add a qubit where there is a hole"
 theme = ExtResource("2_1xsix")
 toggle_mode = true
 button_group = SubResource("ButtonGroup_640wx")
@@ -270,6 +286,7 @@ icon_alignment = 1
 
 [node name="REMOVE" type="Button" parent="Spacer/Hotbar"]
 layout_mode = 2
+tooltip_text = "Remove a qubit"
 theme = ExtResource("2_1xsix")
 toggle_mode = true
 button_group = SubResource("ButtonGroup_640wx")
