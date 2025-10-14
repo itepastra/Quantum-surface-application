@@ -7,17 +7,36 @@
    viewBox="0 0 180 180"
    version="1.1"
    id="svg1"
+   sodipodi:docname="rz-90.svg"
+   inkscape:export-filename="rz-90.svg"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="5.5944444"
+     inkscape:cx="90"
+     inkscape:cy="90.089374"
+     inkscape:window-width="2240"
+     inkscape:window-height="1438"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg1" />
   <defs
      id="defs1">
-    <rect
-       x="60.059582"
-       y="64.170807"
-       width="44.660492"
-       height="53.507252"
-       id="rect1" />
     <marker
        style="overflow:visible"
        id="RoundedArrow"
@@ -37,19 +56,19 @@
     <linearGradient
        id="linearGradient2">
       <stop
-         style="stop-color:#ff0000;stop-opacity:1;"
+         style="stop-color:#0200ff;stop-opacity:1;"
          offset="0"
          id="stop2" />
       <stop
-         style="stop-color:#ff0000;stop-opacity:0.75461209;"
+         style="stop-color:#0000ff;stop-opacity:0.75461209;"
          offset="0.44853833"
          id="stop4" />
       <stop
-         style="stop-color:#ff0000;stop-opacity:0.11383236;"
+         style="stop-color:#0002ff;stop-opacity:0.11383236;"
          offset="0.89776939"
          id="stop5" />
       <stop
-         style="stop-color:#ff0000;stop-opacity:0;"
+         style="stop-color:#0002ff;stop-opacity:0;"
          offset="1"
          id="stop3" />
     </linearGradient>
@@ -65,7 +84,7 @@
        spreadMethod="pad" />
     <marker
        style="overflow:visible"
-       id="RoundedArrow-7"
+       id="RoundedArrow-1"
        refX="0"
        refY="0"
        orient="auto-start-reverse"
@@ -77,11 +96,12 @@
          transform="scale(0.7)"
          d="m -0.21114562,-4.1055728 6.42229122,3.21114561 a 1,1 90 0 1 0,1.78885438 L -0.21114562,4.1055728 A 1.236068,1.236068 31.717474 0 1 -2,3 v -6 a 1.236068,1.236068 148.28253 0 1 1.78885438,-1.1055728 z"
          style="fill:context-stroke;fill-rule:evenodd;stroke:none"
-         id="path8-5" />
+         id="path8-2" />
     </marker>
   </defs>
   <g
-     id="layer1">
+     id="layer1"
+     inkscape:label="layer1">
     <circle
        style="fill:url(#radialGradient3);stroke:none"
        id="path1"
@@ -92,17 +112,14 @@
        style="fill:none;stroke:#000000;stroke-width:9;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#RoundedArrow)"
        id="path5"
        d="M 47.88993,47.889931 A 59.552631,59.552631 0 0 1 97.773177,30.956849 59.552631,59.552631 0 0 1 141.57409,60.223683" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:9;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#RoundedArrow-7)"
-       id="path5-6"
-       d="M 123.61613,136.59363 A 59.552631,59.552631 0 0 1 73.732887,153.52671 59.552631,59.552631 0 0 1 29.931967,124.25988" />
   </g>
   <text
      xml:space="preserve"
-     id="text1"
-     style="font-size:47.3476px;text-align:start;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect1);fill:#ffffff;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
-     transform="matrix(1.971235,0,0,1.971235,-63.792375,-87.521405)"><tspan
-       x="60.060547"
-       y="107.96645"
-       id="tspan2">X</tspan></text>
+     style="font-size:93.3333px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;stroke:#000000;stroke-linecap:round"
+     x="58.450844"
+     y="123.87289"
+     id="text1"><tspan
+       id="tspan1"
+       x="58.450844"
+       y="123.87289">S</tspan></text>
 </svg>

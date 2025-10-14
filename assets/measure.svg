@@ -12,6 +12,38 @@
    xmlns:svg="http://www.w3.org/2000/svg">
   <defs
      id="defs1">
+    <marker
+       style="overflow:visible"
+       id="ArrowTriangleStylized"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="m 6,0 c -3,1 -7,3 -9,5 0,0 0,-4 2,-5 -2,-1 -2,-5 -2,-5 2,2 6,4 9,5 z"
+         id="path4" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Dot"
+       refX="0"
+       refY="0"
+       orient="auto"
+       markerWidth="0.60000002"
+       markerHeight="0.60000002"
+       viewBox="0 0 1 1"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
+         id="path17" />
+    </marker>
     <linearGradient
        id="linearGradient8">
       <stop
@@ -88,15 +120,22 @@
        cx="89.991959"
        cy="90.252014"
        r="90" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:9;stroke-dasharray:none;stroke-opacity:1"
-       id="path5-0"
-       d="M 58.567372,71.313086 C 53.465184,45.693581 95.42455,10.776932 120.3294,43.667477 c 17.58934,23.229341 -17.97793,40.00467 -28.32087,67.903093 -3.914344,10.55831 -3.544223,10.83829 -3.908161,24.78143" />
-    <circle
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:9"
-       id="path2"
-       cx="88.865959"
-       cy="154.66487"
-       r="6.1930294" />
   </g>
+  <path
+     style="fill:none;stroke:#000000;stroke-width:6;stroke-linecap:round;stroke-dasharray:none"
+     id="path2"
+     d="m 29.505034,128.65537 a 60.956051,60.509159 0 0 1 27.843804,-59.233935 60.956051,60.509159 0 0 1 65.846372,0.45537 60.956051,60.509159 0 0 1 27.00971,59.613285" />
+  <path
+     style="fill:none;stroke:#000000;stroke-width:6;stroke-linecap:round;stroke-dasharray:none;marker-start:url(#Dot);marker-end:url(#ArrowTriangleStylized)"
+     d="M 88.305832,122.98464 139.2515,53.090753"
+     id="path3" />
+  <text
+     xml:space="preserve"
+     style="font-size:53.3333px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;stroke:#000000;stroke-width:3;stroke-linecap:round;stroke-dasharray:none"
+     x="44.152912"
+     y="84.015678"
+     id="text3"><tspan
+       id="tspan3"
+       x="44.152912"
+       y="84.015678">Z</tspan></text>
 </svg>

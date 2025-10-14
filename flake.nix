@@ -25,8 +25,14 @@
             pkgs.blender
             pkgs.inkscape
             (pkgs.writeScriptBin "export_images" ''
-              find -type d -not -path "./godot_assets" -exec mkdir -p -- "./godot_assets/{}" \;
+              find -type d -not -path "*godot_assets*" -exec mkdir -p -- "./godot_assets/{}" \;
               for filename in **/*.svg; do
+                echo "converting ''${filename}"
+                basename="''${filename%.svg}"
+                inkscape "$filename" --export-filename="godot_assets/''${basename}.png"
+              done
+              for filename in *.svg; do
+                echo "converting ''${filename}"
                 basename="''${filename%.svg}"
                 inkscape "$filename" --export-filename="godot_assets/''${basename}.png"
               done

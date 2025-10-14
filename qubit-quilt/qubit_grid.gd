@@ -161,7 +161,6 @@ func _on_ready() -> void:
 	for y in y_qubits:
 		for x in x_qubits:
 			make_qubit(x,y)
-	set_to_qec_state()
 	#setup timer
 	play_timer.wait_time = 1
 	play_timer.one_shot = false
@@ -245,6 +244,7 @@ func make_qubit(x: int, y: int, basis: int = 10):
 	else:
 		grid_qubits[nextQubit.array_pos] = nextQubit
 	self.add_child(nextQubit)
+	nextQubit.set_base(basis)
 
 func handle_undo() -> void:
 	if self.operation_idx <= 0:
