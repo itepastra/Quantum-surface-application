@@ -5,8 +5,10 @@ extends Node3D
 @export var y_qubits: int = 4
 @export var cell_size: float = 1.5
 
+@export var macro_scene: PackedScene
 @export var qubit_scene: PackedScene
 @export var gate_scene: PackedScene
+
 
 class Egroup:
 	extends Node
@@ -54,6 +56,12 @@ class Egroup:
 @onready var play_pause: Button = get_node("/root/Scene/HUD/Spacer/TimeControl/PlayPause") as Button
 @onready var play_icon: Texture2D = preload("res://assets/media-controls/play.png")
 @onready var pause_icon: Texture2D = preload("res://assets/media-controls/pause.png")
+@onready var macro_button: Button = get_node("/root/Scene/HUD/Spacer/Macros/RecordMacro") as Button
+
+var recording = false
+var macro_instructions: Array[QubitOperation] = []
+var macros: Array[Macro] = []
+var macro_idx: int = 0
 
 const qubit_size = 1
 
@@ -111,7 +119,10 @@ func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, targe
 	operations.resize(operation_idx + 1)
 	operations[operation_idx] = QubitOperation.new(operation, qubit_idx, target_idx, basis)
 	operation_idx += 1
-	codeEdit.update_qubit_operations(operations)
+	self.macro_instructions.resize(macro_idx + 1)
+	self.macro_instructions[macro_idx] = QubitOperation.new(operation, qubit_idx, target_idx, basis)
+	self.macro_idx += 1
+	codeEdit.update_qubit_operations(self.operations[-1])
 	codeEdit.set_executing(operation_idx)
 
 func parse_js_args() -> void:
@@ -136,6 +147,7 @@ func _on_ready() -> void:
 	(timecontrol.get_node("PlayPause") as Button).pressed.connect(_on_play_pause)
 	(timecontrol.get_node("StepForward") as Button).pressed.connect(_on_step_forward)
 	(timecontrol.get_node("SkipForward") as Button).pressed.connect(_on_skip_forward)
+	macro_button.pressed.connect(_on_macro_button)
 	
 	# Resize the camera to fit with the grid
 	var full_grid_size = Vector2(x_qubits * cell_size, y_qubits*cell_size)
@@ -157,6 +169,12 @@ func _on_ready() -> void:
 	add_child(play_timer)
 	play_timer.timeout.connect(_on_play_timer_timeout)
 
+func _on_macro_button() -> void:
+	if self.recording:
+		stop_record_macro()
+	else:
+		start_record_macro()
+
 func _on_skip_back() -> void:
 	while self.operation_idx > 0:
 		self.handle_undo()
@@ -176,7 +194,7 @@ func _on_play_pause() -> void:
 			play_timer.start()
 			is_playing = true
 			play_pause.icon = pause_icon
-			
+
 
 func _on_play_timer_timeout():
 	if self.operation_idx < len(self.operations):
@@ -185,7 +203,6 @@ func _on_play_timer_timeout():
 		play_timer.stop()
 		is_playing = false	
 		play_pause.icon = play_icon
-		
 
 func _on_step_forward() -> void:
 	self.handle_redo()
@@ -193,6 +210,28 @@ func _on_step_forward() -> void:
 func _on_skip_forward() -> void:
 	while self.operation_idx < len(self.operations):
 		self.handle_redo()
+
+
+func start_record_macro():
+	self.macro_instructions = [] # reset the macro instructions
+	self.macro_idx = 0
+	self.recording = true
+
+func stop_record_macro():
+	self.recording = false
+	print_debug("stopped recording macro")
+	if len(self.macro_instructions) == 0:
+		return
+	var macro: Macro = macro_scene.instantiate()
+	macro.root = self.macro_instructions[0].index
+	macro.instructions = self.macro_instructions
+	self.macro_instructions = []
+	macro.text = "M%d" % (len(macros) + 1)
+	macro.name = "%d" % len(macros)
+	macro.idx = len(macros)
+	self.macros.append(macro)
+	print_debug("adding macro to HUD")
+	get_node("/root/Scene/HUD/Spacer/Macros").add_child(macro)
 
 func make_qubit(x: int, y: int, basis: int = 10):
 	var nextQubit: Qubit = qubit_scene.instantiate()
@@ -380,9 +419,11 @@ func cz(control: int, target: int, update: bool = true):
 	if update:
 		append_or_update(QubitOperation.Operation.CZ, control, target)
 
-func measure_z(qubit: int):
+func measure_z(qubit: int, update: bool = true):
 	qec.mz(qubit)
 	set_to_qec_state()
+	if update:
+		append_or_update(QubitOperation.Operation.MZ, qubit)
 
 func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
 	return true

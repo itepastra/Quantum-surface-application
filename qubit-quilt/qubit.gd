@@ -1,7 +1,8 @@
 class_name Qubit
 extends Node3D
 
-var button_group: ButtonGroup
+@onready var button_group: ButtonGroup = preload("res://control_buttons.tres")
+@onready var macro_group: ButtonGroup = preload("res://macros.tres")
 
 const DECAY_SPEED: float = 0.04
 # no need to recalculate the angle every time
@@ -16,11 +17,6 @@ var is_rotating: bool
 @onready var label: Label3D = get_node("QubitText")
 
 func _ready():
-	# this should be any of the buttons in the Hotbar, 
-	# they're all linked into a single button_group which gives an easy "select 1" option
-	var button = get_node("/root/Scene/HUD/Spacer/Hotbar/X")
-	button_group = button.button_group
-	
 	self.sound = get_node("/root/Scene/SoundSource")
 
 	# connect to the qubit grid for applying the gates
@@ -49,7 +45,9 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT:
 		# find the selected rotation direction from the buttongroup
 		var pressed: Button = button_group.get_pressed_button()
+		var macro: Button = macro_group.get_pressed_button()
 		if pressed == null: # no pressed button, do nothing
+			self.handle_macro(macro)
 			return
 		var grid = get_parent() as QubitGrid
 		match pressed.name:
@@ -90,6 +88,13 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 			_:
 				return
 		sound.play()
+
+func handle_macro(macro: Button):
+	if macro == null:
+		return
+	print(macro.idx)
+	var grid = get_parent() as QubitGrid
+	grid.macros[macro.idx].execute(array_pos)
 
 const labels: Dictionary[int, String] = {
 	0: "+",
