@@ -1,4 +1,4 @@
-[gd_scene load_steps=42 format=3 uid="uid://8h8kpjesx5mq"]
+[gd_scene load_steps=43 format=3 uid="uid://8h8kpjesx5mq"]
 
 [ext_resource type="Script" uid="uid://c16i7rw21hc40" path="res://hud.gd" id="1_1fv7p"]
 [ext_resource type="Texture2D" uid="uid://dmha0kcdynqvd" path="res://assets/button.png" id="1_640wx"]
@@ -20,6 +20,9 @@
 [ext_resource type="Texture2D" uid="uid://dbmdldt03p44i" path="res://assets/menu.png" id="10_gpiub"]
 [ext_resource type="Texture2D" uid="uid://da2w8t4egghnx" path="res://assets/rz-90.png" id="14_ap7yk"]
 [ext_resource type="Texture2D" uid="uid://nfjwr2wkil0g" path="res://assets/measure.png" id="18_5kc73"]
+
+[sub_resource type="Theme" id="Theme_5kc73"]
+CodeEdit/colors/background_color = Color(0, 0, 0, 0.501961)
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_61f8s"]
 texture = ExtResource("1_640wx")
@@ -97,6 +100,7 @@ script = ExtResource("1_1fv7p")
 [node name="CodeEdit" type="CodeEdit" parent="."]
 offset_right = 8.0
 offset_bottom = 8.0
+theme = SubResource("Theme_5kc73")
 placeholder_text = "The QASM code indicating the move operations"
 emoji_menu_enabled = false
 wrap_mode = 1
