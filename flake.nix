@@ -64,7 +64,10 @@
               mkdir -p $out
               cp -r . $out
               cp ${./assets/favicon.png} $out/favicon.png
+              cp ${./assets/QQ-icon-full.png} $out/qq.png
               cp -r ${./website/static} $out/static
+
+              ${pkgs.imagemagick}/bin/convert -resize x16 -gravity center -crop 16x16+0+0 ${./assets/favicon.png} -flatten -colors 256 -background transparent $out/favicon.ico
             '';
           };
           templates =
