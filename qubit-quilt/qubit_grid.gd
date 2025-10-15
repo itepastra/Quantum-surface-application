@@ -115,13 +115,22 @@ func set_to_qec_state():
 			qubits.append(grid_qubits[i])
 		entanglement_groups.append(Egroup.new(qubits, self, qec, randf_range(1.5, 3)))
 
-func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, target_idx: int=-1, basis: int = 10) -> void:
+func pos_to_idx(pos: Vector2i) -> int:
+	return pos.x + pos.y * self.x_qubits
+
+func idx_to_pos(idx: int) -> Vector2i:
+	return Vector2i(idx % self.x_qubits, idx / self.x_qubits)
+
+func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, target_idx: int = 0, basis: int = 10) -> void:
 	operations.resize(operation_idx + 1)
-	operations[operation_idx] = QubitOperation.new(operation, qubit_idx, target_idx, basis)
+	var qubit_loc = idx_to_pos(qubit_idx)
+	var target_loc = idx_to_pos(target_idx)
+	operations[operation_idx] = QubitOperation.new(operation, qubit_loc, target_loc, basis)
 	operation_idx += 1
-	self.macro_instructions.resize(macro_idx + 1)
-	self.macro_instructions[macro_idx] = QubitOperation.new(operation, qubit_idx, target_idx, basis)
-	self.macro_idx += 1
+	if self.recording:
+		self.macro_instructions.resize(macro_idx + 1)
+		self.macro_instructions[macro_idx] = QubitOperation.new(operation, qubit_loc, target_loc, basis)
+		self.macro_idx += 1
 	codeEdit.update_qubit_operations(self.operations[-1])
 	codeEdit.set_executing(operation_idx)
 
@@ -239,12 +248,12 @@ func make_qubit(x: int, y: int, basis: int = 10):
 	nextQubit.position.y = y + start_pos.y
 	nextQubit.position *= cell_size
 	nextQubit.array_pos = y*x_qubits + x
+	nextQubit.rot = nextQubit.bases[basis]
 	if len(grid_qubits) <= nextQubit.array_pos:
 		grid_qubits.append(nextQubit)
 	else:
 		grid_qubits[nextQubit.array_pos] = nextQubit
 	self.add_child(nextQubit)
-	nextQubit.set_base(basis)
 
 func handle_undo() -> void:
 	if self.operation_idx <= 0:
@@ -254,30 +263,30 @@ func handle_undo() -> void:
 		operation_idx -= 1 # go from "what the user will be doing" to "what the user just did" to undo that
 		var selected_op = operations[self.operation_idx]
 		codeEdit.set_executing(operation_idx)
+		var op_idx = pos_to_idx(selected_op.index)
+		var op_tgt = pos_to_idx(selected_op.other)
 		match selected_op.operation:
 			QubitOperation.Operation.RX:
-				rx(selected_op.index, false)
+				rx(op_idx, false)
 			QubitOperation.Operation.RY:
-				ry(selected_op.index, false)
+				ry(op_idx, false)
 			QubitOperation.Operation.RZ:
-				rz(selected_op.index, false)
+				rz(op_idx, false)
 			QubitOperation.Operation.RH:
-				rh(selected_op.index, false)
+				rh(op_idx, false)
 			QubitOperation.Operation.RS:
-				rsd(selected_op.index, false)
+				rsd(op_idx, false)
 			QubitOperation.Operation.RSD:
-				rs(selected_op.index, false)
+				rs(op_idx, false)
 			QubitOperation.Operation.ADD:
-				grid_qubits[selected_op.index].queue_free()
-				grid_qubits[selected_op.index] = null
+				grid_qubits[op_idx].queue_free()
+				grid_qubits[op_idx] = null
 			QubitOperation.Operation.DELETE:
-				var x: int = selected_op.index % x_qubits
-				var y: int = selected_op.index / x_qubits
-				make_qubit(x, y, selected_op.basis)
+				make_qubit(selected_op.index.x, selected_op.index.y, selected_op.basis)
 			QubitOperation.Operation.CX:
-				cx(selected_op.index, selected_op.other, false)
+				cx(op_idx, op_tgt, false)
 			QubitOperation.Operation.CZ:
-				cz(selected_op.index, selected_op.other, false)
+				cz(op_idx, op_tgt, false)
 
 func handle_redo() -> void:
 	if self.operation_idx >= len(operations):
@@ -285,30 +294,30 @@ func handle_redo() -> void:
 		return
 	else:
 		var selected_op = operations[self.operation_idx]
+		var op_idx = pos_to_idx(selected_op.index)
+		var op_tgt = pos_to_idx(selected_op.other)
 		match selected_op.operation:
 			QubitOperation.Operation.RX:
-				rx(selected_op.index, false)
+				rx(op_idx, false)
 			QubitOperation.Operation.RY:
-				ry(selected_op.index, false)
+				ry(op_idx, false)
 			QubitOperation.Operation.RZ:
-				rz(selected_op.index, false)
+				rz(op_idx, false)
 			QubitOperation.Operation.RH:
-				rh(selected_op.index, false)
+				rh(op_idx, false)
 			QubitOperation.Operation.RS:
-				rs(selected_op.index, false)
+				rs(op_idx, false)
 			QubitOperation.Operation.RSD:
-				rsd(selected_op.index, false)
+				rsd(op_idx, false)
 			QubitOperation.Operation.ADD:
-				var x: int = floori(selected_op.index % x_qubits)
-				var y: int = floori(selected_op.index / x_qubits)
-				make_qubit(x, y)
+				make_qubit(selected_op.index.x, selected_op.index.y)
 			QubitOperation.Operation.DELETE:
-				grid_qubits[selected_op.index].queue_free()
-				grid_qubits[selected_op.index] = null
+				grid_qubits[op_idx].queue_free()
+				grid_qubits[op_idx] = null
 			QubitOperation.Operation.CX:
-				cx(selected_op.index, selected_op.other, false)
+				cx(op_idx, op_tgt, false)
 			QubitOperation.Operation.CZ:
-				cz(selected_op.index, selected_op.other, false)
+				cz(op_idx, op_tgt, false)
 		operation_idx += 1 # redo "what the user will be doing"
 		codeEdit.set_executing(operation_idx)
 
@@ -396,9 +405,6 @@ func cx(control: int, target: int, update: bool = true):
 	
 	add_cx_cz_visuals(control, target, false)
 	
-	# apply cx between control and target
-	var qc = grid_qubits[control]
-	var qt = grid_qubits[target]
 	qec.cnot(control, target)
 	set_to_qec_state()
 	if update:
@@ -411,9 +417,6 @@ func cz(control: int, target: int, update: bool = true):
 	
 	add_cx_cz_visuals(control, target, true)
 	
-	# apply cz between control and target
-	var qc = grid_qubits[control]
-	var qt = grid_qubits[target]
 	qec.cphase(control, target)
 	set_to_qec_state()
 	if update:
@@ -426,29 +429,13 @@ func measure_z(qubit: int, update: bool = true):
 		append_or_update(QubitOperation.Operation.MZ, qubit)
 
 func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
-	return true
-	# Calculate row and column positions
-	var row1: int = qubit1_pos / width
-	var col1: int = qubit1_pos % width
-	var row2: int = qubit2_pos / width
-	var col2: int = qubit2_pos % width
-	
-	# Check if they are orthogonal neighbors
-	var row_diff = abs(row1 - row2)
-	var col_diff = abs(col1 - col2)
-	if (row_diff + col_diff) != 1:  # Manhattan distance 1
-		return false
-	
-	return true
-
-func get_qubit_position_from_index(qubit_index: int) -> Vector2i:
-	var col = qubit_index % x_qubits
-	var row = qubit_index / x_qubits
-	return Vector2i(col, row)
+	var p1 = idx_to_pos(qubit1_pos)
+	var p2 = idx_to_pos(qubit2_pos)
+	return (qubit1_pos != qubit2_pos)
 
 func add_cx_cz_visuals(control: int, target: int, gate_is_cz: bool) -> void:
-	var pos1 = get_qubit_position_from_index(control)
-	var pos2 = get_qubit_position_from_index(target)
+	var pos1 = idx_to_pos(control)
+	var pos2 = idx_to_pos(target)
 	var dx = abs(pos1.x - pos2.x)
 	var dy = abs(pos1.y - pos2.y)
 	

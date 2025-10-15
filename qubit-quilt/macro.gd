@@ -2,65 +2,93 @@ class_name Macro
 extends Button
 
 const DELAY: float = 0.1
-var root: int # index of the macro root in the grid
+var root: Vector2i # index of the macro root in the grid
 var instructions: Array[QubitOperation] = []
 var idx: int # position in macros array
-@onready var grid: QubitGrid = get_node("/root/Scene/QubitGrid")
+var spread: Array[Vector2i]
 
+@onready var grid: QubitGrid = get_node("/root/Scene/QubitGrid")
 @onready var hotbar: ButtonGroup = preload("res://control_buttons.tres")
 
 func _ready() -> void:
 	self.button_group = preload("res://macros.tres")
-	print(self.button_group)
+	self.gen_spread()
+	print(self.spread)
 
-
-func execute(target: int):
+func gen_spread() -> void:
 	for instr in self.instructions:
-		# calculate the offset targets
+		var offindex = instr.index - self.root
+		var offother = instr.other - self.root
+		
+		if not offindex in self.spread:
+			self.spread.append(offindex)
+		if (not offother in self.spread) and (instr.is_two_qubit()):
+			self.spread.append(offother)
+
+func check_valid(target: Vector2i) -> bool:
+	for instr in self.instructions:
 		var offindex = instr.index - self.root + target
 		var offother = instr.other - self.root + target
 		
-		# check if possible (do I want to check all of them first??)
-		if offindex >= len(grid.grid_qubits) or offindex < 0:
-			print("offset ", offindex, " outside of array range, ignoring")
+		if offindex.x < 0 or offindex.x >= grid.x_qubits or offindex.y < 0 or offindex.y >= grid.y_qubits:
+			return false
+		if (offother.x < 0 or offother.x >= grid.x_qubits or offother.y < 0 or offother.y >= grid.y_qubits) and (instr.is_two_qubit()):
+			return false
+		var index = offindex.x + offindex.y * grid.x_qubits 
+		var other = offother.x + offother.y * grid.x_qubits
+		if (grid.grid_qubits[other] == null) and (instr.is_two_qubit()):
+			return false
+		if grid.grid_qubits[index] == null:
+			return false
+	return true
+
+func execute(target: Vector2i) -> void:
+	for instr in self.instructions:
+		var offindex = instr.index - self.root + target
+		var offother = instr.other - self.root + target
+		
+		if offindex.x < 0 or offindex.x >= grid.x_qubits or offindex.y < 0 or offindex.y >= grid.y_qubits:
+			print("index outside of grid")
 			continue
-		if (instr.is_two_qubit()) and (offother >= len(grid.grid_qubits) or offother < 0):
-			print("offother ", offother, " outside of array range, ignoring")
+		if (offother.x < 0 or offother.x >= grid.x_qubits or offother.y < 0 or offother.y >= grid.y_qubits) and (instr.is_two_qubit()):
+			print("other outside of grid")
 			continue
-		if (grid.grid_qubits[offother] == null) and (instr.is_two_qubit()):
-			print("otheridx ", offother, " did not exist in grid: ", grid.grid_qubits[offother])
+		var index = offindex.x + offindex.y * grid.x_qubits 
+		var other = offother.x + offother.y * grid.x_qubits
+		
+		if (grid.grid_qubits[other] == null) and (instr.is_two_qubit()):
+			print("otheridx ", other, " did not exist in grid: ", grid.grid_qubits[other])
 			continue
-		if grid.grid_qubits[offindex] == null:
-			print("offsetidx ", offindex, " did not exist in grid: ", grid.grid_qubits[offindex])
+		if grid.grid_qubits[index] == null:
+			print("offsetidx ", index, " did not exist in grid: ", grid.grid_qubits[index])
 			continue
+		
 		match instr.operation:
 			QubitOperation.Operation.RX:
-				grid.rx(offindex)
+				grid.rx(index)
 			QubitOperation.Operation.RY:
-				grid.ry(offindex)
+				grid.ry(index)
 			QubitOperation.Operation.RZ:
-				grid.rz(offindex)
+				grid.rz(index)
 			QubitOperation.Operation.RH:
-				grid.rh(offindex)
+				grid.rh(index)
 			QubitOperation.Operation.RS:
-				grid.rs(offindex)
+				grid.rs(index)
 			QubitOperation.Operation.RSD:
-				grid.rsd(offindex)
+				grid.rsd(index)
 			QubitOperation.Operation.ADD:
 				print_debug("TODO: fix ADD in macro")
-				var x: int = floori(offindex % grid.x_qubits)
-				var y: int = floori(offindex / grid.x_qubits)
-				grid.make_qubit(x, y)
+				grid.make_qubit(offindex.x, offindex.y)
 			QubitOperation.Operation.DELETE:
 				print_debug("TODO: fix DELETE in macro")
-				grid.grid_qubits[offindex].queue_free()
-				grid.grid_qubits[offindex] = null
+				grid.grid_qubits[index].queue_free()
+				grid.grid_qubits[index] = null
 			QubitOperation.Operation.CX:
-				grid.cx(offindex, offother)
+				grid.cx(index, other)
 			QubitOperation.Operation.CZ:
-				grid.cz(offindex, offother)
+				grid.cz(index, other)
 			QubitOperation.Operation.MZ:
-				grid.measure_z(offindex)
+				grid.measure_z(index)
 		await get_tree().create_timer(DELAY).timeout
 
 func _on_pressed() -> void:

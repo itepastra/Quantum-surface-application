@@ -10,24 +10,30 @@ const angle_90 = deg_to_rad(90)
 
 var sound: AudioStreamPlayer
 var array_pos: int # what position this qubit has in the grid array
+var pos: Vector2i # what position this qubit has in 2d coordinates
 var rot: Basis # the "target" rotation
-var is_rotating: bool
+var is_rotating: bool = false
+var is_hovered: bool = false
 
 @onready var qb: StaticBody3D = get_node("QubitBody")
 @onready var label: Label3D = get_node("QubitText")
+@onready var grid: QubitGrid = get_parent() as QubitGrid
+@onready var particle_color: BaseMaterial3D = preload("res://qubit_particle.tres") as BaseMaterial3D
 
 func _ready():
 	self.sound = get_node("/root/Scene/SoundSource")
-
 	# connect to the qubit grid for applying the gates
-	
-	self.rot = qb.transform.basis
+	qb.transform.basis = self.rot
 	self.is_rotating = false
+	self.pos = grid.idx_to_pos(self.array_pos)
 
 func set_base(num: int) -> void:
 	self.rot = bases[num]
 	self.is_rotating = true
 	self.label.text = labels[num]
+
+func highlight(is_warn: bool) -> void:
+	pass
 
 func _process(delta: float) -> void:
 	# don't do the calculations if the qubit is in a stationary state
@@ -40,7 +46,7 @@ func _process(delta: float) -> void:
 		self.is_rotating = false
 
 func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _normal: Vector3, _shape_idx: int) -> void:
-	# the user clicked on the qubitg
+	# the user clicked on the qubit
 	
 	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT:
 		# find the selected rotation direction from the buttongroup
@@ -49,7 +55,6 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 		if pressed == null: # no pressed button, do nothing
 			self.handle_macro(macro)
 			return
-		var grid = get_parent() as QubitGrid
 		match pressed.name:
 			"X":
 				grid.rx(array_pos)
@@ -93,8 +98,10 @@ func handle_macro(macro: Button):
 	if macro == null:
 		return
 	print(macro.idx)
-	var grid = get_parent() as QubitGrid
-	grid.macros[macro.idx].execute(array_pos)
+	grid.macros[macro.idx].execute(Vector2i(array_pos % grid.x_qubits, array_pos / grid.x_qubits))
+
+
+
 
 const labels: Dictionary[int, String] = {
 	0: "+",
@@ -150,3 +157,58 @@ const bases: Dictionary[int, Basis] = {
 	22: Basis(Vector3(-1,0,0),Vector3(0,0,-1), Vector3(0,-1,0)),
 	23: Basis(Vector3(1,0,0),Vector3(0,0,-1), Vector3(0,1,0)),
 }
+
+
+func _on_qubit_body_mouse_entered() -> void:
+	var macro: Macro = macro_group.get_pressed_button()
+	if macro == null:
+		return
+	
+	var all_valid: bool = true
+	var to_toggle: Array[Qubit] = []
+	
+	for s in macro.spread:
+		var offset: Vector2i = self.pos + s
+		if offset.x < 0 or offset.x >= grid.x_qubits or offset.y < 0 or offset.y >= grid.y_qubits:
+			all_valid = false
+			print(s, " is not in range with ", self.pos)
+			continue
+		var other = self.grid.pos_to_idx(offset)
+		if grid.grid_qubits[other] == null:
+			all_valid = false
+			print(s, " does not exist with ", self.pos)
+			continue
+		to_toggle.append(grid.grid_qubits[other])
+	if all_valid:
+		particle_color.albedo_color = Color(0,1,0)
+	else:
+		particle_color.albedo_color = Color(1,0,1)
+	for q in to_toggle:
+		var glow = q.get_node("Glow") as GPUParticles3D
+		glow.emitting = true
+
+
+func _on_qubit_body_mouse_exited() -> void:
+	var macro: Macro = macro_group.get_pressed_button()
+	if macro == null:
+		return
+	is_hovered = false
+	
+	var to_toggle: Array[Qubit] = []
+	
+	for s in macro.spread:
+		var offset: Vector2i = self.pos + s
+		if offset.x < 0 or offset.x >= grid.x_qubits or offset.y < 0 or offset.y >= grid.y_qubits:
+			continue
+		var other = self.grid.pos_to_idx(offset)
+		if grid.grid_qubits[other] == null:
+			continue
+		to_toggle.append(grid.grid_qubits[other])
+	
+	for q in to_toggle:
+		var glow = q.get_node("Glow") as GPUParticles3D
+		glow.emitting = false
+	# get the selected macro spread
+	
+	# for each qubit in the spread
+		# disable the emitter

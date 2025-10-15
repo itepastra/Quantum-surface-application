@@ -1,9 +1,41 @@
-[gd_scene load_steps=4 format=3 uid="uid://c2ct5l3xnl1ug"]
+[gd_scene load_steps=9 format=3 uid="uid://c2ct5l3xnl1ug"]
 
 [ext_resource type="Script" uid="uid://d1t0ojx53vfcm" path="res://qubit.gd" id="1_p1x3c"]
 [ext_resource type="ArrayMesh" uid="uid://dltjeicqvrm7a" path="res://assets/Qubit_ball.obj" id="2_p1x3c"]
+[ext_resource type="Material" uid="uid://nl4y1n6funvr" path="res://qubit_particle.tres" id="3_xbv63"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_p1x3c"]
+
+[sub_resource type="Curve" id="Curve_xbv63"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_ubpqw"]
+curve = SubResource("Curve_xbv63")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_p1x3c"]
+emission_shape = 6
+emission_ring_axis = Vector3(0, 0, 1)
+emission_ring_height = 1.0
+emission_ring_radius = 1.0
+emission_ring_inner_radius = 0.7
+emission_ring_cone_angle = 90.0
+direction = Vector3(0, 0, 1)
+spread = 90.0
+initial_velocity_min = -0.5
+initial_velocity_max = 0.5
+gravity = Vector3(0, 0, 0)
+radial_accel_min = -3.0
+radial_accel_max = -1.0
+attractor_interaction_enabled = false
+scale_curve = SubResource("CurveTexture_ubpqw")
+
+[sub_resource type="SphereMesh" id="SphereMesh_xbv63"]
+material = ExtResource("3_xbv63")
+radius = 0.1
+height = 0.2
+radial_segments = 8
+rings = 4
 
 [node name="qbit" type="Node3D"]
 script = ExtResource("1_p1x3c")
@@ -14,13 +46,25 @@ script = ExtResource("1_p1x3c")
 shape = SubResource("SphereShape3D_p1x3c")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="QubitBody"]
+cast_shadow = 0
 gi_mode = 0
 gi_lightmap_texel_scale = 4.0
 mesh = ExtResource("2_p1x3c")
 
+[node name="Glow" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.912794)
+gi_mode = 0
+emitting = false
+lifetime = 0.4
+randomness = 1.0
+process_material = SubResource("ParticleProcessMaterial_p1x3c")
+draw_pass_1 = SubResource("SphereMesh_xbv63")
+
 [node name="QubitText" type="Label3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+transform = Transform3D(0.999926, 0.0121472, 0, -0.0121472, 0.999926, 0, 0, 0, 1, 0, 0, 1)
 pixel_size = 0.0085
 text = "0"
 
 [connection signal="input_event" from="QubitBody" to="." method="_on_input_event"]
+[connection signal="mouse_entered" from="QubitBody" to="." method="_on_qubit_body_mouse_entered"]
+[connection signal="mouse_exited" from="QubitBody" to="." method="_on_qubit_body_mouse_exited"]
