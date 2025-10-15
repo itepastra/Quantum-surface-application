@@ -135,14 +135,11 @@ func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, targe
 	codeEdit.set_executing(operation_idx)
 
 func parse_js_args() -> void:
-	print("testing for feature")
 	if OS.has_feature("web"):
-		print("parsing js args")
 		var iface = JavaScriptBridge.get_interface("qubits")
 		if iface:
 			self.x_qubits = iface.width
 			self.y_qubits = iface.height
-			print("set qubits to %s by %s" % [self.x_qubits, self.y_qubits])
 
 func _on_ready() -> void:
 	parse_js_args()
@@ -257,7 +254,6 @@ func make_qubit(x: int, y: int, basis: int = 10):
 
 func handle_undo() -> void:
 	if self.operation_idx <= 0:
-		print("undo without any action")
 		return
 	else:
 		operation_idx -= 1 # go from "what the user will be doing" to "what the user just did" to undo that
@@ -290,7 +286,6 @@ func handle_undo() -> void:
 
 func handle_redo() -> void:
 	if self.operation_idx >= len(operations):
-		print("redo without any future")
 		return
 	else:
 		var selected_op = operations[self.operation_idx]

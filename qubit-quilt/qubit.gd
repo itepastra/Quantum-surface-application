@@ -97,11 +97,7 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 func handle_macro(macro: Button):
 	if macro == null:
 		return
-	print(macro.idx)
 	grid.macros[macro.idx].execute(Vector2i(array_pos % grid.x_qubits, array_pos / grid.x_qubits))
-
-
-
 
 const labels: Dictionary[int, String] = {
 	0: "+",
@@ -171,12 +167,10 @@ func _on_qubit_body_mouse_entered() -> void:
 		var offset: Vector2i = self.pos + s
 		if offset.x < 0 or offset.x >= grid.x_qubits or offset.y < 0 or offset.y >= grid.y_qubits:
 			all_valid = false
-			print(s, " is not in range with ", self.pos)
 			continue
 		var other = self.grid.pos_to_idx(offset)
 		if grid.grid_qubits[other] == null:
 			all_valid = false
-			print(s, " does not exist with ", self.pos)
 			continue
 		to_toggle.append(grid.grid_qubits[other])
 	if all_valid:

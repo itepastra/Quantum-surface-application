@@ -13,7 +13,6 @@ var spread: Array[Vector2i]
 func _ready() -> void:
 	self.button_group = preload("res://macros.tres")
 	self.gen_spread()
-	print(self.spread)
 
 func gen_spread() -> void:
 	for instr in self.instructions:
@@ -48,19 +47,15 @@ func execute(target: Vector2i) -> void:
 		var offother = instr.other - self.root + target
 		
 		if offindex.x < 0 or offindex.x >= grid.x_qubits or offindex.y < 0 or offindex.y >= grid.y_qubits:
-			print("index outside of grid")
 			continue
 		if (offother.x < 0 or offother.x >= grid.x_qubits or offother.y < 0 or offother.y >= grid.y_qubits) and (instr.is_two_qubit()):
-			print("other outside of grid")
 			continue
 		var index = offindex.x + offindex.y * grid.x_qubits 
 		var other = offother.x + offother.y * grid.x_qubits
 		
 		if (grid.grid_qubits[other] == null) and (instr.is_two_qubit()):
-			print("otheridx ", other, " did not exist in grid: ", grid.grid_qubits[other])
 			continue
 		if grid.grid_qubits[index] == null:
-			print("offsetidx ", index, " did not exist in grid: ", grid.grid_qubits[index])
 			continue
 		
 		match instr.operation:
