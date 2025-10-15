@@ -7,4 +7,4 @@ In this app, we’ve focused on the six most significant qubit states,the cardin
 
 Below, you can see how a quantum state is precisely mapped onto the Bloch sphere, alongside the six cardinal states used in our simulation, with their corresponding colors. The visualization also shows the X, Y, and Z axes, which align with these states, giving a clear picture of how qubit states are oriented in this geometric representation.
 
-![bloch sphere](bloch sphere.png)
+![bloch sphere](/bloch-sphere.png)
