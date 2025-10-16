@@ -52,7 +52,7 @@ gi_lightmap_texel_scale = 4.0
 mesh = ExtResource("2_p1x3c")
 
 [node name="Glow" type="GPUParticles3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.912794)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
 gi_mode = 0
 emitting = false
 lifetime = 0.4
