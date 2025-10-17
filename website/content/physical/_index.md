@@ -4,4 +4,4 @@ title = "Physical Qubits"
 sort_by = "weight"
 +++
 
-This is a chapter
+This chapter is all about how physical qubits work and how they can be controlled.

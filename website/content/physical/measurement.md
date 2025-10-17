@@ -35,4 +35,4 @@ Since we are not using an actual quantum computer we can fully know the state of
 which you can see by the color facing towards you. If however a "measurement" is done, the qubit will
 rotate to what the result was to imitate reality.
 
-{{ qubitquilt(w=1,h=1) }}
+{{ qubitquilt(w=1,h=1,gates='["X","Y","Z","MZ"]') }}
