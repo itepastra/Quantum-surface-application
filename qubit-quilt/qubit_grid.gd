@@ -8,6 +8,8 @@ extends Node3D
 @export var qubit_scene: PackedScene
 @export var gate_scene: PackedScene
 
+var enabled_gates: Array[String] = ["X", "Y", "Z", "H", "S", "CX", "CZ", "MZ", "ADD", "REMOVE"]
+
 class Egroup:
 	extends Node
 	var qubits: Array[Qubit] = []
@@ -124,10 +126,18 @@ func parse_js_args() -> void:
 		if iface:
 			self.x_qubits = iface.width
 			self.y_qubits = iface.height
-			print("set qubits to %s by %s" % [self.x_qubits, self.y_qubits])
+			self.enabled_gates = []
+			for i in iface.gates.length:
+				self.enabled_gates.append(iface.gates[i])
 
 func _on_ready() -> void:
 	parse_js_args()
+	
+	var hb = get_node("/root/Scene/HUD/Spacer/Hotbar/")
+	
+	for b in self.enabled_gates:
+		var but = hb.get_node(b) as Button
+		but.visible = true;
 	
 	self.button = get_node("/root/Scene/HUD/Spacer/Hotbar/ADD")
 	qec.init(x_qubits*y_qubits);

@@ -4,7 +4,8 @@
 	<script>
 		window.qubits = {
 			width: "{{w}}",
-			height: "{{h}}"
+			height: "{{h}}",
+			gates: {{gates | safe}}
 		};
 
 		function printProgress(current, total) {
