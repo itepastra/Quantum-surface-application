@@ -204,6 +204,7 @@ grow_vertical = 0
 theme = SubResource("Theme_n2snw")
 
 [node name="X" type="Button" parent="Spacer/Hotbar"]
+visible = false
 layout_mode = 2
 tooltip_text = "X-gate"
 theme = ExtResource("2_1xsix")
@@ -214,6 +215,7 @@ icon = ExtResource("2_a2258")
 icon_alignment = 1
 
 [node name="Y" type="Button" parent="Spacer/Hotbar"]
+visible = false
 layout_mode = 2
 tooltip_text = "Y-gate"
 toggle_mode = true
@@ -223,6 +225,7 @@ icon = ExtResource("3_1xsix")
 icon_alignment = 1
 
 [node name="Z" type="Button" parent="Spacer/Hotbar"]
+visible = false
 layout_mode = 2
 tooltip_text = "Z-gate"
 toggle_mode = true
@@ -232,6 +235,7 @@ icon = ExtResource("4_rftc2")
 icon_alignment = 1
 
 [node name="H" type="Button" parent="Spacer/Hotbar"]
+visible = false
 layout_mode = 2
 tooltip_text = "H-gate (Hadamard)"
 toggle_mode = true
@@ -241,6 +245,7 @@ icon = ExtResource("9_4u2vk")
 icon_alignment = 1
 
 [node name="S" type="Button" parent="Spacer/Hotbar"]
+visible = false
 layout_mode = 2
 tooltip_text = "S-gate (√Z)"
 toggle_mode = true
@@ -250,6 +255,7 @@ icon = ExtResource("14_ap7yk")
 icon_alignment = 1
 
 [node name="CX" type="Button" parent="Spacer/Hotbar"]
+visible = false
 layout_mode = 2
 tooltip_text = "CNOT (Controlled X)"
 toggle_mode = true
@@ -259,6 +265,7 @@ icon = ExtResource("6_g10ll")
 icon_alignment = 1
 
 [node name="CZ" type="Button" parent="Spacer/Hotbar"]
+visible = false
 layout_mode = 2
 tooltip_text = "CPhase (Controlled Z)"
 toggle_mode = true
@@ -267,6 +274,7 @@ shortcut = SubResource("Shortcut_amv7k")
 icon = ExtResource("7_gpiub")
 
 [node name="MZ" type="Button" parent="Spacer/Hotbar"]
+visible = false
 layout_mode = 2
 tooltip_text = "Measure Z basis"
 toggle_mode = true
@@ -275,6 +283,7 @@ shortcut = SubResource("Shortcut_bp16l")
 icon = ExtResource("18_5kc73")
 
 [node name="ADD" type="Button" parent="Spacer/Hotbar"]
+visible = false
 layout_mode = 2
 tooltip_text = "Add a qubit where there is a hole"
 theme = ExtResource("2_1xsix")
@@ -285,6 +294,7 @@ icon = ExtResource("7_rftc2")
 icon_alignment = 1
 
 [node name="REMOVE" type="Button" parent="Spacer/Hotbar"]
+visible = false
 layout_mode = 2
 tooltip_text = "Remove a qubit"
 theme = ExtResource("2_1xsix")
