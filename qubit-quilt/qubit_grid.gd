@@ -74,6 +74,8 @@ var entanglement_groups: Array[Egroup] = []
 func set_to_qec_state():
 	var graph: Dictionary[int,PackedInt32Array] = {};
 	for i in x_qubits*y_qubits:
+		if grid_qubits[i] == null:
+			continue
 		grid_qubits[i].set_base(qec.get_vop(i))
 		graph.get_or_add(i, PackedInt32Array())
 		graph[i].append_array(qec.get_adjacent(i))
