@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://dkat3guhw738"]
+
+[ext_resource type="Theme" uid="uid://cvssq0yc2h85n" path="res://controls.tres" id="1_l2s0j"]
+[ext_resource type="Script" uid="uid://btncv66k1elap" path="res://macro.gd" id="3_h2udn"]
+
+[node name="Macro" type="Button"]
+custom_minimum_size = Vector2(40, 40)
+layout_direction = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme = ExtResource("1_l2s0j")
+toggle_mode = true
+icon_alignment = 1
+expand_icon = true
+script = ExtResource("3_h2udn")
+
+[connection signal="pressed" from="." to="." method="_on_pressed"]
