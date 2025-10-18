@@ -387,20 +387,7 @@ func measure_z(qubit: int):
 	set_to_qec_state()
 
 func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
-	return true
-	# Calculate row and column positions
-	var row1: int = qubit1_pos / width
-	var col1: int = qubit1_pos % width
-	var row2: int = qubit2_pos / width
-	var col2: int = qubit2_pos % width
-	
-	# Check if they are orthogonal neighbors
-	var row_diff = abs(row1 - row2)
-	var col_diff = abs(col1 - col2)
-	if (row_diff + col_diff) != 1:  # Manhattan distance 1
-		return false
-	
-	return true
+	return qubit1_pos != qubit2_pos
 
 func get_qubit_position_from_index(qubit_index: int) -> Vector2i:
 	var col = qubit_index % x_qubits
