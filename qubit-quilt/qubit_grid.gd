@@ -166,7 +166,7 @@ func _on_ready() -> void:
 	# initialize the qubits themselves
 	for y in y_qubits:
 		for x in x_qubits:
-			make_qubit(x,y)
+			make_qubit(Vector2i(x,y))
 	#setup timer
 	play_timer.wait_time = 1
 	play_timer.one_shot = false
@@ -238,13 +238,13 @@ func stop_record_macro():
 	print_debug("adding macro to HUD")
 	get_node("/root/Scene/HUD/Spacer/Macros").add_child(macro)
 
-func make_qubit(x: int, y: int, basis: int = 10):
+func make_qubit(pos: Vector2i, basis: int = 10) -> void:
 	var nextQubit: Qubit = qubit_scene.instantiate()
-	nextQubit.name = "Qubit (%d, %d)" % [x,y]
-	nextQubit.position.x = x + start_pos.x
-	nextQubit.position.y = y + start_pos.y
+	nextQubit.name = "Qubit (%d, %d)" % [pos.x,pos.y]
+	nextQubit.position.x = pos.x + start_pos.x
+	nextQubit.position.y = pos.y + start_pos.y
 	nextQubit.position *= cell_size
-	nextQubit.array_pos = y*x_qubits + x
+	nextQubit.array_pos = pos_to_idx(pos)
 	nextQubit.rot = nextQubit.bases[basis]
 	if len(grid_qubits) <= nextQubit.array_pos:
 		grid_qubits.append(nextQubit)
@@ -278,7 +278,7 @@ func handle_undo() -> void:
 				grid_qubits[op_idx].queue_free()
 				grid_qubits[op_idx] = null
 			QubitOperation.Operation.DELETE:
-				make_qubit(selected_op.index.x, selected_op.index.y, selected_op.basis)
+				make_qubit(selected_op.index, selected_op.basis)
 			QubitOperation.Operation.CX:
 				cx(op_idx, op_tgt, false)
 			QubitOperation.Operation.CZ:
@@ -332,13 +332,13 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT and self.button.button_pressed:
 		# get the position in grid space of the click
 		var camera: Camera3D = %Camera
-		var mevent = event as InputEventMouseButton
+		var mevent: InputEventMouseButton = event as InputEventMouseButton
 		var world_pos: Vector3 = camera.project_position(mevent.position, 10)/cell_size - start_pos
 		# get the closest qubit clamped to the size of the grid
-		var snapped_pos = world_pos.snapped(Vector3(1, 1, 1)).clamp(
+		var snapped_pos: Vector3 = world_pos.snapped(Vector3(1, 1, 1)).clamp(
 			Vector3(0,0,0), Vector3(x_qubits-1,y_qubits-1,0))
 		# check if any qubit in the grid has the coordinates we would be creating it at
-		var collision = false
+		var collision: bool = false
 		for qubit in grid_qubits:
 			if qubit == null:
 				continue
@@ -346,10 +346,9 @@ func _input(event: InputEvent) -> void:
 				collision = true
 		# create a qubit at the correct position
 		if not collision:
-			var x = roundi(snapped_pos.x)
-			var y = roundi(snapped_pos.y)
-			make_qubit(x, y)
-			append_or_update(QubitOperation.Operation.ADD, y*x_qubits + x)
+			var sp2: Vector2i = Vector2i(snapped_pos.x, snapped_pos.y)
+			make_qubit(sp2)
+			append_or_update(QubitOperation.Operation.ADD, pos_to_idx(sp2))
 
 
 func rx(qubit: int, update: bool = true):
