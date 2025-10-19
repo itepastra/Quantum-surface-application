@@ -1,9 +1,8 @@
 class_name QubitGrid
 extends Node3D
 
-@export var x_qubits: int = 8
-@export var y_qubits: int = 4
-@export var cell_size: float = 1.5
+@export var x_qubits: int = 1
+@export var y_qubits: int = 1
 
 @export var macro_scene: PackedScene
 @export var qubit_scene: PackedScene
@@ -79,9 +78,22 @@ var operations: Array[QubitOperation] = []
 
 var entanglement_groups: Array[Egroup] = []
 
+# works specifically for the cell size (1.8, 0.9), 
+# calculated by making a square that looked correct and then the inverse affine transform
+# offset is calculated at initialisation, since it depends on the amount of qubits
+var aftrans: Transform3D = Transform3D(Basis(
+	Vector3(5.0/9.0, -5.0/9.0, 0.0), 
+	Vector3(5.0/9.0, 5.0/9.0, 0.0),
+	Vector3(0.0, 0.0, 1.0/sqrt(2))
+), 
+	Vector3(0.0, 0.0, 0.0)
+)
+
 func set_to_qec_state():
 	var graph: Dictionary[int,PackedInt32Array] = {};
 	for i in x_qubits*y_qubits:
+		if grid_qubits[i] == null:
+			continue
 		grid_qubits[i].set_base(qec.get_vop(i))
 		graph.get_or_add(i, PackedInt32Array())
 		graph[i].append_array(qec.get_adjacent(i))
@@ -156,13 +168,14 @@ func _on_ready() -> void:
 	macro_button.pressed.connect(_on_macro_button)
 	
 	# Resize the camera to fit with the grid
-	var full_grid_size = Vector2(x_qubits * cell_size, y_qubits*cell_size)
+	var full_grid_size = Vector2(x_qubits * cell_size.x, y_qubits*cell_size.y)
 	var camera: Camera3D = %Camera
 	camera.size = max(full_grid_size.x, full_grid_size.y)*1.05
 	# Dynamically change the keep_aspect of the camera to always fit the whole grid
 	camera.keep_aspect = camera.KEEP_WIDTH if full_grid_size.x > full_grid_size.y else camera.KEEP_HEIGHT
 	
 	self.start_pos = Vector3(-(x_qubits-1)/2.0, -(y_qubits-1)/2.0, 0)
+	self.aftrans.origin = aftrans * (-self.start_pos * cell_size)
 	# initialize the qubits themselves
 	for y in y_qubits:
 		for x in x_qubits:
@@ -216,6 +229,7 @@ func _on_skip_forward() -> void:
 	while self.operation_idx < len(self.operations):
 		self.handle_redo()
 
+<<<<<<< HEAD
 
 func start_record_macro():
 	self.macro_instructions = [] # reset the macro instructions
@@ -238,11 +252,13 @@ func stop_record_macro():
 	print_debug("adding macro to HUD")
 	get_node("/root/Scene/HUD/Spacer/Macros").add_child(macro)
 
-func make_qubit(pos: Vector2i, basis: int = 10) -> void:
+const cell_size: Vector3 = Vector3(1.8, 0.9, 1.0)
+
+func make_qubit(x: int, y: int, basis: int = 10):
 	var nextQubit: Qubit = qubit_scene.instantiate()
-	nextQubit.name = "Qubit (%d, %d)" % [pos.x,pos.y]
-	nextQubit.position.x = pos.x + start_pos.x
-	nextQubit.position.y = pos.y + start_pos.y
+	nextQubit.name = "Qubit (%d, %d)" % [x,y]
+	nextQubit.position.x = x + start_pos.x + (y & 0b1) * 0.5
+	nextQubit.position.y = y + start_pos.y
 	nextQubit.position *= cell_size
 	nextQubit.array_pos = pos_to_idx(pos)
 	nextQubit.rot = nextQubit.bases[basis]
@@ -333,22 +349,15 @@ func _input(event: InputEvent) -> void:
 		# get the position in grid space of the click
 		var camera: Camera3D = %Camera
 		var mevent: InputEventMouseButton = event as InputEventMouseButton
-		var world_pos: Vector3 = camera.project_position(mevent.position, 10)/cell_size - start_pos
-		# get the closest qubit clamped to the size of the grid
-		var snapped_pos: Vector3 = world_pos.snapped(Vector3(1, 1, 1)).clamp(
-			Vector3(0,0,0), Vector3(x_qubits-1,y_qubits-1,0))
-		# check if any qubit in the grid has the coordinates we would be creating it at
-		var collision: bool = false
-		for qubit in grid_qubits:
-			if qubit == null:
-				continue
-			elif qubit.position.is_equal_approx((snapped_pos + start_pos)*cell_size):
-				collision = true
-		# create a qubit at the correct position
-		if not collision:
-			var sp2: Vector2i = Vector2i(snapped_pos.x, snapped_pos.y)
-			make_qubit(sp2)
-			append_or_update(QubitOperation.Operation.ADD, pos_to_idx(sp2))
+		var world_pos: Vector3 = camera.project_position(mevent.position, 10)
+		var transformed: Vector3 = (aftrans * world_pos).snapped(Vector3(1.0, 1.0, 1.0))
+		var pos: Vector2i = Vector2i((transformed.x - transformed.y)/2, (transformed.x + transformed.y))
+		var idx: int = pos.x + pos.y * self.x_qubits # TODO: use pos_to_idx after macros merged
+		if pos.x < 0 or pos.x >= self.x_qubits or pos.y < 0 or pos.y >= self.y_qubits:
+			pass
+		elif grid_qubits[idx] == null:
+			make_qubit((transformed.x - transformed.y)/2, (transformed.x + transformed.y))
+			append_or_update(QubitOperation.Operation.ADD, idx)
 
 
 func rx(qubit: int, update: bool = true):
@@ -426,9 +435,7 @@ func measure_z(qubit: int, update: bool = true):
 		append_or_update(QubitOperation.Operation.MZ, qubit)
 
 func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
-	var p1 = idx_to_pos(qubit1_pos)
-	var p2 = idx_to_pos(qubit2_pos)
-	return (qubit1_pos != qubit2_pos)
+	return qubit1_pos != qubit2_pos
 
 func add_cx_cz_visuals(control: int, target: int, gate_is_cz: bool) -> void:
 	var pos1 = idx_to_pos(control)
@@ -442,9 +449,9 @@ func add_cx_cz_visuals(control: int, target: int, gate_is_cz: bool) -> void:
 	if dx == 1: # horizontal connection
 		var x = min(pos1.x, pos2.x)
 		var y = pos1.y
-		var startx = (x - (x_qubits-1)/2.0) * cell_size + qubit_size
-		var endx = (x + 1 - (x_qubits-1)/2.0) * cell_size - qubit_size
-		var gatey = (y - (y_qubits-1)/2.0) * cell_size
+		var startx = (x - (x_qubits-1)/2.0) * cell_size.x + qubit_size
+		var endx = (x + 1 - (x_qubits-1)/2.0) * cell_size.y - qubit_size
+		var gatey = (y - (y_qubits-1)/2.0) * cell_size.y
 		
 		# flip the gate based on selection order so that 
 		# we have first control then target
@@ -459,9 +466,9 @@ func add_cx_cz_visuals(control: int, target: int, gate_is_cz: bool) -> void:
 	else: # vertical connection
 		var x = pos1.x
 		var y = min(pos1.y, pos2.y)
-		var gatex = (x - (x_qubits-1)/2.0) * cell_size
-		var starty = (y - (y_qubits-1)/2.0) * cell_size + qubit_size
-		var endy = (y + 1 - (y_qubits-1)/2.0) * cell_size - qubit_size
+		var gatex = (x - (x_qubits-1)/2.0) * cell_size.x
+		var starty = (y - (y_qubits-1)/2.0) * cell_size.y + qubit_size
+		var endy = (y + 1 - (y_qubits-1)/2.0) * cell_size.y - qubit_size
 
 		# flip if needed
 		var flip_vertical = pos1.y < pos2.y

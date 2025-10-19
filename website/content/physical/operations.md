@@ -12,7 +12,7 @@ In an actual quantum computer you can put the qubit in any direction. For exampl
 It may make sense to give the gates some names. We can use the color of the gate to be a direction,
 so blue is Z, red is X and green is Y. It's conventional to have a 180 degree flip being just the letter,
 so we should add that the 90 degrees these rotate are half of that. 
-If we call them $ \sqrt(Z) $, $ \sqrt(X) $ and $ \sqrt(Y) $ doing it twice (multiplying) gives the 180 degree
+If we call them $ \sqrt{Z} $, $ \sqrt{X} $ and $ \sqrt{Y} $ doing it twice (multiplying) gives the 180 degree
 flip that's conventional.
 
 {{ qubitquilt(w=1,h=1) }}
