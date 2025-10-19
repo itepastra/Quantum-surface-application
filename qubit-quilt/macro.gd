@@ -12,29 +12,32 @@ var spread: Array[Vector2i]
 
 func _ready() -> void:
 	self.button_group = preload("res://macros.tres")
+	self.rebase_to_root()
 	self.gen_spread()
+
+func rebase_to_root() -> void:
+	for instr in self.instructions:
+		instr.index = instr.index - self.root
+		instr.other = instr.other - self.root
 
 func gen_spread() -> void:
 	for instr in self.instructions:
-		var offindex = instr.index - self.root
-		var offother = instr.other - self.root
-		
-		if not offindex in self.spread:
-			self.spread.append(offindex)
-		if (not offother in self.spread) and (instr.is_two_qubit()):
-			self.spread.append(offother)
+		if not instr.index in self.spread:
+			self.spread.append(instr.index)
+		if (not instr.other in self.spread) and (instr.is_two_qubit()):
+			self.spread.append(instr.other)
 
 func check_valid(target: Vector2i) -> bool:
 	for instr in self.instructions:
-		var offindex = instr.index - self.root + target
-		var offother = instr.other - self.root + target
+		var offindex = instr.index + target
+		var offother = instr.other + target
 		
-		if offindex.x < 0 or offindex.x >= grid.x_qubits or offindex.y < 0 or offindex.y >= grid.y_qubits:
+		if grid.is_not_in_bounds(offindex):
 			return false
-		if (offother.x < 0 or offother.x >= grid.x_qubits or offother.y < 0 or offother.y >= grid.y_qubits) and (instr.is_two_qubit()):
+		if grid.is_not_in_bounds(offother) and (instr.is_two_qubit()):
 			return false
-		var index = offindex.x + offindex.y * grid.x_qubits 
-		var other = offother.x + offother.y * grid.x_qubits
+		var index = grid.pos_to_idx(offindex) 
+		var other = grid.pos_to_idx(offother)
 		if (grid.grid_qubits[other] == null) and (instr.is_two_qubit()):
 			return false
 		if grid.grid_qubits[index] == null:
@@ -43,15 +46,15 @@ func check_valid(target: Vector2i) -> bool:
 
 func execute(target: Vector2i) -> void:
 	for instr in self.instructions:
-		var offindex = instr.index - self.root + target
-		var offother = instr.other - self.root + target
+		var offindex = instr.index + target
+		var offother = instr.other + target
 		
-		if offindex.x < 0 or offindex.x >= grid.x_qubits or offindex.y < 0 or offindex.y >= grid.y_qubits:
+		if grid.is_not_in_bounds(offindex):
 			continue
-		if (offother.x < 0 or offother.x >= grid.x_qubits or offother.y < 0 or offother.y >= grid.y_qubits) and (instr.is_two_qubit()):
+		if grid.is_not_in_bounds(offother) and (instr.is_two_qubit()):
 			continue
-		var index = offindex.x + offindex.y * grid.x_qubits 
-		var other = offother.x + offother.y * grid.x_qubits
+		var index = grid.pos_to_idx(offindex) 
+		var other = grid.pos_to_idx(offother)
 		
 		if (grid.grid_qubits[other] == null) and (instr.is_two_qubit()):
 			continue

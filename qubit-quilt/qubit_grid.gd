@@ -284,6 +284,9 @@ func handle_undo() -> void:
 			QubitOperation.Operation.CZ:
 				cz(op_idx, op_tgt, false)
 
+func is_not_in_bounds(pos: Vector2i) -> bool:
+	return pos.x < 0 or pos.x >= self.x_qubits or pos.y < 0 or pos.y >= self.y_qubits
+
 func handle_redo() -> void:
 	if self.operation_idx >= len(operations):
 		return
