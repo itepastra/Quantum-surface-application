@@ -26,8 +26,6 @@ func _ready():
 	qb.transform.basis = self.rot
 	self.is_rotating = false
 	self.pos = grid.idx_to_pos(self.array_pos)
-	var tmp = "I: %s, P: %s"
-	self.label.text = tmp % [self.array_pos, self.pos]
 
 func set_base(num: int) -> void:
 	self.rot = bases[num]
