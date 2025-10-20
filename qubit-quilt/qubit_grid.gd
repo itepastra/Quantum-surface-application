@@ -4,6 +4,7 @@ extends Node3D
 @export var x_qubits: int = 1
 @export var y_qubits: int = 1
 
+@export var macro_scene: PackedScene
 @export var qubit_scene: PackedScene
 @export var gate_scene: PackedScene
 
@@ -55,6 +56,12 @@ class Egroup:
 @onready var play_pause: Button = get_node("/root/Scene/HUD/Spacer/TimeControl/PlayPause") as Button
 @onready var play_icon: Texture2D = preload("res://assets/media-controls/play.png")
 @onready var pause_icon: Texture2D = preload("res://assets/media-controls/pause.png")
+@onready var macro_button: Button = get_node("/root/Scene/HUD/Spacer/Macros/RecordMacro") as Button
+
+var recording = false
+var macro_instructions: Array[QubitOperation] = []
+var macros: Array[Macro] = []
+var macro_idx: int = 0
 
 const qubit_size = 1
 
@@ -122,17 +129,28 @@ func set_to_qec_state():
 			qubits.append(grid_qubits[i])
 		entanglement_groups.append(Egroup.new(qubits, self, qec, randf_range(1.5, 3)))
 
-func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, target_idx: int=-1, basis: int = 10) -> void:
+func pos_to_idx(pos: Vector2i) -> int:
+	return pos.x/2 + pos.y * self.x_qubits
+
+func idx_to_pos(idx: int) -> Vector2i:
+	var y = idx / self.x_qubits
+	return Vector2i((idx % self.x_qubits)*2 + (y&1), y)
+
+func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, target_idx: int = 0, basis: int = 10) -> void:
 	operations.resize(operation_idx + 1)
-	operations[operation_idx] = QubitOperation.new(operation, qubit_idx, target_idx, basis)
+	var qubit_loc = idx_to_pos(qubit_idx)
+	var target_loc = idx_to_pos(target_idx)
+	operations[operation_idx] = QubitOperation.new(operation, qubit_loc, target_loc, basis)
 	operation_idx += 1
-	codeEdit.update_qubit_operations(operations)
+	if self.recording:
+		self.macro_instructions.resize(macro_idx + 1)
+		self.macro_instructions[macro_idx] = QubitOperation.new(operation, qubit_loc, target_loc, basis)
+		self.macro_idx += 1
+	codeEdit.update_qubit_operations(self.operations[-1])
 	codeEdit.set_executing(operation_idx)
 
 func parse_js_args() -> void:
-	print("testing for feature")
 	if OS.has_feature("web"):
-		print("parsing js args")
 		var iface = JavaScriptBridge.get_interface("qubits")
 		if iface:
 			self.x_qubits = iface.width
@@ -159,6 +177,7 @@ func _on_ready() -> void:
 	(timecontrol.get_node("PlayPause") as Button).pressed.connect(_on_play_pause)
 	(timecontrol.get_node("StepForward") as Button).pressed.connect(_on_step_forward)
 	(timecontrol.get_node("SkipForward") as Button).pressed.connect(_on_skip_forward)
+	macro_button.pressed.connect(_on_macro_button)
 	
 	self.camera = %Camera as Camera
 	# Resize the camera to fit with the grid
@@ -169,13 +188,19 @@ func _on_ready() -> void:
 	# initialize the qubits themselves
 	for y in y_qubits:
 		for x in x_qubits:
-			make_qubit(x,y)
+			make_qubit(Vector2i(2*x,y))
 	#setup timer
 	play_timer.wait_time = 1
 	play_timer.one_shot = false
 	play_timer.autostart = false
 	add_child(play_timer)
 	play_timer.timeout.connect(_on_play_timer_timeout)
+
+func _on_macro_button() -> void:
+	if self.recording:
+		stop_record_macro()
+	else:
+		start_record_macro()
 
 func _on_skip_back() -> void:
 	while self.operation_idx > 0:
@@ -196,7 +221,7 @@ func _on_play_pause() -> void:
 			play_timer.start()
 			is_playing = true
 			play_pause.icon = pause_icon
-			
+
 
 func _on_play_timer_timeout():
 	if self.operation_idx < len(self.operations):
@@ -205,7 +230,6 @@ func _on_play_timer_timeout():
 		play_timer.stop()
 		is_playing = false	
 		play_pause.icon = play_icon
-		
 
 func _on_step_forward() -> void:
 	self.handle_redo()
@@ -214,14 +238,36 @@ func _on_skip_forward() -> void:
 	while self.operation_idx < len(self.operations):
 		self.handle_redo()
 
+
+func start_record_macro():
+	self.macro_instructions = [] # reset the macro instructions
+	self.macro_idx = 0
+	self.recording = true
+
+func stop_record_macro():
+	self.recording = false
+	if len(self.macro_instructions) == 0:
+		return
+	var macro: Macro = macro_scene.instantiate()
+	macro.root = self.macro_instructions[0].index
+	macro.instructions = self.macro_instructions
+	self.macro_instructions = []
+	macro.text = "M%d" % (len(macros) + 1)
+	macro.name = "%d" % len(macros)
+	macro.idx = len(macros)
+	self.macros.append(macro)
+	get_node("/root/Scene/HUD/Spacer/Macros").add_child(macro)
+
 const cell_size: Vector3 = Vector3(1.8, 0.9, 1.0)
 
-func make_qubit(x: int, y: int, basis: int = 10):
+func make_qubit(pos: Vector2i, basis: int = 10):
 	var nextQubit: Qubit = qubit_scene.instantiate()
-	nextQubit.name = "Qubit (%d, %d)" % [x,y]
-	nextQubit.position.x = x + start_pos.x + (y & 0b1) * 0.5
-	nextQubit.position.y = y + start_pos.y
+	nextQubit.name = "Qubit %d" % [pos]
+	nextQubit.position.x = pos.x / 2 + start_pos.x + (pos.y & 0b1) * 0.5
+	nextQubit.position.y = pos.y + start_pos.y
 	nextQubit.position *= cell_size
+	nextQubit.array_pos = pos_to_idx(pos)
+	nextQubit.rot = nextQubit.bases[basis]
 	
 	if self.camera.minvec.x > nextQubit.position.x:
 		self.camera.minvec.x = nextQubit.position.x
@@ -232,77 +278,76 @@ func make_qubit(x: int, y: int, basis: int = 10):
 	if self.camera.maxvec.y < nextQubit.position.y:
 		self.camera.maxvec.y = nextQubit.position.y
 	
-	nextQubit.array_pos = y*x_qubits + x
 	if len(grid_qubits) <= nextQubit.array_pos:
 		grid_qubits.append(nextQubit)
 	else:
 		grid_qubits[nextQubit.array_pos] = nextQubit
 	self.add_child(nextQubit)
-	nextQubit.set_base(basis)
 
 func handle_undo() -> void:
 	if self.operation_idx <= 0:
-		print("undo without any action")
 		return
 	else:
 		operation_idx -= 1 # go from "what the user will be doing" to "what the user just did" to undo that
 		var selected_op = operations[self.operation_idx]
 		codeEdit.set_executing(operation_idx)
+		var op_idx = pos_to_idx(selected_op.index)
+		var op_tgt = pos_to_idx(selected_op.other)
 		match selected_op.operation:
 			QubitOperation.Operation.RX:
-				rx(selected_op.index, false)
+				rx(op_idx, false)
 			QubitOperation.Operation.RY:
-				ry(selected_op.index, false)
+				ry(op_idx, false)
 			QubitOperation.Operation.RZ:
-				rz(selected_op.index, false)
+				rz(op_idx, false)
 			QubitOperation.Operation.RH:
-				rh(selected_op.index, false)
+				rh(op_idx, false)
 			QubitOperation.Operation.RS:
-				rsd(selected_op.index, false)
+				rsd(op_idx, false)
 			QubitOperation.Operation.RSD:
-				rs(selected_op.index, false)
+				rs(op_idx, false)
 			QubitOperation.Operation.ADD:
-				grid_qubits[selected_op.index].queue_free()
-				grid_qubits[selected_op.index] = null
+				grid_qubits[op_idx].queue_free()
+				grid_qubits[op_idx] = null
 			QubitOperation.Operation.DELETE:
-				var x: int = selected_op.index % x_qubits
-				var y: int = selected_op.index / x_qubits
-				make_qubit(x, y, selected_op.basis)
+				make_qubit(selected_op.index, selected_op.basis)
 			QubitOperation.Operation.CX:
-				cx(selected_op.index, selected_op.other, false)
+				cx(op_idx, op_tgt, false)
 			QubitOperation.Operation.CZ:
-				cz(selected_op.index, selected_op.other, false)
+				cz(op_idx, op_tgt, false)
+
+func is_not_in_bounds(pos: Vector2i) -> bool:
+	return pos.x < 0 or pos.x/2 >= self.x_qubits or pos.y < 0 or pos.y >= self.y_qubits
 
 func handle_redo() -> void:
 	if self.operation_idx >= len(operations):
-		print("redo without any future")
 		return
 	else:
 		var selected_op = operations[self.operation_idx]
+		var op_idx = pos_to_idx(selected_op.index)
+		var op_tgt = pos_to_idx(selected_op.other)
 		match selected_op.operation:
 			QubitOperation.Operation.RX:
-				rx(selected_op.index, false)
+				rx(op_idx, false)
 			QubitOperation.Operation.RY:
-				ry(selected_op.index, false)
+				ry(op_idx, false)
 			QubitOperation.Operation.RZ:
-				rz(selected_op.index, false)
+				rz(op_idx, false)
 			QubitOperation.Operation.RH:
-				rh(selected_op.index, false)
+				rh(op_idx, false)
 			QubitOperation.Operation.RS:
-				rs(selected_op.index, false)
+				rs(op_idx, false)
 			QubitOperation.Operation.RSD:
-				rsd(selected_op.index, false)
+				rsd(op_idx, false)
 			QubitOperation.Operation.ADD:
-				var x: int = floori(selected_op.index % x_qubits)
-				var y: int = floori(selected_op.index / x_qubits)
-				make_qubit(x, y)
+				make_qubit(selected_op.index.x, selected_op.index.y)
 			QubitOperation.Operation.DELETE:
-				grid_qubits[selected_op.index].queue_free()
-				grid_qubits[selected_op.index] = null
+				grid_qubits[op_idx].queue_free()
+				grid_qubits[op_idx] = null
 			QubitOperation.Operation.CX:
-				cx(selected_op.index, selected_op.other, false)
+				cx(op_idx, op_tgt, false)
 			QubitOperation.Operation.CZ:
-				cz(selected_op.index, selected_op.other, false)
+				cz(op_idx, op_tgt, false)
 		operation_idx += 1 # redo "what the user will be doing"
 		codeEdit.set_executing(operation_idx)
 
@@ -319,15 +364,15 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT and self.button.button_pressed:
 		# get the position in grid space of the click
 		var camera: Camera3D = %Camera
-		var mevent = event as InputEventMouseButton
+		var mevent: InputEventMouseButton = event as InputEventMouseButton
 		var world_pos: Vector3 = camera.project_position(mevent.position, 10)
 		var transformed: Vector3 = (aftrans * world_pos).snapped(Vector3(1.0, 1.0, 1.0))
-		var pos: Vector2i = Vector2i((transformed.x - transformed.y)/2, (transformed.x + transformed.y))
-		var idx: int = pos.x + pos.y * self.x_qubits # TODO: use pos_to_idx after macros merged
-		if pos.x < 0 or pos.x >= self.x_qubits or pos.y < 0 or pos.y >= self.y_qubits:
+		var pos: Vector2i = Vector2i((transformed.x - transformed.y), (transformed.x + transformed.y))
+		var idx: int = pos_to_idx(pos)
+		if self.is_not_in_bounds(pos):
 			pass
 		elif grid_qubits[idx] == null:
-			make_qubit((transformed.x - transformed.y)/2, (transformed.x + transformed.y))
+			make_qubit(Vector2i((transformed.x - transformed.y), (transformed.x + transformed.y)))
 			append_or_update(QubitOperation.Operation.ADD, idx)
 
 
@@ -382,9 +427,6 @@ func cx(control: int, target: int, update: bool = true):
 	
 	add_cx_cz_visuals(control, target, false)
 	
-	# apply cx between control and target
-	var qc = grid_qubits[control]
-	var qt = grid_qubits[target]
 	qec.cnot(control, target)
 	set_to_qec_state()
 	if update:
@@ -397,29 +439,23 @@ func cz(control: int, target: int, update: bool = true):
 	
 	add_cx_cz_visuals(control, target, true)
 	
-	# apply cz between control and target
-	var qc = grid_qubits[control]
-	var qt = grid_qubits[target]
 	qec.cphase(control, target)
 	set_to_qec_state()
 	if update:
 		append_or_update(QubitOperation.Operation.CZ, control, target)
 
-func measure_z(qubit: int):
+func measure_z(qubit: int, update: bool = true):
 	qec.mz(qubit)
 	set_to_qec_state()
+	if update:
+		append_or_update(QubitOperation.Operation.MZ, qubit)
 
 func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
 	return qubit1_pos != qubit2_pos
 
-func get_qubit_position_from_index(qubit_index: int) -> Vector2i:
-	var col = qubit_index % x_qubits
-	var row = qubit_index / x_qubits
-	return Vector2i(col, row)
-
 func add_cx_cz_visuals(control: int, target: int, gate_is_cz: bool) -> void:
-	var pos1 = get_qubit_position_from_index(control)
-	var pos2 = get_qubit_position_from_index(target)
+	var pos1 = idx_to_pos(control)
+	var pos2 = idx_to_pos(target)
 	var dx = abs(pos1.x - pos2.x)
 	var dy = abs(pos1.y - pos2.y)
 	
