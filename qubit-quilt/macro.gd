@@ -38,7 +38,7 @@ func check_valid(target: Vector2i) -> bool:
 			return false
 		if grid.is_not_in_bounds(offother) and (instr.is_two_qubit()):
 			return false
-		var index = grid.pos_to_idx(offindex) 
+		var index = grid.pos_to_idx(offindex)
 		var other = grid.pos_to_idx(offother)
 		if (grid.grid_qubits[other] == null) and (instr.is_two_qubit()):
 			return false

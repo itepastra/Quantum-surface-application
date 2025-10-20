@@ -19,7 +19,7 @@
 [ext_resource type="Script" uid="uid://c1vu2ywfadoqj" path="res://code_edit.gd" id="10_amv7k"]
 [ext_resource type="Texture2D" uid="uid://dbmdldt03p44i" path="res://assets/menu.png" id="10_gpiub"]
 [ext_resource type="ButtonGroup" uid="uid://bgpxf2yyv8quc" path="res://control_buttons.tres" id="11_5iihh"]
-[ext_resource type="Script" path="res://hotbar_button.gd" id="13_rgb5v"]
+[ext_resource type="Script" uid="uid://c43jdqdlgp6h5" path="res://hotbar_button.gd" id="13_rgb5v"]
 [ext_resource type="Texture2D" uid="uid://da2w8t4egghnx" path="res://assets/rz-90.png" id="14_ap7yk"]
 [ext_resource type="Texture2D" uid="uid://nfjwr2wkil0g" path="res://assets/measure.png" id="18_5kc73"]
 [ext_resource type="Texture2D" uid="uid://bfma5yqm5bhlg" path="res://assets/macro.png" id="21_bp16l"]
