@@ -128,10 +128,11 @@ func set_to_qec_state():
 		entanglement_groups.append(Egroup.new(qubits, self, qec, randf_range(1.5, 3)))
 
 func pos_to_idx(pos: Vector2i) -> int:
-	return pos.x + pos.y * self.x_qubits
+	return pos.x/2 + pos.y * self.x_qubits
 
 func idx_to_pos(idx: int) -> Vector2i:
-	return Vector2i(idx % self.x_qubits, idx / self.x_qubits)
+	var y = idx / self.x_qubits
+	return Vector2i((idx % self.x_qubits)*2 + (y&1), y)
 
 func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, target_idx: int = 0, basis: int = 10) -> void:
 	operations.resize(operation_idx + 1)
@@ -179,7 +180,7 @@ func _on_ready() -> void:
 	# initialize the qubits themselves
 	for y in y_qubits:
 		for x in x_qubits:
-			make_qubit(Vector2i(x,y))
+			make_qubit(Vector2i(2*x,y))
 	#setup timer
 	play_timer.wait_time = 1
 	play_timer.one_shot = false
@@ -254,7 +255,7 @@ const cell_size: Vector3 = Vector3(1.8, 0.9, 1.0)
 func make_qubit(pos: Vector2i, basis: int = 10):
 	var nextQubit: Qubit = qubit_scene.instantiate()
 	nextQubit.name = "Qubit %d" % [pos]
-	nextQubit.position.x = pos.x + start_pos.x + (pos.y & 0b1) * 0.5
+	nextQubit.position.x = pos.x / 2 + start_pos.x + (pos.y & 0b1) * 0.5
 	nextQubit.position.y = pos.y + start_pos.y
 	nextQubit.position *= cell_size
 	nextQubit.array_pos = pos_to_idx(pos)
@@ -348,12 +349,12 @@ func _input(event: InputEvent) -> void:
 		var mevent: InputEventMouseButton = event as InputEventMouseButton
 		var world_pos: Vector3 = camera.project_position(mevent.position, 10)
 		var transformed: Vector3 = (aftrans * world_pos).snapped(Vector3(1.0, 1.0, 1.0))
-		var pos: Vector2i = Vector2i((transformed.x - transformed.y)/2, (transformed.x + transformed.y))
-		var idx: int = pos.x + pos.y * self.x_qubits # TODO: use pos_to_idx after macros merged
+		var pos: Vector2i = Vector2i((transformed.x - transformed.y), (transformed.x + transformed.y))
+		var idx: int = pos_to_idx(pos)
 		if pos.x < 0 or pos.x >= self.x_qubits or pos.y < 0 or pos.y >= self.y_qubits:
 			pass
 		elif grid_qubits[idx] == null:
-			make_qubit(Vector2i((transformed.x - transformed.y)/2, (transformed.x + transformed.y)))
+			make_qubit(Vector2i((transformed.x - transformed.y), (transformed.x + transformed.y)))
 			append_or_update(QubitOperation.Operation.ADD, idx)
 
 
