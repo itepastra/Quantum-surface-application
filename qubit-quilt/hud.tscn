@@ -195,14 +195,12 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -235.0
-offset_top = -56.0
-offset_right = 235.0
 grow_horizontal = 2
 grow_vertical = 0
 theme = SubResource("Theme_n2snw")
 
 [node name="X" type="Button" parent="Spacer/Hotbar"]
+visible = false
 layout_mode = 2
 tooltip_text = "X-gate"
 theme = ExtResource("2_1xsix")
@@ -214,6 +212,7 @@ icon_alignment = 1
 script = ExtResource("13_rgb5v")
 
 [node name="Y" type="Button" parent="Spacer/Hotbar"]
+visible = false
 layout_mode = 2
 tooltip_text = "Y-gate"
 toggle_mode = true
@@ -224,6 +223,7 @@ icon_alignment = 1
 script = ExtResource("13_rgb5v")
 
 [node name="Z" type="Button" parent="Spacer/Hotbar"]
+visible = false
 layout_mode = 2
 tooltip_text = "Z-gate"
 toggle_mode = true
@@ -234,6 +234,7 @@ icon_alignment = 1
 script = ExtResource("13_rgb5v")
 
 [node name="H" type="Button" parent="Spacer/Hotbar"]
+visible = false
 layout_mode = 2
 tooltip_text = "H-gate (Hadamard)"
 toggle_mode = true
@@ -244,6 +245,7 @@ icon_alignment = 1
 script = ExtResource("13_rgb5v")
 
 [node name="S" type="Button" parent="Spacer/Hotbar"]
+visible = false
 layout_mode = 2
 tooltip_text = "S-gate (√Z)"
 toggle_mode = true
@@ -254,6 +256,7 @@ icon_alignment = 1
 script = ExtResource("13_rgb5v")
 
 [node name="CX" type="Button" parent="Spacer/Hotbar"]
+visible = false
 layout_mode = 2
 tooltip_text = "CNOT (Controlled X)"
 toggle_mode = true
@@ -264,6 +267,7 @@ icon_alignment = 1
 script = ExtResource("13_rgb5v")
 
 [node name="CZ" type="Button" parent="Spacer/Hotbar"]
+visible = false
 layout_mode = 2
 tooltip_text = "CPhase (Controlled Z)"
 toggle_mode = true
@@ -274,6 +278,7 @@ icon_alignment = 1
 script = ExtResource("13_rgb5v")
 
 [node name="MZ" type="Button" parent="Spacer/Hotbar"]
+visible = false
 layout_mode = 2
 tooltip_text = "Measure Z basis"
 toggle_mode = true
@@ -283,6 +288,7 @@ icon = ExtResource("18_5kc73")
 script = ExtResource("13_rgb5v")
 
 [node name="ADD" type="Button" parent="Spacer/Hotbar"]
+visible = false
 layout_mode = 2
 tooltip_text = "Add a qubit where there is a hole"
 theme = ExtResource("2_1xsix")
@@ -294,6 +300,7 @@ icon_alignment = 1
 script = ExtResource("13_rgb5v")
 
 [node name="REMOVE" type="Button" parent="Spacer/Hotbar"]
+visible = false
 layout_mode = 2
 tooltip_text = "Remove a qubit"
 theme = ExtResource("2_1xsix")

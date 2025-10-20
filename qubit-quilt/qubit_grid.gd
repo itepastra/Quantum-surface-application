@@ -8,6 +8,7 @@ extends Node3D
 @export var qubit_scene: PackedScene
 @export var gate_scene: PackedScene
 
+var enabled_gates: Array[String] = ["X", "Y", "Z", "H", "S", "CX", "CZ", "MZ", "ADD", "REMOVE"]
 
 class Egroup:
 	extends Node
@@ -72,6 +73,7 @@ var two_qubit_gate_type: String = ""
 var grid_qubits: Array[Qubit] = []
 var start_pos: Vector3
 var qec = Qec.new()
+var camera: Camera
 
 var operation_idx: int = 0 # index of the operation that the user will be doing
 var operations: Array[QubitOperation] = []
@@ -153,9 +155,18 @@ func parse_js_args() -> void:
 		if iface:
 			self.x_qubits = iface.width
 			self.y_qubits = iface.height
+			self.enabled_gates = []
+			for i in iface.gates.length:
+				self.enabled_gates.append(iface.gates[i])
 
 func _on_ready() -> void:
 	parse_js_args()
+	
+	var hb = get_node("/root/Scene/HUD/Spacer/Hotbar/")
+	
+	for b in self.enabled_gates:
+		var but = hb.get_node(b) as Button
+		but.visible = true;
 	
 	self.button = get_node("/root/Scene/HUD/Spacer/Hotbar/ADD")
 	qec.init(x_qubits*y_qubits);
@@ -168,12 +179,9 @@ func _on_ready() -> void:
 	(timecontrol.get_node("SkipForward") as Button).pressed.connect(_on_skip_forward)
 	macro_button.pressed.connect(_on_macro_button)
 	
+	self.camera = %Camera as Camera
 	# Resize the camera to fit with the grid
 	var full_grid_size = Vector2(x_qubits * cell_size.x, y_qubits*cell_size.y)
-	var camera: Camera3D = %Camera
-	camera.size = max(full_grid_size.x, full_grid_size.y)*1.05
-	# Dynamically change the keep_aspect of the camera to always fit the whole grid
-	camera.keep_aspect = camera.KEEP_WIDTH if full_grid_size.x > full_grid_size.y else camera.KEEP_HEIGHT
 	
 	self.start_pos = Vector3(-(x_qubits-1)/2.0, -(y_qubits-1)/2.0, 0)
 	self.aftrans.origin = aftrans * (-self.start_pos * cell_size)
@@ -260,6 +268,16 @@ func make_qubit(pos: Vector2i, basis: int = 10):
 	nextQubit.position *= cell_size
 	nextQubit.array_pos = pos_to_idx(pos)
 	nextQubit.rot = nextQubit.bases[basis]
+	
+	if self.camera.minvec.x > nextQubit.position.x:
+		self.camera.minvec.x = nextQubit.position.x
+	if self.camera.minvec.y > nextQubit.position.y:
+		self.camera.minvec.y = nextQubit.position.y
+	if self.camera.maxvec.x < nextQubit.position.x:
+		self.camera.maxvec.x = nextQubit.position.x
+	if self.camera.maxvec.y < nextQubit.position.y:
+		self.camera.maxvec.y = nextQubit.position.y
+	
 	if len(grid_qubits) <= nextQubit.array_pos:
 		grid_qubits.append(nextQubit)
 	else:
