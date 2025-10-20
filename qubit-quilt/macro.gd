@@ -5,7 +5,7 @@ const DELAY: float = 0.1
 var root: Vector2i # index of the macro root in the grid
 var instructions: Array[QubitOperation] = []
 var idx: int # position in macros array
-var spread: Array[Vector2i]
+var spread: Array[Vector2i] # stored in rot format
 
 @onready var grid: QubitGrid = get_node("/root/Scene/QubitGrid")
 @onready var hotbar: ButtonGroup = preload("res://control_buttons.tres")
@@ -15,10 +15,22 @@ func _ready() -> void:
 	self.rebase_to_root()
 	self.gen_spread()
 
+static func zig_zag_to_rot(pos: Vector2i) -> Vector2i:
+	var rot: Vector2i = Vector2i(pos.x + pos.y, -(pos.x - pos.y))
+	var str = "zz: %s is rot: %s"
+	print(str % [pos, rot])
+	return rot
+
+static func rot_to_zig_zag(pos: Vector2i) -> Vector2i:
+	var zz: Vector2i =  Vector2i(pos.x - pos.y, pos.x + pos.y)
+	var str = "rot: %s is zz: %s"
+	print(str % [pos, zz])
+	return zz
+
 func rebase_to_root() -> void:
 	for instr in self.instructions:
-		instr.index = instr.index - self.root
-		instr.other = instr.other - self.root
+		instr.index = zig_zag_to_rot(instr.index - self.root)
+		instr.other = zig_zag_to_rot(instr.other - self.root)
 
 func gen_spread() -> void:
 	for instr in self.instructions:
@@ -26,11 +38,12 @@ func gen_spread() -> void:
 			self.spread.append(instr.index)
 		if (not instr.other in self.spread) and (instr.is_two_qubit()):
 			self.spread.append(instr.other)
+	print(self.spread)
 
 func check_valid(target: Vector2i) -> bool:
 	for instr in self.instructions:
-		var offindex = instr.index + target
-		var offother = instr.other + target
+		var offindex = rot_to_zig_zag(instr.index + zig_zag_to_rot(target))
+		var offother = rot_to_zig_zag(instr.other + zig_zag_to_rot(target))
 		
 		if grid.is_not_in_bounds(offindex):
 			return false
@@ -46,14 +59,14 @@ func check_valid(target: Vector2i) -> bool:
 
 func execute(target: Vector2i) -> void:
 	for instr in self.instructions:
-		var offindex = instr.index + target
-		var offother = instr.other + target
+		var offindex = rot_to_zig_zag(instr.index + zig_zag_to_rot(target))
+		var offother = rot_to_zig_zag(instr.other + zig_zag_to_rot(target))
 		
 		if grid.is_not_in_bounds(offindex):
 			continue
 		if grid.is_not_in_bounds(offother) and (instr.is_two_qubit()):
 			continue
-		var index = grid.pos_to_idx(offindex) 
+		var index = grid.pos_to_idx(offindex)
 		var other = grid.pos_to_idx(offother)
 		
 		if (grid.grid_qubits[other] == null) and (instr.is_two_qubit()):

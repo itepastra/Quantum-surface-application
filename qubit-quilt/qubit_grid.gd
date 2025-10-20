@@ -229,7 +229,6 @@ func _on_skip_forward() -> void:
 	while self.operation_idx < len(self.operations):
 		self.handle_redo()
 
-<<<<<<< HEAD
 
 func start_record_macro():
 	self.macro_instructions = [] # reset the macro instructions
@@ -238,7 +237,6 @@ func start_record_macro():
 
 func stop_record_macro():
 	self.recording = false
-	print_debug("stopped recording macro")
 	if len(self.macro_instructions) == 0:
 		return
 	var macro: Macro = macro_scene.instantiate()
@@ -249,16 +247,15 @@ func stop_record_macro():
 	macro.name = "%d" % len(macros)
 	macro.idx = len(macros)
 	self.macros.append(macro)
-	print_debug("adding macro to HUD")
 	get_node("/root/Scene/HUD/Spacer/Macros").add_child(macro)
 
 const cell_size: Vector3 = Vector3(1.8, 0.9, 1.0)
 
-func make_qubit(x: int, y: int, basis: int = 10):
+func make_qubit(pos: Vector2i, basis: int = 10):
 	var nextQubit: Qubit = qubit_scene.instantiate()
-	nextQubit.name = "Qubit (%d, %d)" % [x,y]
-	nextQubit.position.x = x + start_pos.x + (y & 0b1) * 0.5
-	nextQubit.position.y = y + start_pos.y
+	nextQubit.name = "Qubit %d" % [pos]
+	nextQubit.position.x = pos.x + start_pos.x + (pos.y & 0b1) * 0.5
+	nextQubit.position.y = pos.y + start_pos.y
 	nextQubit.position *= cell_size
 	nextQubit.array_pos = pos_to_idx(pos)
 	nextQubit.rot = nextQubit.bases[basis]
@@ -356,7 +353,7 @@ func _input(event: InputEvent) -> void:
 		if pos.x < 0 or pos.x >= self.x_qubits or pos.y < 0 or pos.y >= self.y_qubits:
 			pass
 		elif grid_qubits[idx] == null:
-			make_qubit((transformed.x - transformed.y)/2, (transformed.x + transformed.y))
+			make_qubit(Vector2i((transformed.x - transformed.y)/2, (transformed.x + transformed.y)))
 			append_or_update(QubitOperation.Operation.ADD, idx)
 
 
