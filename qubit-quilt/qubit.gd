@@ -59,19 +59,14 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 		match pressed.name:
 			"X":
 				grid.rx(array_pos)
-				grid.selected_qubit = -1
 			"Y":
 				grid.ry(array_pos)
-				grid.selected_qubit = -1
 			"Z":
 				grid.rz(array_pos)
-				grid.selected_qubit = -1
 			"H":
 				grid.rh(array_pos)
-				grid.selected_qubit = -1
 			"S":
 				grid.rs(array_pos)
-				grid.selected_qubit = -1
 			"CX":
 				if grid.selected_qubit == -1:
 					grid.selected_qubit = array_pos
@@ -91,7 +86,6 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 				self.queue_free()
 			"MZ":
 				grid.measure_z(array_pos)
-				grid.selected_qubit = -1
 			_:
 				return
 		sound.play()

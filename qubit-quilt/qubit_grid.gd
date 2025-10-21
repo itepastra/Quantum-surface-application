@@ -10,6 +10,9 @@ extends Node3D
 
 var enabled_gates: Array[String] = ["X", "Y", "Z", "H", "S", "CX", "CZ", "MZ", "ADD", "REMOVE"]
 
+var drag_gate: Gate
+var selected_gate_type: Gate.Type
+
 class Egroup:
 	extends Node
 	var qubits: Array[Qubit] = []
@@ -168,7 +171,10 @@ func _on_ready() -> void:
 		var but = hb.get_node(b) as Button
 		but.visible = true;
 	
-	self.button = get_node("/root/Scene/HUD/Spacer/Hotbar/ADD")
+	(hb.get_node("CX") as Button).pressed.connect(func(): self.selected_gate_type = Gate.Type.CX)
+	(hb.get_node("CZ") as Button).pressed.connect(func(): self.selected_gate_type = Gate.Type.CZ)
+	
+	self.button = hb.get_node("ADD")
 	qec.init(x_qubits*y_qubits);
 	# NOTE: maybe there is a nicer way, but not one I can quickly think of
 	var timecontrol = get_node("/root/Scene/HUD/Spacer/TimeControl")
@@ -363,7 +369,6 @@ func _input(event: InputEvent) -> void:
 	# filter out all the input events that aren't mouse clicks with the create button selected
 	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT and self.button.button_pressed:
 		# get the position in grid space of the click
-		var camera: Camera3D = %Camera
 		var mevent: InputEventMouseButton = event as InputEventMouseButton
 		var world_pos: Vector3 = camera.project_position(mevent.position, 10)
 		var transformed: Vector3 = (aftrans * world_pos).snapped(Vector3(1.0, 1.0, 1.0))
@@ -374,7 +379,15 @@ func _input(event: InputEvent) -> void:
 		elif grid_qubits[idx] == null:
 			make_qubit(Vector2i((transformed.x - transformed.y), (transformed.x + transformed.y)))
 			append_or_update(QubitOperation.Operation.ADD, idx)
-
+	elif self.selected_qubit != -1 and event is InputEventMouseMotion:
+		if drag_gate == null:
+			drag_gate = gate_scene.instantiate()
+			drag_gate.process_mode = Node.PROCESS_MODE_DISABLED
+			self.add_child(drag_gate)
+		var world_pos: Vector3 = camera.project_position(event.position, 7)
+		var pos1: Vector3 = grid_qubits[self.selected_qubit].position + Vector3(0, 0, 3)
+		var ndiff: Vector3 = (world_pos - pos1).normalized()
+		drag_gate.setup(pos1 + ndiff/3, world_pos, selected_gate_type)
 
 func rx(qubit: int, update: bool = true):
 	var q = grid_qubits[qubit]
@@ -425,7 +438,7 @@ func cx(control: int, target: int, update: bool = true):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
 	
-	add_cx_cz_visuals(control, target, false)
+	add_cx_cz_visuals(control, target, Gate.Type.CX)
 	
 	qec.cnot(control, target)
 	set_to_qec_state()
@@ -437,7 +450,7 @@ func cz(control: int, target: int, update: bool = true):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
 	
-	add_cx_cz_visuals(control, target, true)
+	add_cx_cz_visuals(control, target, Gate.Type.CZ)
 	
 	qec.cphase(control, target)
 	set_to_qec_state()
@@ -453,47 +466,13 @@ func measure_z(qubit: int, update: bool = true):
 func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
 	return qubit1_pos != qubit2_pos
 
-func add_cx_cz_visuals(control: int, target: int, gate_is_cz: bool) -> void:
-	var pos1 = idx_to_pos(control)
-	var pos2 = idx_to_pos(target)
-	var dx = abs(pos1.x - pos2.x)
-	var dy = abs(pos1.y - pos2.y)
-	
-	var gate_instance = gate_scene.instantiate()
-	add_child(gate_instance)
-	
-	if dx == 1: # horizontal connection
-		var x = min(pos1.x, pos2.x)
-		var y = pos1.y
-		var startx = (x - (x_qubits-1)/2.0) * cell_size.x + qubit_size
-		var endx = (x + 1 - (x_qubits-1)/2.0) * cell_size.y - qubit_size
-		var gatey = (y - (y_qubits-1)/2.0) * cell_size.y
-		
-		# flip the gate based on selection order so that 
-		# we have first control then target
-		var flip_horizontal = pos1.x < pos2.x
-		if flip_horizontal:
-			# swap start and end to flip the gate
-			var temp = startx
-			startx = endx
-			endx = temp
-		gate_instance.setup(Vector3(startx, gatey, 0), Vector3(endx, gatey, 0))
-		
-	else: # vertical connection
-		var x = pos1.x
-		var y = min(pos1.y, pos2.y)
-		var gatex = (x - (x_qubits-1)/2.0) * cell_size.x
-		var starty = (y - (y_qubits-1)/2.0) * cell_size.y + qubit_size
-		var endy = (y + 1 - (y_qubits-1)/2.0) * cell_size.y - qubit_size
 
-		# flip if needed
-		var flip_vertical = pos1.y < pos2.y
-		if flip_vertical:
-			var temp = starty
-			starty = endy
-			endy = temp
-			
-		gate_instance.setup(Vector3(gatex, starty, 0), Vector3(gatex, endy, 0))
-	
-	if gate_is_cz:
-		gate_instance.texture = preload("res://assets/cz.png")
+func add_cx_cz_visuals(control: int, target: int, gate_type: Gate.Type) -> void:
+	var pos1: Vector3 = grid_qubits[control].position + Vector3(0, 0, 3)
+	var pos2: Vector3 = grid_qubits[target].position + Vector3(0, 0, 3)
+	var ndiff: Vector3 = (pos2 - pos1).normalized()
+	var g = self.gate_scene.instantiate()
+	self.add_child(g)
+	g.setup(pos1 + ndiff/3, pos2 - ndiff/3, gate_type)
+	if self.drag_gate != null:
+		self.drag_gate.queue_free()

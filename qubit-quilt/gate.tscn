@@ -3,8 +3,31 @@
 [ext_resource type="Texture2D" uid="uid://bqg0xk827fxs2" path="res://assets/cx.png" id="1_ikl61"]
 [ext_resource type="Script" uid="uid://b33y2imds5xim" path="res://gate.gd" id="2_5lukw"]
 
-[node name="Gate" type="Sprite3D"]
+[node name="Node3D" type="Node3D"]
+script = ExtResource("2_5lukw")
+
+[node name="Left" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0)
 cast_shadow = 0
 gi_mode = 0
+pixel_size = 0.005
 texture = ExtResource("1_ikl61")
-script = ExtResource("2_5lukw")
+region_enabled = true
+region_rect = Rect2(0, 0, 45, 83)
+
+[node name="Middle" type="Sprite3D" parent="."]
+cast_shadow = 0
+gi_mode = 0
+pixel_size = 0.005
+texture = ExtResource("1_ikl61")
+region_enabled = true
+region_rect = Rect2(45, 0, 170, 83)
+
+[node name="Right" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.35086, 0, 0)
+cast_shadow = 0
+gi_mode = 0
+pixel_size = 0.005
+texture = ExtResource("1_ikl61")
+region_enabled = true
+region_rect = Rect2(218, 0, 87, 83)
