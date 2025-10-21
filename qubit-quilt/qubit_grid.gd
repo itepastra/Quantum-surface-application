@@ -127,7 +127,7 @@ func set_to_qec_state():
 	for group in egroups:
 		if group.size() == 1:
 			continue
-		var qubits: Array[Qubit] = [];
+		var qubits: Array[Qubit] = []
 		for i in group:
 			qubits.append(grid_qubits[i])
 		entanglement_groups.append(Egroup.new(qubits, self, qec, randf_range(1.5, 3)))
