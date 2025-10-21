@@ -15,18 +15,18 @@ enum Type {
 	CZ
 }
 
+const cx_rect: Rect2 = Rect2(218, 0, 87, 83)
+const cz_rect: Rect2 = Rect2(0, 0, 45, 83)
+
 func setup(start: Vector3, end: Vector3, type: Type):
-	# get the width of self
-	
 	var start_width: float = left.region_rect.size.x * left.pixel_size
 	var mid_width: float = middle.region_rect.size.x * middle.pixel_size
 
 	match type:
 		Type.CX:
-			pass
+			right.region_rect = cx_rect
 		Type.CZ:
-			right.region_rect = left.region_rect
-			right.rotate_object_local(Vector3.BACK, PI)
+			right.region_rect = cz_rect
 
 	var end_width: float = right.region_rect.size.x * right.pixel_size
 	# get the target width
@@ -41,14 +41,19 @@ func setup(start: Vector3, end: Vector3, type: Type):
 	var average_vec: Vector3 = start + (diff)/2
 	var angle: float = atan2(diff.y, diff.x)
 	var spos: Vector3 = start + start_width/2 * ndiff
-	left.rotate_object_local(Vector3.BACK, angle)
-	left.position = spos
-	middle.rotate_object_local(Vector3.BACK, angle)
-	middle.position = average_vec
-	middle.scale_object_local(Vector3(scale_factor, 1.0, 1.0))
 	var epos: Vector3 = end - (start_width/2 * ndiff)
-	right.rotate_object_local(Vector3.BACK, angle)
-	right.position = epos
+	
+	var rt = Transform3D.IDENTITY.rotated_local(Vector3.BACK, angle)
+	
+	var st = rt.translated(spos)
+	var mt = rt.translated(average_vec).scaled_local(Vector3(scale_factor, 1.0, 1.0))
+	if type == Type.CZ:
+		rt = rt.rotated(Vector3.BACK, PI)
+	var et = rt.translated(epos)
+	
+	left.transform = st
+	middle.transform = mt
+	right.transform = et
 
 func _process(delta: float) -> void:
 	if self.intensity < 0.01:

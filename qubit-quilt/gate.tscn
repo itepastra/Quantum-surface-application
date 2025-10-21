@@ -30,4 +30,4 @@ gi_mode = 0
 pixel_size = 0.005
 texture = ExtResource("1_ikl61")
 region_enabled = true
-region_rect = Rect2(215, 0, 89.27, 83)
+region_rect = Rect2(218, 0, 87, 83)

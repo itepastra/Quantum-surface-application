@@ -10,6 +10,9 @@ extends Node3D
 
 var enabled_gates: Array[String] = ["X", "Y", "Z", "H", "S", "CX", "CZ", "MZ", "ADD", "REMOVE"]
 
+var drag_gate: Gate
+var selected_gate_type: Gate.Type
+
 class Egroup:
 	extends Node
 	var qubits: Array[Qubit] = []
@@ -168,7 +171,10 @@ func _on_ready() -> void:
 		var but = hb.get_node(b) as Button
 		but.visible = true;
 	
-	self.button = get_node("/root/Scene/HUD/Spacer/Hotbar/ADD")
+	(hb.get_node("CX") as Button).pressed.connect(func(): self.selected_gate_type = Gate.Type.CX)
+	(hb.get_node("CZ") as Button).pressed.connect(func(): self.selected_gate_type = Gate.Type.CZ)
+	
+	self.button = hb.get_node("ADD")
 	qec.init(x_qubits*y_qubits);
 	# NOTE: maybe there is a nicer way, but not one I can quickly think of
 	var timecontrol = get_node("/root/Scene/HUD/Spacer/TimeControl")
@@ -363,7 +369,6 @@ func _input(event: InputEvent) -> void:
 	# filter out all the input events that aren't mouse clicks with the create button selected
 	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT and self.button.button_pressed:
 		# get the position in grid space of the click
-		var camera: Camera3D = %Camera
 		var mevent: InputEventMouseButton = event as InputEventMouseButton
 		var world_pos: Vector3 = camera.project_position(mevent.position, 10)
 		var transformed: Vector3 = (aftrans * world_pos).snapped(Vector3(1.0, 1.0, 1.0))
@@ -374,7 +379,15 @@ func _input(event: InputEvent) -> void:
 		elif grid_qubits[idx] == null:
 			make_qubit(Vector2i((transformed.x - transformed.y), (transformed.x + transformed.y)))
 			append_or_update(QubitOperation.Operation.ADD, idx)
-
+	elif self.selected_qubit != -1 and event is InputEventMouseMotion:
+		if drag_gate == null:
+			drag_gate = gate_scene.instantiate()
+			drag_gate.process_mode = Node.PROCESS_MODE_DISABLED
+			self.add_child(drag_gate)
+		var world_pos: Vector3 = camera.project_position(event.position, 7)
+		var pos1: Vector3 = grid_qubits[self.selected_qubit].position + Vector3(0, 0, 3)
+		var ndiff: Vector3 = (world_pos - pos1).normalized()
+		drag_gate.setup(pos1 + ndiff/3, world_pos, selected_gate_type)
 
 func rx(qubit: int, update: bool = true):
 	var q = grid_qubits[qubit]
@@ -461,3 +474,5 @@ func add_cx_cz_visuals(control: int, target: int, gate_type: Gate.Type) -> void:
 	var g = self.gate_scene.instantiate()
 	self.add_child(g)
 	g.setup(pos1 + ndiff/3, pos2 - ndiff/3, gate_type)
+	if self.drag_gate != null:
+		self.drag_gate.queue_free()
