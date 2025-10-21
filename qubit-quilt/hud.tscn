@@ -311,6 +311,30 @@ icon = ExtResource("6_1xsix")
 icon_alignment = 1
 script = ExtResource("13_rgb5v")
 
+[node name="LABELD" type="Button" parent="Spacer/Hotbar"]
+visible = false
+layout_mode = 2
+tooltip_text = "Remove a qubit"
+theme = ExtResource("2_1xsix")
+toggle_mode = true
+button_group = ExtResource("11_5iihh")
+shortcut = SubResource("Shortcut_4q17s")
+text = "DATA"
+icon_alignment = 1
+script = ExtResource("13_rgb5v")
+
+[node name="LABELA" type="Button" parent="Spacer/Hotbar"]
+visible = false
+layout_mode = 2
+tooltip_text = "Remove a qubit"
+theme = ExtResource("2_1xsix")
+toggle_mode = true
+button_group = ExtResource("11_5iihh")
+shortcut = SubResource("Shortcut_4q17s")
+text = "ANCILLA"
+icon_alignment = 1
+script = ExtResource("13_rgb5v")
+
 [node name="Macros" type="VFlowContainer" parent="Spacer"]
 layout_mode = 1
 anchors_preset = 9

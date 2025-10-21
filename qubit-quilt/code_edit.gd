@@ -53,3 +53,7 @@ func update_qubit_operations(op: QubitOperation) -> void:
 			self.text += "init %s\n" % [grid.pos_to_idx(op.index)]
 		QubitOperation.Operation.MZ:
 			self.text += "measure %s\n" % [grid.pos_to_idx(op.index)]
+		QubitOperation.Operation.LABELA:
+			self.text += "#label ancilla %s\n" % [grid.pos_to_idx(op.index)]
+		QubitOperation.Operation.LABELD:
+			self.text += "#label data %s\n" % [grid.pos_to_idx(op.index)]

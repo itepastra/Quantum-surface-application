@@ -86,9 +86,24 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 				self.queue_free()
 			"MZ":
 				grid.measure_z(array_pos)
+				if (self.get_node("BG") as Node3D).visible and self.label.text == "1":
+					(self.get_node("Error") as GPUParticles3D).emitting = true
+			"LABELA":
+				grid.append_or_update(QubitOperation.Operation.LABELA, array_pos)
+				self.toggle_ancilla()
+			"LABELD":
+				grid.append_or_update(QubitOperation.Operation.LABELD, array_pos)
+				self.toggle_data()
 			_:
 				return
 		sound.play()
+
+func toggle_ancilla():
+	(self.get_node("BG") as Node3D).visible = not (self.get_node("BG") as Node3D).visible
+
+func toggle_data():
+	(self.get_node("BORDER") as Node3D).visible = not (self.get_node("BORDER") as Node3D).visible
+
 
 func handle_macro(macro: Button):
 	if macro == null:

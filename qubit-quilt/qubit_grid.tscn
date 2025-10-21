@@ -22,7 +22,7 @@ script = ExtResource("2_jnhir")
 [node name="QubitGrid" type="Node3D" parent="."]
 script = ExtResource("1_6duni")
 x_qubits = 5
-y_qubits = 5
+y_qubits = 10
 macro_scene = ExtResource("3_qm3wh")
 qubit_scene = ExtResource("2_5u0ha")
 gate_scene = ExtResource("3_pkvuj")
