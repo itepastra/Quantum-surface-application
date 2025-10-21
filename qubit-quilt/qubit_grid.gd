@@ -262,7 +262,7 @@ const cell_size: Vector3 = Vector3(1.8, 0.9, 1.0)
 
 func make_qubit(pos: Vector2i, basis: int = 10):
 	var nextQubit: Qubit = qubit_scene.instantiate()
-	nextQubit.name = "Qubit %d" % [pos]
+	nextQubit.name = "Qubit %s" % [pos]
 	nextQubit.position.x = pos.x / 2 + start_pos.x + (pos.y & 0b1) * 0.5
 	nextQubit.position.y = pos.y + start_pos.y
 	nextQubit.position *= cell_size

@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://jukmsc1d2v30"]
+[gd_scene load_steps=9 format=3 uid="uid://jukmsc1d2v30"]
 
 [ext_resource type="Script" uid="uid://ckikupasg3gwl" path="res://qubit_grid.gd" id="1_6duni"]
 [ext_resource type="Script" uid="uid://diu3l43af1nl1" path="res://root.gd" id="1_eejlk"]
