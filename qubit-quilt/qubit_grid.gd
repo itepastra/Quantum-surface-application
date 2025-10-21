@@ -425,7 +425,7 @@ func cx(control: int, target: int, update: bool = true):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
 	
-	add_cx_cz_visuals(control, target, false)
+	add_cx_cz_visuals(control, target, Gate.Type.CX)
 	
 	qec.cnot(control, target)
 	set_to_qec_state()
@@ -437,7 +437,7 @@ func cz(control: int, target: int, update: bool = true):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
 	
-	add_cx_cz_visuals(control, target, true)
+	add_cx_cz_visuals(control, target, Gate.Type.CZ)
 	
 	qec.cphase(control, target)
 	set_to_qec_state()
@@ -453,47 +453,11 @@ func measure_z(qubit: int, update: bool = true):
 func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
 	return qubit1_pos != qubit2_pos
 
-func add_cx_cz_visuals(control: int, target: int, gate_is_cz: bool) -> void:
-	var pos1 = idx_to_pos(control)
-	var pos2 = idx_to_pos(target)
-	var dx = abs(pos1.x - pos2.x)
-	var dy = abs(pos1.y - pos2.y)
-	
-	var gate_instance = gate_scene.instantiate()
-	add_child(gate_instance)
-	
-	if dx == 1: # horizontal connection
-		var x = min(pos1.x, pos2.x)
-		var y = pos1.y
-		var startx = (x - (x_qubits-1)/2.0) * cell_size.x + qubit_size
-		var endx = (x + 1 - (x_qubits-1)/2.0) * cell_size.y - qubit_size
-		var gatey = (y - (y_qubits-1)/2.0) * cell_size.y
-		
-		# flip the gate based on selection order so that 
-		# we have first control then target
-		var flip_horizontal = pos1.x < pos2.x
-		if flip_horizontal:
-			# swap start and end to flip the gate
-			var temp = startx
-			startx = endx
-			endx = temp
-		gate_instance.setup(Vector3(startx, gatey, 0), Vector3(endx, gatey, 0))
-		
-	else: # vertical connection
-		var x = pos1.x
-		var y = min(pos1.y, pos2.y)
-		var gatex = (x - (x_qubits-1)/2.0) * cell_size.x
-		var starty = (y - (y_qubits-1)/2.0) * cell_size.y + qubit_size
-		var endy = (y + 1 - (y_qubits-1)/2.0) * cell_size.y - qubit_size
 
-		# flip if needed
-		var flip_vertical = pos1.y < pos2.y
-		if flip_vertical:
-			var temp = starty
-			starty = endy
-			endy = temp
-			
-		gate_instance.setup(Vector3(gatex, starty, 0), Vector3(gatex, endy, 0))
-	
-	if gate_is_cz:
-		gate_instance.texture = preload("res://assets/cz.png")
+func add_cx_cz_visuals(control: int, target: int, gate_type: Gate.Type) -> void:
+	var pos1: Vector3 = grid_qubits[control].position + Vector3(0, 0, 3)
+	var pos2: Vector3 = grid_qubits[target].position + Vector3(0, 0, 3)
+	var ndiff: Vector3 = (pos2 - pos1).normalized()
+	var g = self.gate_scene.instantiate()
+	self.add_child(g)
+	g.setup(pos1 + ndiff/3, pos2 - ndiff/3, gate_type)
