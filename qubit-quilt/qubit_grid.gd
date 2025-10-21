@@ -8,7 +8,7 @@ extends Node3D
 @export var qubit_scene: PackedScene
 @export var gate_scene: PackedScene
 
-var enabled_gates: Array[String] = ["X", "Y", "Z", "H", "S", "CX", "CZ", "MZ", "ADD", "REMOVE"]
+var enabled_gates: Array[String] = ["X", "Y", "Z", "H", "S", "CX", "CZ", "MZ", "ADD", "REMOVE", "LABELA", "LABELD"]
 
 var drag_gate: Gate
 var selected_gate_type: Gate.Type

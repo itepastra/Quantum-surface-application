@@ -89,6 +89,10 @@ func execute(target: Vector2i) -> void:
 				grid.cz(index, other)
 			QubitOperation.Operation.MZ:
 				grid.measure_z(index)
+			QubitOperation.Operation.LABELA:
+				grid.grid_qubits[index].toggle_ancilla()
+			QubitOperation.Operation.LABELD:
+				grid.grid_qubits[index].toggle_data()
 		await get_tree().create_timer(DELAY).timeout
 
 func _on_pressed() -> void:
