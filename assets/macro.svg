@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="180"
+   height="180"
+   viewBox="0 0 180 180"
+   version="1.1"
+   id="svg1"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient2">
+      <stop
+         style="stop-color:#ff0000;stop-opacity:1;"
+         offset="0"
+         id="stop2" />
+      <stop
+         style="stop-color:#ff0000;stop-opacity:1;"
+         offset="0.33203018"
+         id="stop4" />
+      <stop
+         style="stop-color:#ff0000;stop-opacity:0;"
+         offset="0.43537766"
+         id="stop5" />
+      <stop
+         style="stop-color:#ff0000;stop-opacity:0.93075407;"
+         offset="0.53284752"
+         id="stop1" />
+      <stop
+         style="stop-color:#ff0000;stop-opacity:1;"
+         offset="0.70021123"
+         id="stop6" />
+      <stop
+         style="stop-color:#ff0000;stop-opacity:0;"
+         offset="0.86984116"
+         id="stop7" />
+    </linearGradient>
+    <radialGradient
+       xlink:href="#linearGradient2"
+       id="radialGradient3"
+       cx="90"
+       cy="90"
+       fx="90"
+       fy="90"
+       r="90"
+       gradientUnits="userSpaceOnUse"
+       spreadMethod="pad" />
+  </defs>
+  <g
+     id="layer1">
+    <circle
+       style="fill:url(#radialGradient3);stroke:none"
+       id="path1"
+       cx="90"
+       cy="90"
+       r="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:42.6667px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke-width:9"
+       x="9.9731913"
+       y="105.20107"
+       id="text7"><tspan
+         id="tspan7"
+         x="9.9731913"
+         y="105.20107"
+         style="font-size:42.6667px">MACRO</tspan></text>
+  </g>
+</svg>

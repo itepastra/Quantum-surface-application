@@ -28,7 +28,7 @@ so let's call the last two states $\ket{+i} = \ket{0} + i \ket{1}$ and $\ket{-i}
 Now that we know a bit about what we call the states of the qubit normally. Let's have a look
 at one in the simulation
 
-{{ qubitquilt(w=1,h=1) }}
+{{ qubitquilt(w=1,h=1,gates='["X","Y","Z"]') }}
 
 Using the buttons at the bottom, you can select what direction to rotate the qubit, try rotating
 it to all the colors to the front to get a feel for it. In these texts we'll always

@@ -1,12 +1,17 @@
 class_name QubitGrid
 extends Node3D
 
-@export var x_qubits: int = 8
-@export var y_qubits: int = 4
-@export var cell_size: float = 1.5
+@export var x_qubits: int = 1
+@export var y_qubits: int = 1
 
+@export var macro_scene: PackedScene
 @export var qubit_scene: PackedScene
 @export var gate_scene: PackedScene
+
+var enabled_gates: Array[String] = ["X", "Y", "Z", "H", "S", "CX", "CZ", "MZ", "ADD", "REMOVE", "LABELA", "LABELD"]
+
+var drag_gate: Gate
+var selected_gate_type: Gate.Type
 
 class Egroup:
 	extends Node
@@ -54,6 +59,12 @@ class Egroup:
 @onready var play_pause: Button = get_node("/root/Scene/HUD/Spacer/TimeControl/PlayPause") as Button
 @onready var play_icon: Texture2D = preload("res://assets/media-controls/play.png")
 @onready var pause_icon: Texture2D = preload("res://assets/media-controls/pause.png")
+@onready var macro_button: Button = get_node("/root/Scene/HUD/Spacer/Macros/RecordMacro") as Button
+
+var recording = false
+var macro_instructions: Array[QubitOperation] = []
+var macros: Array[Macro] = []
+var macro_idx: int = 0
 
 const qubit_size = 1
 
@@ -65,12 +76,24 @@ var two_qubit_gate_type: String = ""
 var grid_qubits: Array[Qubit] = []
 var start_pos: Vector3
 var qec = Qec.new()
+var camera: Camera
 
 var operation_idx: int = 0 # index of the operation that the user will be doing
 var operations: Array[QubitOperation] = []
 
 var entanglement_groups: Array[Egroup] = []
 var snapshots: Dictionary = {}
+
+# works specifically for the cell size (1.8, 0.9), 
+# calculated by making a square that looked correct and then the inverse affine transform
+# offset is calculated at initialisation, since it depends on the amount of qubits
+var aftrans: Transform3D = Transform3D(Basis(
+	Vector3(5.0/9.0, -5.0/9.0, 0.0), 
+	Vector3(5.0/9.0, 5.0/9.0, 0.0),
+	Vector3(0.0, 0.0, 1.0/sqrt(2))
+), 
+	Vector3(0.0, 0.0, 0.0)
+)
 
 func set_to_qec_state():
 	var graph: Dictionary[int,PackedInt32Array] = {};
@@ -110,27 +133,49 @@ func set_to_qec_state():
 			qubits.append(grid_qubits[i])
 		entanglement_groups.append(Egroup.new(qubits, self, qec, randf_range(1.5, 3)))
 
-func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, target_idx: int=-1, basis: int = 10) -> void:
+func pos_to_idx(pos: Vector2i) -> int:
+	return pos.x/2 + pos.y * self.x_qubits
+
+func idx_to_pos(idx: int) -> Vector2i:
+	var y = idx / self.x_qubits
+	return Vector2i((idx % self.x_qubits)*2 + (y&1), y)
+
+func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, target_idx: int = 0, basis: int = 10) -> void:
 	operations.resize(operation_idx + 1)
-	operations[operation_idx] = QubitOperation.new(operation, qubit_idx, target_idx, basis)
+	var qubit_loc = idx_to_pos(qubit_idx)
+	var target_loc = idx_to_pos(target_idx)
+	operations[operation_idx] = QubitOperation.new(operation, qubit_loc, target_loc, basis)
 	operation_idx += 1
-	codeEdit.update_qubit_operations(operations)
+	if self.recording:
+		self.macro_instructions.resize(macro_idx + 1)
+		self.macro_instructions[macro_idx] = QubitOperation.new(operation, qubit_loc, target_loc, basis)
+		self.macro_idx += 1
+	codeEdit.update_qubit_operations(self.operations[-1])
 	codeEdit.set_executing(operation_idx)
 
 func parse_js_args() -> void:
-	print("testing for feature")
 	if OS.has_feature("web"):
-		print("parsing js args")
 		var iface = JavaScriptBridge.get_interface("qubits")
 		if iface:
 			self.x_qubits = iface.width
 			self.y_qubits = iface.height
-			print("set qubits to %s by %s" % [self.x_qubits, self.y_qubits])
+			self.enabled_gates = []
+			for i in iface.gates.length:
+				self.enabled_gates.append(iface.gates[i])
 
 func _on_ready() -> void:
 	parse_js_args()
 	
-	self.button = get_node("/root/Scene/HUD/Spacer/Hotbar/ADD")
+	var hb = get_node("/root/Scene/HUD/Spacer/Hotbar/")
+	
+	for b in self.enabled_gates:
+		var but = hb.get_node(b) as Button
+		but.visible = true;
+	
+	(hb.get_node("CX") as Button).pressed.connect(func(): self.selected_gate_type = Gate.Type.CX)
+	(hb.get_node("CZ") as Button).pressed.connect(func(): self.selected_gate_type = Gate.Type.CZ)
+	
+	self.button = hb.get_node("ADD")
 	qec.init(x_qubits*y_qubits);
 	# NOTE: maybe there is a nicer way, but not one I can quickly think of
 	var timecontrol = get_node("/root/Scene/HUD/Spacer/TimeControl")
@@ -139,25 +184,30 @@ func _on_ready() -> void:
 	(timecontrol.get_node("PlayPause") as Button).pressed.connect(_on_play_pause)
 	(timecontrol.get_node("StepForward") as Button).pressed.connect(_on_step_forward)
 	(timecontrol.get_node("SkipForward") as Button).pressed.connect(_on_skip_forward)
+	macro_button.pressed.connect(_on_macro_button)
 	
+	self.camera = %Camera as Camera
 	# Resize the camera to fit with the grid
-	var full_grid_size = Vector2(x_qubits * cell_size, y_qubits*cell_size)
-	var camera: Camera3D = %Camera
-	camera.size = max(full_grid_size.x, full_grid_size.y)*1.05
-	# Dynamically change the keep_aspect of the camera to always fit the whole grid
-	camera.keep_aspect = camera.KEEP_WIDTH if full_grid_size.x > full_grid_size.y else camera.KEEP_HEIGHT
+	var full_grid_size = Vector2(x_qubits * cell_size.x, y_qubits*cell_size.y)
 	
 	self.start_pos = Vector3(-(x_qubits-1)/2.0, -(y_qubits-1)/2.0, 0)
+	self.aftrans.origin = aftrans * (-self.start_pos * cell_size)
 	# initialize the qubits themselves
 	for y in y_qubits:
 		for x in x_qubits:
-			make_qubit(x,y)
+			make_qubit(Vector2i(2*x,y))
 	#setup timer
 	play_timer.wait_time = 1
 	play_timer.one_shot = false
 	play_timer.autostart = false
 	add_child(play_timer)
 	play_timer.timeout.connect(_on_play_timer_timeout)
+
+func _on_macro_button() -> void:
+	if self.recording:
+		stop_record_macro()
+	else:
+		start_record_macro()
 
 func _on_skip_back() -> void:
 	while self.operation_idx > 0:
@@ -178,7 +228,7 @@ func _on_play_pause() -> void:
 			play_timer.start()
 			is_playing = true
 			play_pause.icon = pause_icon
-			
+
 
 func _on_play_timer_timeout():
 	if self.operation_idx < len(self.operations):
@@ -187,7 +237,6 @@ func _on_play_timer_timeout():
 		play_timer.stop()
 		is_playing = false	
 		play_pause.icon = play_icon
-		
 
 func _on_step_forward() -> void:
 	self.handle_redo()
@@ -196,52 +245,83 @@ func _on_skip_forward() -> void:
 	while self.operation_idx < len(self.operations):
 		self.handle_redo()
 
-func make_qubit(x: int, y: int, basis: int = 10):
+
+func start_record_macro():
+	self.macro_instructions = [] # reset the macro instructions
+	self.macro_idx = 0
+	self.recording = true
+
+func stop_record_macro():
+	self.recording = false
+	if len(self.macro_instructions) == 0:
+		return
+	var macro: Macro = macro_scene.instantiate()
+	macro.root = self.macro_instructions[0].index
+	macro.instructions = self.macro_instructions
+	self.macro_instructions = []
+	macro.text = "M%d" % (len(macros) + 1)
+	macro.name = "%d" % len(macros)
+	macro.idx = len(macros)
+	self.macros.append(macro)
+	get_node("/root/Scene/HUD/Spacer/Macros").add_child(macro)
+
+const cell_size: Vector3 = Vector3(1.8, 0.9, 1.0)
+
+func make_qubit(pos: Vector2i, basis: int = 10):
 	var nextQubit: Qubit = qubit_scene.instantiate()
-	nextQubit.name = "Qubit (%d, %d)" % [x,y]
-	nextQubit.position.x = x + start_pos.x
-	nextQubit.position.y = y + start_pos.y
+	nextQubit.name = "Qubit %s" % [pos]
+	nextQubit.position.x = pos.x / 2 + start_pos.x + (pos.y & 0b1) * 0.5
+	nextQubit.position.y = pos.y + start_pos.y
 	nextQubit.position *= cell_size
-	nextQubit.array_pos = y*x_qubits + x
+	nextQubit.array_pos = pos_to_idx(pos)
+	nextQubit.rot = nextQubit.bases[basis]
+	
+	if self.camera.minvec.x > nextQubit.position.x:
+		self.camera.minvec.x = nextQubit.position.x
+	if self.camera.minvec.y > nextQubit.position.y:
+		self.camera.minvec.y = nextQubit.position.y
+	if self.camera.maxvec.x < nextQubit.position.x:
+		self.camera.maxvec.x = nextQubit.position.x
+	if self.camera.maxvec.y < nextQubit.position.y:
+		self.camera.maxvec.y = nextQubit.position.y
+	
 	if len(grid_qubits) <= nextQubit.array_pos:
 		grid_qubits.append(nextQubit)
 	else:
 		grid_qubits[nextQubit.array_pos] = nextQubit
 	self.add_child(nextQubit)
-	nextQubit.set_base(basis)
 
 func handle_undo() -> void:
 	if self.operation_idx <= 0:
-		print("undo without any action")
 		return
 	else:
 		operation_idx -= 1 # go from "what the user will be doing" to "what the user just did" to undo that
 		var selected_op = operations[self.operation_idx]
 		codeEdit.set_executing(operation_idx)
+		var op_idx = pos_to_idx(selected_op.index)
+		var op_tgt = pos_to_idx(selected_op.other)
 		match selected_op.operation:
 			QubitOperation.Operation.RX:
-				rx(selected_op.index, false)
+				rx(op_idx, false)
 			QubitOperation.Operation.RY:
-				ry(selected_op.index, false)
+				ry(op_idx, false)
 			QubitOperation.Operation.RZ:
-				rz(selected_op.index, false)
+				rz(op_idx, false)
 			QubitOperation.Operation.RH:
-				rh(selected_op.index, false)
+				rh(op_idx, false)
 			QubitOperation.Operation.RS:
-				rsd(selected_op.index, false)
+				rsd(op_idx, false)
 			QubitOperation.Operation.RSD:
-				rs(selected_op.index, false)
+				rs(op_idx, false)
 			QubitOperation.Operation.ADD:
-				grid_qubits[selected_op.index].queue_free()
-				grid_qubits[selected_op.index] = null
+				grid_qubits[op_idx].queue_free()
+				grid_qubits[op_idx] = null
 			QubitOperation.Operation.DELETE:
-				var x: int = selected_op.index % x_qubits
-				var y: int = selected_op.index / x_qubits
-				make_qubit(x, y, selected_op.basis)
+				make_qubit(selected_op.index, selected_op.basis)
 			QubitOperation.Operation.CX:
-				cx(selected_op.index, selected_op.other, false)
+				cx(op_idx, op_tgt, false)
 			QubitOperation.Operation.CZ:
-				cz(selected_op.index, selected_op.other, false)
+				cz(op_idx, op_tgt, false)
 			QubitOperation.Operation.MZ:
 				var snap: Dictionary = snapshots.get(operation_idx, null)
 				if snap:
@@ -250,39 +330,40 @@ func handle_undo() -> void:
 				else:
 					print_debug("Missing snapshot for MZ at op index %d" % operation_idx)	
 
+func is_not_in_bounds(pos: Vector2i) -> bool:
+	return pos.x < 0 or pos.x/2 >= self.x_qubits or pos.y < 0 or pos.y >= self.y_qubits
+
 func handle_redo() -> void:
 	if self.operation_idx >= len(operations):
-		print("redo without any future")
 		return
 	else:
 		var selected_op = operations[self.operation_idx]
+		var op_idx = pos_to_idx(selected_op.index)
+		var op_tgt = pos_to_idx(selected_op.other)
 		match selected_op.operation:
 			QubitOperation.Operation.RX:
-				rx(selected_op.index, false)
+				rx(op_idx, false)
 			QubitOperation.Operation.RY:
-				ry(selected_op.index, false)
+				ry(op_idx, false)
 			QubitOperation.Operation.RZ:
-				rz(selected_op.index, false)
+				rz(op_idx, false)
 			QubitOperation.Operation.RH:
-				rh(selected_op.index, false)
+				rh(op_idx, false)
 			QubitOperation.Operation.RS:
-				rs(selected_op.index, false)
+				rs(op_idx, false)
 			QubitOperation.Operation.RSD:
-				rsd(selected_op.index, false)
+				rsd(op_idx, false)
 			QubitOperation.Operation.ADD:
-				var x: int = floori(selected_op.index % x_qubits)
-				var y: int = floori(selected_op.index / x_qubits)
-				make_qubit(x, y)
+				make_qubit(selected_op.index.x, selected_op.index.y)
 			QubitOperation.Operation.DELETE:
-				grid_qubits[selected_op.index].queue_free()
-				grid_qubits[selected_op.index] = null
+				grid_qubits[op_idx].queue_free()
+				grid_qubits[op_idx] = null
 			QubitOperation.Operation.CX:
-				cx(selected_op.index, selected_op.other, false)
+				cx(op_idx, op_tgt, false)
 			QubitOperation.Operation.CZ:
-				cz(selected_op.index, selected_op.other, false)
+				cz(op_idx, op_tgt, false)
 			QubitOperation.Operation.MZ:
 				_apply_measure_z_no_record(selected_op.index)
-				
 		operation_idx += 1 # redo "what the user will be doing"
 		codeEdit.set_executing(operation_idx)
 
@@ -298,26 +379,25 @@ func _input(event: InputEvent) -> void:
 	# filter out all the input events that aren't mouse clicks with the create button selected
 	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT and self.button.button_pressed:
 		# get the position in grid space of the click
-		var camera: Camera3D = %Camera
-		var mevent = event as InputEventMouseButton
-		var world_pos: Vector3 = camera.project_position(mevent.position, 10)/cell_size - start_pos
-		# get the closest qubit clamped to the size of the grid
-		var snapped_pos = world_pos.snapped(Vector3(1, 1, 1)).clamp(
-			Vector3(0,0,0), Vector3(x_qubits-1,y_qubits-1,0))
-		# check if any qubit in the grid has the coordinates we would be creating it at
-		var collision = false
-		for qubit in grid_qubits:
-			if qubit == null:
-				continue
-			elif qubit.position.is_equal_approx((snapped_pos + start_pos)*cell_size):
-				collision = true
-		# create a qubit at the correct position
-		if not collision:
-			var x = roundi(snapped_pos.x)
-			var y = roundi(snapped_pos.y)
-			make_qubit(x, y)
-			append_or_update(QubitOperation.Operation.ADD, y*x_qubits + x)
-
+		var mevent: InputEventMouseButton = event as InputEventMouseButton
+		var world_pos: Vector3 = camera.project_position(mevent.position, 10)
+		var transformed: Vector3 = (aftrans * world_pos).snapped(Vector3(1.0, 1.0, 1.0))
+		var pos: Vector2i = Vector2i((transformed.x - transformed.y), (transformed.x + transformed.y))
+		var idx: int = pos_to_idx(pos)
+		if self.is_not_in_bounds(pos):
+			pass
+		elif grid_qubits[idx] == null:
+			make_qubit(Vector2i((transformed.x - transformed.y), (transformed.x + transformed.y)))
+			append_or_update(QubitOperation.Operation.ADD, idx)
+	elif self.selected_qubit != -1 and event is InputEventMouseMotion:
+		if drag_gate == null:
+			drag_gate = gate_scene.instantiate()
+			drag_gate.process_mode = Node.PROCESS_MODE_DISABLED
+			self.add_child(drag_gate)
+		var world_pos: Vector3 = camera.project_position(event.position, 7)
+		var pos1: Vector3 = grid_qubits[self.selected_qubit].position + Vector3(0, 0, 3)
+		var ndiff: Vector3 = (world_pos - pos1).normalized()
+		drag_gate.setup(pos1 + ndiff/3, world_pos, selected_gate_type)
 
 func rx(qubit: int, update: bool = true):
 	var q = grid_qubits[qubit]
@@ -368,11 +448,8 @@ func cx(control: int, target: int, update: bool = true):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
 	
-	add_cx_cz_visuals(control, target, false)
+	add_cx_cz_visuals(control, target, Gate.Type.CX)
 	
-	# apply cx between control and target
-	var qc = grid_qubits[control]
-	var qt = grid_qubits[target]
 	qec.cnot(control, target)
 	set_to_qec_state()
 	if update:
@@ -383,11 +460,8 @@ func cz(control: int, target: int, update: bool = true):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
 	
-	add_cx_cz_visuals(control, target, true)
+	add_cx_cz_visuals(control, target, Gate.Type.CZ)
 	
-	# apply cz between control and target
-	var qc = grid_qubits[control]
-	var qt = grid_qubits[target]
 	qec.cphase(control, target)
 	set_to_qec_state()
 	if update:
@@ -412,67 +486,15 @@ func measure_z(qubit: int, update: bool = true):
 		snapshots.set(operation_idx - 1, snap)
 		
 func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
-	return true
-	# Calculate row and column positions
-	var row1: int = qubit1_pos / width
-	var col1: int = qubit1_pos % width
-	var row2: int = qubit2_pos / width
-	var col2: int = qubit2_pos % width
-	
-	# Check if they are orthogonal neighbors
-	var row_diff = abs(row1 - row2)
-	var col_diff = abs(col1 - col2)
-	if (row_diff + col_diff) != 1:  # Manhattan distance 1
-		return false
-	
-	return true
+	return qubit1_pos != qubit2_pos
 
-func get_qubit_position_from_index(qubit_index: int) -> Vector2i:
-	var col = qubit_index % x_qubits
-	var row = qubit_index / x_qubits
-	return Vector2i(col, row)
 
-func add_cx_cz_visuals(control: int, target: int, gate_is_cz: bool) -> void:
-	var pos1 = get_qubit_position_from_index(control)
-	var pos2 = get_qubit_position_from_index(target)
-	var dx = abs(pos1.x - pos2.x)
-	var dy = abs(pos1.y - pos2.y)
-	
-	var gate_instance = gate_scene.instantiate()
-	add_child(gate_instance)
-	
-	if dx == 1: # horizontal connection
-		var x = min(pos1.x, pos2.x)
-		var y = pos1.y
-		var startx = (x - (x_qubits-1)/2.0) * cell_size + qubit_size
-		var endx = (x + 1 - (x_qubits-1)/2.0) * cell_size - qubit_size
-		var gatey = (y - (y_qubits-1)/2.0) * cell_size
-		
-		# flip the gate based on selection order so that 
-		# we have first control then target
-		var flip_horizontal = pos1.x < pos2.x
-		if flip_horizontal:
-			# swap start and end to flip the gate
-			var temp = startx
-			startx = endx
-			endx = temp
-		gate_instance.setup(Vector3(startx, gatey, 0), Vector3(endx, gatey, 0))
-		
-	else: # vertical connection
-		var x = pos1.x
-		var y = min(pos1.y, pos2.y)
-		var gatex = (x - (x_qubits-1)/2.0) * cell_size
-		var starty = (y - (y_qubits-1)/2.0) * cell_size + qubit_size
-		var endy = (y + 1 - (y_qubits-1)/2.0) * cell_size - qubit_size
-
-		# flip if needed
-		var flip_vertical = pos1.y < pos2.y
-		if flip_vertical:
-			var temp = starty
-			starty = endy
-			endy = temp
-			
-		gate_instance.setup(Vector3(gatex, starty, 0), Vector3(gatex, endy, 0))
-	
-	if gate_is_cz:
-		gate_instance.texture = preload("res://assets/cz.png")
+func add_cx_cz_visuals(control: int, target: int, gate_type: Gate.Type) -> void:
+	var pos1: Vector3 = grid_qubits[control].position + Vector3(0, 0, 3)
+	var pos2: Vector3 = grid_qubits[target].position + Vector3(0, 0, 3)
+	var ndiff: Vector3 = (pos2 - pos1).normalized()
+	var g = self.gate_scene.instantiate()
+	self.add_child(g)
+	g.setup(pos1 + ndiff/3, pos2 - ndiff/3, gate_type)
+	if self.drag_gate != null:
+		self.drag_gate.queue_free()

@@ -31,25 +31,29 @@ func set_executing(step: int):
 	self.clear_executing_lines()
 	self.set_line_as_executing(step + setup_offset, true)
 
-func update_qubit_operations(operations: Array[QubitOperation]) -> void:
-	self.text = init_string
-	for op in operations:
-		match op.operation:
-			QubitOperation.Operation.RX:
-				self.text += "X %s\n" % op.index
-			QubitOperation.Operation.RY:
-				self.text += "Y %s\n" % op.index
-			QubitOperation.Operation.RZ:
-				self.text += "Z %s\n" % op.index
-			QubitOperation.Operation.RH:
-				self.text += "H %s\n" % op.index
-			QubitOperation.Operation.RS:
-				self.text += "S %s\n" % op.index
-			QubitOperation.Operation.CX:
-				self.text += "CNOT %s %s\n" % [op.index, op.other]
-			QubitOperation.Operation.CZ:
-				self.text += "CZ %s %s\n" % [op.index, op.other]
-			QubitOperation.Operation.DELETE:
-				self.text += "reset %s" % [op.index]
-			QubitOperation.Operation.ADD:
-				self.text += "init %s" % [op.index]
+func update_qubit_operations(op: QubitOperation) -> void:
+	match op.operation:
+		QubitOperation.Operation.RX:
+			self.text += "X %s\n" % [grid.pos_to_idx(op.index)]
+		QubitOperation.Operation.RY:
+			self.text += "Y %s\n" % [grid.pos_to_idx(op.index)]
+		QubitOperation.Operation.RZ:
+			self.text += "Z %s\n" % [grid.pos_to_idx(op.index)]
+		QubitOperation.Operation.RH:
+			self.text += "H %s\n" % [grid.pos_to_idx(op.index)]
+		QubitOperation.Operation.RS:
+			self.text += "S %s\n" % [grid.pos_to_idx(op.index)]
+		QubitOperation.Operation.CX:
+			self.text += "CNOT %s %s\n" % [grid.pos_to_idx(op.index), grid.pos_to_idx(op.other)]
+		QubitOperation.Operation.CZ:
+			self.text += "CZ %s %s\n" % [grid.pos_to_idx(op.index), grid.pos_to_idx(op.other)]
+		QubitOperation.Operation.DELETE:
+			self.text += "reset %s\n" % [grid.pos_to_idx(op.index)]
+		QubitOperation.Operation.ADD:
+			self.text += "init %s\n" % [grid.pos_to_idx(op.index)]
+		QubitOperation.Operation.MZ:
+			self.text += "measure %s\n" % [grid.pos_to_idx(op.index)]
+		QubitOperation.Operation.LABELA:
+			self.text += "#label ancilla %s\n" % [grid.pos_to_idx(op.index)]
+		QubitOperation.Operation.LABELD:
+			self.text += "#label data %s\n" % [grid.pos_to_idx(op.index)]
