@@ -363,7 +363,7 @@ func handle_redo() -> void:
 			QubitOperation.Operation.CZ:
 				cz(op_idx, op_tgt, false)
 			QubitOperation.Operation.MZ:
-				_apply_measure_z_no_record(selected_op.index)
+				_apply_measure_z_no_record(op_idx)
 		operation_idx += 1 # redo "what the user will be doing"
 		codeEdit.set_executing(operation_idx)
 
