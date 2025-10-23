@@ -54,7 +54,7 @@ class Egroup:
 		for i in len(results):
 			qubits[i].set_base(results[i]&0b11111)
 
-@onready var codeEdit: CodeEdit = get_node("/root/Scene/HUD/CodeEdit")
+@onready var codeEdit: CodeEdit = get_node("/root/Scene/HUD/Tabs/QASM")
 @onready var play_timer: Timer = Timer.new()
 @onready var play_pause: Button = get_node("/root/Scene/HUD/Spacer/TimeControl/PlayPause") as Button
 @onready var play_icon: Texture2D = preload("res://assets/media-controls/play.png")
@@ -77,6 +77,8 @@ var grid_qubits: Array[Qubit] = []
 var start_pos: Vector3
 var qec = Qec.new()
 var camera: Camera
+
+var errors: Vector3 = Vector3.ZERO
 
 var operation_idx: int = 0 # index of the operation that the user will be doing
 var operations: Array[QubitOperation] = []
@@ -184,6 +186,8 @@ func _on_ready() -> void:
 	(timecontrol.get_node("StepForward") as Button).pressed.connect(_on_step_forward)
 	(timecontrol.get_node("SkipForward") as Button).pressed.connect(_on_skip_forward)
 	macro_button.pressed.connect(_on_macro_button)
+	
+	(get_node("/root/Scene/HUD/Tabs/ErrorPanel") as ErrorPanel).errors_changed.connect(func(e: Vector3): self.errors = e)
 	
 	self.camera = %Camera as Camera
 	# Resize the camera to fit with the grid
@@ -301,26 +305,26 @@ func handle_undo() -> void:
 		var op_tgt = pos_to_idx(selected_op.other)
 		match selected_op.operation:
 			QubitOperation.Operation.RX:
-				rx(op_idx, false)
+				rx(op_idx, false, false)
 			QubitOperation.Operation.RY:
-				ry(op_idx, false)
+				ry(op_idx, false, false)
 			QubitOperation.Operation.RZ:
-				rz(op_idx, false)
+				rz(op_idx, false, false)
 			QubitOperation.Operation.RH:
-				rh(op_idx, false)
+				rh(op_idx, false, false)
 			QubitOperation.Operation.RS:
-				rsd(op_idx, false)
+				rsd(op_idx, false, false)
 			QubitOperation.Operation.RSD:
-				rs(op_idx, false)
+				rs(op_idx, false, false)
 			QubitOperation.Operation.ADD:
 				grid_qubits[op_idx].queue_free()
 				grid_qubits[op_idx] = null
 			QubitOperation.Operation.DELETE:
 				make_qubit(selected_op.index, selected_op.basis)
 			QubitOperation.Operation.CX:
-				cx(op_idx, op_tgt, false)
+				cx(op_idx, op_tgt, false, false)
 			QubitOperation.Operation.CZ:
-				cz(op_idx, op_tgt, false)
+				cz(op_idx, op_tgt, false, false)
 
 func is_not_in_bounds(pos: Vector2i) -> bool:
 	return pos.x < 0 or pos.x/2 >= self.x_qubits or pos.y < 0 or pos.y >= self.y_qubits
@@ -389,51 +393,63 @@ func _input(event: InputEvent) -> void:
 		var ndiff: Vector3 = (world_pos - pos1).normalized()
 		drag_gate.setup(pos1 + ndiff/3, world_pos, selected_gate_type)
 
-func rx(qubit: int, update: bool = true):
+func rx(qubit: int, update: bool = true, do_errors: bool = true):
 	var q = grid_qubits[qubit]
 	qec.xgate(qubit)
+	if do_errors:
+		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 	if update:
 		append_or_update(QubitOperation.Operation.RX, qubit)
 
 
-func ry(qubit: int, update: bool = true):
+func ry(qubit: int, update: bool = true, do_errors: bool = true):
 	var q = grid_qubits[qubit]
 	qec.ygate(qubit)
+	if do_errors: 
+		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 	if update:
 		append_or_update(QubitOperation.Operation.RY, qubit)
 
-func rz(qubit: int, update: bool = true):
+func rz(qubit: int, update: bool = true, do_errors: bool = true):
 	var q = grid_qubits[qubit]
 	# the qubit's z-axis is the y axis in godot
 	qec.zgate(qubit)
+	if do_errors: 
+		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 	if update:
 		append_or_update(QubitOperation.Operation.RZ, qubit)
 
-func rh(qubit: int, update: bool = true):
+func rh(qubit: int, update: bool = true, do_errors: bool = true):
 	var q = grid_qubits[qubit]
 	qec.hadamard(qubit)
+	if do_errors: 
+		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 	if update:
 		append_or_update(QubitOperation.Operation.RH, qubit)
 
-func rs(qubit: int, update: bool = true):
+func rs(qubit: int, update: bool = true, do_errors: bool = true):
 	var q = grid_qubits[qubit]
 	qec.phase(qubit)
+	if do_errors: 
+		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 	if update:
 		append_or_update(QubitOperation.Operation.RS, qubit)
 
-func rsd(qubit: int, update: bool = true):
+func rsd(qubit: int, update: bool = true, do_errors: bool = true):
 	var q = grid_qubits[qubit]
 	qec.phase_dag(qubit)
+	if do_errors: 
+		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 	if update:
 		append_or_update(QubitOperation.Operation.RSD, qubit)
 
-func cx(control: int, target: int, update: bool = true):
+func cx(control: int, target: int, update: bool = true, do_errors: bool = true):
 	if not check_orthogonal_neighbors(control, target, x_qubits):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
@@ -441,11 +457,14 @@ func cx(control: int, target: int, update: bool = true):
 	add_cx_cz_visuals(control, target, Gate.Type.CX)
 	
 	qec.cnot(control, target)
+	if do_errors: 
+		do_errors(control)
+		do_errors(target)
 	set_to_qec_state()
 	if update:
 		append_or_update(QubitOperation.Operation.CX, control, target)
 
-func cz(control: int, target: int, update: bool = true):
+func cz(control: int, target: int, update: bool = true, do_errors: bool = true):
 	if not check_orthogonal_neighbors(control, target, x_qubits):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
@@ -453,11 +472,16 @@ func cz(control: int, target: int, update: bool = true):
 	add_cx_cz_visuals(control, target, Gate.Type.CZ)
 	
 	qec.cphase(control, target)
+	if do_errors: 
+		do_errors(control)
+		do_errors(target)
 	set_to_qec_state()
 	if update:
 		append_or_update(QubitOperation.Operation.CZ, control, target)
 
-func measure_z(qubit: int, update: bool = true):
+func measure_z(qubit: int, update: bool = true, do_errors: bool = true):
+	if do_errors:
+		do_errors(qubit)
 	qec.mz(qubit)
 	set_to_qec_state()
 	if update:
@@ -466,6 +490,13 @@ func measure_z(qubit: int, update: bool = true):
 func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
 	return qubit1_pos != qubit2_pos
 
+func do_errors(qubit: int):
+	if randf() < self.errors.x:
+		qec.xgate(qubit)
+	if randf() < self.errors.y:
+		qec.zgate(qubit)
+	if randf() < self.errors.z:
+		qec.relax(qubit)
 
 func add_cx_cz_visuals(control: int, target: int, gate_type: Gate.Type) -> void:
 	var pos1: Vector3 = grid_qubits[control].position + Vector3(0, 0, 3)
