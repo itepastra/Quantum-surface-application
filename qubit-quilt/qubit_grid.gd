@@ -70,6 +70,7 @@ var operation_idx: int = 0 # index of the operation that the user will be doing
 var operations: Array[QubitOperation] = []
 
 var entanglement_groups: Array[Egroup] = []
+var snapshots: Dictionary = {}
 
 func set_to_qec_state():
 	var graph: Dictionary[int,PackedInt32Array] = {};
@@ -241,6 +242,13 @@ func handle_undo() -> void:
 				cx(selected_op.index, selected_op.other, false)
 			QubitOperation.Operation.CZ:
 				cz(selected_op.index, selected_op.other, false)
+			QubitOperation.Operation.MZ:
+				var snap: Dictionary = snapshots.get(operation_idx, null)
+				if snap:
+					qec.restore_entanglement_group(snap)
+					set_to_qec_state()
+				else:
+					print_debug("Missing snapshot for MZ at op index %d" % operation_idx)	
 
 func handle_redo() -> void:
 	if self.operation_idx >= len(operations):
@@ -272,6 +280,9 @@ func handle_redo() -> void:
 				cx(selected_op.index, selected_op.other, false)
 			QubitOperation.Operation.CZ:
 				cz(selected_op.index, selected_op.other, false)
+			QubitOperation.Operation.MZ:
+				_apply_measure_z_no_record(selected_op.index)
+				
 		operation_idx += 1 # redo "what the user will be doing"
 		codeEdit.set_executing(operation_idx)
 
@@ -382,10 +393,24 @@ func cz(control: int, target: int, update: bool = true):
 	if update:
 		append_or_update(QubitOperation.Operation.CZ, control, target)
 
-func measure_z(qubit: int):
+func _apply_measure_z_no_record(qubit: int):
 	qec.mz(qubit)
 	set_to_qec_state()
 
+func measure_z(qubit: int, update: bool = true):
+	# snapshot of entire entanglement group
+	var snap: Dictionary = qec.snapshot_entanglement_group(qubit)
+
+	qec.mz(qubit)
+	set_to_qec_state()
+
+	# store operation + its snapshot for undo/redo
+	if update:
+		append_or_update(QubitOperation.Operation.MZ, qubit)
+		# store snapshot under the appended op index
+		# (operation_idx was incremented by append_or_update)
+		snapshots.set(operation_idx - 1, snap)
+		
 func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
 	return true
 	# Calculate row and column positions
