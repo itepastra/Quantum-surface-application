@@ -14,6 +14,7 @@ var pos: Vector2i # what position this qubit has in 2d coordinates
 var rot: Basis # the "target" rotation
 var is_rotating: bool = false
 var is_hovered: bool = false
+var is_in_ninja_star: bool = false
 
 @onready var qb: StaticBody3D = get_node("QubitBody")
 @onready var label: Label3D = get_node("QubitText")
@@ -109,6 +110,10 @@ func handle_macro(macro: Button):
 	if macro == null:
 		return
 	grid.macros[macro.idx].execute(self.pos)
+	
+func is_data_qubit() -> bool:
+	return (self.get_node("BORDER") as Node3D).visible
+
 
 const labels: Dictionary[int, String] = {
 	0: "+",
