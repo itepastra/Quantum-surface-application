@@ -363,7 +363,7 @@ func handle_redo() -> void:
 			QubitOperation.Operation.CZ:
 				cz(op_idx, op_tgt, false)
 			QubitOperation.Operation.MZ:
-				_apply_measure_z_no_record(op_idx)
+				measure_z(op_idx, false)
 		operation_idx += 1 # redo "what the user will be doing"
 		codeEdit.set_executing(operation_idx)
 
@@ -466,10 +466,6 @@ func cz(control: int, target: int, update: bool = true):
 	set_to_qec_state()
 	if update:
 		append_or_update(QubitOperation.Operation.CZ, control, target)
-
-func _apply_measure_z_no_record(qubit: int):
-	qec.mz(qubit)
-	set_to_qec_state()
 
 func measure_z(qubit: int, update: bool = true):
 	# snapshot of entire entanglement group
