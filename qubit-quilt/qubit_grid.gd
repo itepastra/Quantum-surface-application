@@ -68,6 +68,7 @@ class Egroup:
 @onready var stabilize_ninja: Texture2D = preload("res://assets/stabilize_ninja_star.png")
 @onready var logicalX: Texture2D = preload("res://assets/logicalX.png")
 @onready var logicalZ: Texture2D = preload("res://assets/logicalZ.png")
+@onready var measure_logical: Texture2D = preload("res://assets/measure_logical.png")
 
 var recording = false
 var macro_instructions: Array[QubitOperation] = []
@@ -217,6 +218,7 @@ func _on_ready() -> void:
 	logical_X()
 	logical_Z()
 	stabilize_ninja_star()
+	measure_LOGICAL()
 	
 
 func _on_macro_button() -> void:
@@ -426,6 +428,8 @@ func create_default_macro(name: String, root: Vector2i, operations: Array[QubitO
 			macro.icon = logicalZ
 		"STABILIZE NINJA STAR":
 			macro.icon = stabilize_ninja
+		"MEASURE LOGICAL":
+			macro.icon = measure_logical
 
 	macros.append(macro)
 	get_node("/root/Scene/HUD/Spacer/Macros").add_child(macro)
@@ -497,17 +501,41 @@ func ninja_star():
 	
 	for qubit in data:
 		ops.append(QubitOperation.new(QubitOperation.Operation.LABELD, qubit))
-		var idx = self.pos_to_idx(qubit)
-		if macro_ninja == true:
-			grid_qubits[idx].is_in_ninja_star = true
 	
 	for qubit in ancilla:
 		ops.append(QubitOperation.new(QubitOperation.Operation.LABELA, qubit))
-		var idx = self.pos_to_idx(qubit)
-		if macro_ninja == true:
-			grid_qubits[idx].is_in_ninja_star = true
 	
-	macro_ninja = true
+	var d1 = Vector2i(-2,-2)
+	var d2 = Vector2i(0, -2)
+	var d3 = Vector2i(2, -2)
+	var d4 = Vector2i(-2, 0)
+	var d5 = Vector2i(0, 0)
+	var d6 = Vector2i(2, 0)
+	var d7 = Vector2i(-2, 2)
+	var d8 = Vector2i(0, 2)
+	var d9 = Vector2i(2, 2)
+	
+	var x1 = Vector2i(-1, -3)
+	var x2 = Vector2i(1, -1)
+	var x3 = Vector2i(-1, 1)
+	var x4 = Vector2i(1, 3)
+	
+	var z1 = Vector2i(-1, -1)
+	var z2 = Vector2i(3, -1)
+	var z3 = Vector2i(-3, 1)
+	var z4 = Vector2i(1, 1)
+	
+	#CNOTs
+	ops.append(QubitOperation.new(QubitOperation.Operation.CX, d5, x2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CX, d5, z4))
+	
+	#SWAPs
+	ops.append(QubitOperation.new(QubitOperation.Operation.CX, x2, d2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CX, d2, x2))
+	
+	ops.append(QubitOperation.new(QubitOperation.Operation.CX, z4, d8))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CX, d8, z4))
+	
 	create_default_macro("NINJA STAR", Vector2i(0,0), ops)
 	
 
@@ -527,74 +555,131 @@ func logical_Z():
 	
 func stabilize_ninja_star():
 	var ops: Array[QubitOperation] = []
-	var d1 = Vector2i(-2, 2)
-	var d2 = Vector2i(0, 2)
-	var d3 = Vector2i(2, 2)
+	var d1 = Vector2i(-2,-2)
+	var d2 = Vector2i(0, -2)
+	var d3 = Vector2i(2, -2)
 	var d4 = Vector2i(-2, 0)
 	var d5 = Vector2i(0, 0)
 	var d6 = Vector2i(2, 0)
-	var d7 = Vector2i(-2, -2)
-	var d8 = Vector2i(0, -2)
-	var d9 = Vector2i(2, -2)
+	var d7 = Vector2i(-2, 2)
+	var d8 = Vector2i(0, 2)
+	var d9 = Vector2i(2, 2)
 	
-	var z1 = Vector2i(1, 3)
-	var z2 = Vector2i(-1, 1)
-	var z3 = Vector2i(1, -1)
-	var z4 = Vector2i(-1, -3)
+	var x1 = Vector2i(-1, -3)
+	var x2 = Vector2i(1, -1)
+	var x3 = Vector2i(-1, 1)
+	var x4 = Vector2i(1, 3)
 	
-	var x1 = Vector2i(-3, 1)
-	var x2 = Vector2i(1, 1)
-	var x3 = Vector2i(-1, -1)
-	var x4 = Vector2i(3, -1)
+	var z1 = Vector2i(-1, -1)
+	var z2 = Vector2i(3, -1)
+	var z3 = Vector2i(-3, 1)
+	var z4 = Vector2i(1, 1)
 	
+	#X stabilizers
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d4))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d5))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d6))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d7))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d8))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d9))
+
 	ops.append(QubitOperation.new(QubitOperation.Operation.RH, x1))
 	ops.append(QubitOperation.new(QubitOperation.Operation.RH, x2))
 	ops.append(QubitOperation.new(QubitOperation.Operation.RH, x3))
 	ops.append(QubitOperation.new(QubitOperation.Operation.RH, x4))
 	
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, x2, d3))
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, d2, z2))
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, x1, d1))
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, x3, d5))
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, d6, z3))
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, d8, z4))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d2, x1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d6, x2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d8, x3))
 	
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, x2, d2))
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, d1, z2))
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, x3, d4))
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, d5, z3))
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, x4, d6))
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, d7, z4))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d1, x1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d5, x2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d7, x3))
 	
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, d3, z1))
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, x2, d6))
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, d5, z2))
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, x1, d4))
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, x3, d8))
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, d9, z3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d3, x2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d5, x3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d9, x4))
 	
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, d2, z1))
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, x2, d5))
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, d4, z2))
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, x3, d7))
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, d8, z3))
-	ops.append(QubitOperation.new(QubitOperation.Operation.CX, x4, d9))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d2, x2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d4, x3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d8, x4))
 	
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d4))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d5))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d6))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d7))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d8))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d9))
+
 	ops.append(QubitOperation.new(QubitOperation.Operation.RH, x1))
 	ops.append(QubitOperation.new(QubitOperation.Operation.RH, x2))
 	ops.append(QubitOperation.new(QubitOperation.Operation.RH, x3))
 	ops.append(QubitOperation.new(QubitOperation.Operation.RH, x4))
+	
+	
+	#Z stabilizers
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, z1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, z2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, z3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, z4))
+	
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d5, z1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d7, z3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d9, z4))
+	
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d2, z1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d4, z3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d6, z4))
+	
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d4, z1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d6, z2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d8, z4))
+	
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d1, z1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d3, z2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d5, z4))
+	
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, z1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, z2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, z3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, z4))
+	
+	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, x1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, x2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, x3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, x4))
 	
 	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, z1))
-	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, x2))
 	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, z2))
-	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, x1))
-	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, x3))
 	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, z3))
-	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, x4))
 	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, z4))
 	
 	create_default_macro("STABILIZE NINJA STAR", Vector2i(0,0), ops)
+	
+func measure_LOGICAL():
+	var ops: Array[QubitOperation] = []
+	var data = [
+		Vector2i(-2,2), #up left
+		Vector2i(0,2), #up center
+		Vector2i(2,2), #up right
+		Vector2i(2,0), #center right
+		Vector2i(2,-2), #bottom right
+		Vector2i(0, -2), #bottom center
+		Vector2i(-2,-2), #bottom left
+		Vector2i(-2,0), #center left
+		Vector2i(0,0) #center
+	]
+	
+	for qubit in data:
+		ops.append(QubitOperation.new(QubitOperation.Operation.MZ, qubit))
+
+	create_default_macro("MEASURE LOGICAL", Vector2i(0,0), ops)
 	
 
 func rx(qubit: int, update: bool = true):
