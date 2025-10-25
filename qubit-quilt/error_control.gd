@@ -2,9 +2,16 @@ class_name ErrorControl
 extends GridContainer
 
 enum ErrType {
+	# These apply to (one of) the qubit(s) the gate is applied on
 	BITFLIP_GATE,
 	PHASEFLIP_GATE,
 	RELAXATION_GATE,
+	# These apply to a random qubit in the grid, not just the selected one
+	BITFLIP_ANY,
+	PHASEFLIP_ANY,
+	RELAXATION_ANY,
+	# These apply to a whole region *NOT YET IMPLEMENTED*
+	COHERENT_SPACE,
 }
 
 @onready var text: Label = get_node("Prob") as Label

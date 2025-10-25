@@ -515,6 +515,23 @@ func measure_z(qubit: int, update: bool = true, do_errors: bool = true):
 func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
 	return qubit1_pos != qubit2_pos
 
+func do_bitflip_error(qubit: int):
+	self.operations[operation_idx-1].errors.append(QubitOperation.new(QubitOperation.Operation.RX, idx_to_pos(qubit)))
+	qec.xgate(qubit)
+	self.grid_qubits[qubit].set_base(qec.get_vop(qubit))
+
+func do_phaseflip_error(qubit: int):
+	self.operations[operation_idx-1].errors.append(QubitOperation.new(QubitOperation.Operation.RZ, idx_to_pos(qubit)))
+	qec.zgate(qubit)
+	self.grid_qubits[qubit].set_base(qec.get_vop(qubit))
+
+func do_relaxation_error(qubit: int):
+	var new_op = QubitOperation.new(QubitOperation.Operation.MZ, idx_to_pos(qubit))
+	new_op.snap = qec.snapshot_entanglement_group(qubit)
+	self.operations[operation_idx-1].errors.append(new_op)
+	qec.relax(qubit)
+	self.grid_qubits[qubit].set_base(qec.get_vop(qubit))
+
 func do_errors(qubit: int):
 	# reset the errors that may exist from earlier
 	self.operations[operation_idx-1].errors.clear()
@@ -522,18 +539,23 @@ func do_errors(qubit: int):
 		if randf() < self.error_rates[i]:
 			match i:
 				ErrorControl.ErrType.BITFLIP_GATE:
-					self.operations[operation_idx-1].errors.append(QubitOperation.new(QubitOperation.Operation.RX, idx_to_pos(qubit)))
-					qec.xgate(qubit)
+					do_bitflip_error(qubit)
 				ErrorControl.ErrType.PHASEFLIP_GATE:
-					self.operations[operation_idx-1].errors.append(QubitOperation.new(QubitOperation.Operation.RZ, idx_to_pos(qubit)))
-					qec.zgate(qubit)
+					do_phaseflip_error(qubit)
 				ErrorControl.ErrType.RELAXATION_GATE:
-					self.operations[operation_idx-1].errors.append(QubitOperation.new(QubitOperation.Operation.MZ, idx_to_pos(qubit)))
-					self.operations[operation_idx-1].errors[-1].snap = qec.snapshot_entanglement_group(qubit)
-					qec.mz(qubit)
-					var nvop = qec.get_vop(qubit)
-					if nvop in [8,9,22,23]:
-						qec.xgate(qubit)
+					do_relaxation_error(qubit)
+				ErrorControl.ErrType.BITFLIP_ANY:
+					var target = randi_range(0, grid_qubits.size() - 1)
+					if grid_qubits[target] != null:
+						do_bitflip_error(target)
+				ErrorControl.ErrType.PHASEFLIP_ANY:
+					var target = randi_range(0, grid_qubits.size() - 1)
+					if grid_qubits[target] != null:
+						do_phaseflip_error(target)
+				ErrorControl.ErrType.RELAXATION_ANY:
+					var target = randi_range(0, grid_qubits.size() - 1)
+					if grid_qubits[target] != null:
+						do_relaxation_error(target)
 				_:
 					print("unhandled error type %d" % i)
 
