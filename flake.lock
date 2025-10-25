@@ -19,11 +19,11 @@
     "godot_src": {
       "flake": false,
       "locked": {
-        "lastModified": 1761205457,
-        "narHash": "sha256-FPaNHXc2eyMsA6rppMe4hpG7uoH9o3/aLDt09ToM2Xw=",
+        "lastModified": 1761246163,
+        "narHash": "sha256-AEX9c4DL/PLNNeY5ER6EL6Tq05TNxKzn3n/s85l15R0=",
         "owner": "itepastra",
         "repo": "godot",
-        "rev": "4a89de2cd0a6f013f64880c63a8c0cc8694bceee",
+        "rev": "16220121baaf44ca31347b6a6cd302c22d40a18e",
         "type": "github"
       },
       "original": {

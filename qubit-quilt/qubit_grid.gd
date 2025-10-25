@@ -82,6 +82,7 @@ var operation_idx: int = 0 # index of the operation that the user will be doing
 var operations: Array[QubitOperation] = []
 
 var entanglement_groups: Array[Egroup] = []
+var snapshots: Dictionary = {}
 
 # works specifically for the cell size (1.8, 0.9), 
 # calculated by making a square that looked correct and then the inverse affine transform
@@ -332,6 +333,13 @@ func undo_operation(op: QubitOperation):
 			cx(op_idx, op_tgt, false, false)
 		QubitOperation.Operation.CZ:
 			cz(op_idx, op_tgt, false, false)
+		QubitOperation.Operation.MZ:
+			var snap: Dictionary = snapshots.get(operation_idx, null)
+			if snap:
+				qec.restore_entanglement_group(snap)
+				set_to_qec_state()
+			else:
+				print_debug("Missing snapshot for MZ at op index %d" % operation_idx)	
 	op.errors = []
 
 func handle_undo() -> void:
@@ -377,6 +385,8 @@ func handle_redo() -> void:
 				cx(op_idx, op_tgt, false)
 			QubitOperation.Operation.CZ:
 				cz(op_idx, op_tgt, false)
+			QubitOperation.Operation.MZ:
+				measure_z(op_idx, false)
 
 func _input(event: InputEvent) -> void:
 	# if ctrl + z is pressed
@@ -495,11 +505,13 @@ func cz(control: int, target: int, update: bool = true, do_errors: bool = true):
 	set_to_qec_state()
 
 func measure_z(qubit: int, update: bool = true, do_errors: bool = true):
+	var snap: Dictionary = qec.snapshot_entanglement_group(qubit)
 	if update:
 		append_or_update(QubitOperation.Operation.MZ, qubit)
 	qec.mz(qubit)
 	if do_errors:
 		do_errors(qubit)
+	snapshots.set(operation_idx - 1, snap)
 	set_to_qec_state()
 
 func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
