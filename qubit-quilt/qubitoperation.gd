@@ -4,6 +4,7 @@ var operation: Operation
 var index: Vector2i # arrayindex of the operation
 var other: Vector2i # only used with 2 qubit operations
 var basis: int
+var snap: Dictionary
 
 var errors: Array[QubitOperation] = []
 
