@@ -19,6 +19,7 @@ var is_hovered: bool = false
 @onready var label: Label3D = get_node("QubitText")
 @onready var grid: QubitGrid = get_parent() as QubitGrid
 @onready var particle_color: BaseMaterial3D = preload("res://qubit_particle.tres") as BaseMaterial3D
+@onready var meas_res: Label3D = get_node("MRes") as Label3D
 
 func _ready():
 	self.sound = get_node("/root/Scene/SoundSource")
@@ -88,6 +89,7 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 				grid.measure_z(array_pos)
 				if (self.get_node("BG") as Node3D).visible and self.label.text == "1":
 					(self.get_node("Error") as GPUParticles3D).emitting = true
+				meas_res.text = labels[grid.qec.get_vop(self.array_pos)]
 			"LABELA":
 				grid.append_or_update(QubitOperation.Operation.LABELA, array_pos)
 				self.toggle_ancilla()
