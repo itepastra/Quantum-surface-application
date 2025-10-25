@@ -527,6 +527,13 @@ func do_errors(qubit: int):
 				ErrorControl.ErrType.PHASEFLIP_GATE:
 					self.operations[operation_idx-1].errors.append(QubitOperation.new(QubitOperation.Operation.RZ, idx_to_pos(qubit)))
 					qec.zgate(qubit)
+				ErrorControl.ErrType.RELAXATION_GATE:
+					self.operations[operation_idx-1].errors.append(QubitOperation.new(QubitOperation.Operation.MZ, idx_to_pos(qubit)))
+					self.operations[operation_idx-1].errors[-1].snap = qec.snapshot_entanglement_group(qubit)
+					qec.mz(qubit)
+					var nvop = qec.get_vop(qubit)
+					if nvop in [8,9,22,23]:
+						qec.xgate(qubit)
 				_:
 					print("unhandled error type %d" % i)
 
