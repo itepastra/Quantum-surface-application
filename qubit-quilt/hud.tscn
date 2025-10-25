@@ -23,7 +23,7 @@
 [ext_resource type="Texture2D" uid="uid://nfjwr2wkil0g" path="res://assets/measure.png" id="18_5kc73"]
 [ext_resource type="Texture2D" uid="uid://bfma5yqm5bhlg" path="res://assets/macro.png" id="21_bp16l"]
 [ext_resource type="Script" uid="uid://cnfwx8pehjsq3" path="res://error_panel.gd" id="22_np8ax"]
-[ext_resource type="Script" uid="uid://f530f83406rd" path="res://bitflip.gd" id="22_rgb5v"]
+[ext_resource type="Script" uid="uid://wymb580hlnu3" path="res://error_control.gd" id="24_8w6vd"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_61f8s"]
 texture = ExtResource("1_640wx")
@@ -353,22 +353,30 @@ metadata/_tab_index = 0
 
 [node name="VBox" type="VBoxContainer" parent="Tabs/ErrorPanel"]
 layout_mode = 2
+theme = ExtResource("2_1xsix")
 
-[node name="EnableErrors" type="CheckButton" parent="Tabs/ErrorPanel/VBox"]
+[node name="BitFlip" type="GridContainer" parent="Tabs/ErrorPanel/VBox"]
 layout_mode = 2
-text = "Enable Errors"
+columns = 2
+script = ExtResource("24_8w6vd")
 
-[node name="BitFlipOdds" type="HBoxContainer" parent="Tabs/ErrorPanel/VBox"]
+[node name="Name" type="Label" parent="Tabs/ErrorPanel/VBox/BitFlip"]
 layout_mode = 2
-script = ExtResource("22_rgb5v")
-STATIC = "Bit-flip Odds: %0.6f"
+size_flags_horizontal = 3
+text = "Bit Flip Errors"
 
-[node name="Label" type="Label" parent="Tabs/ErrorPanel/VBox/BitFlipOdds"]
+[node name="Enable" type="CheckButton" parent="Tabs/ErrorPanel/VBox/BitFlip"]
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 3
+text = "Enable"
+
+[node name="Prob" type="Label" parent="Tabs/ErrorPanel/VBox/BitFlip"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Probability: ???"
 vertical_alignment = 1
 
-[node name="HSlider" type="HSlider" parent="Tabs/ErrorPanel/VBox/BitFlipOdds"]
+[node name="ProbSlider" type="HSlider" parent="Tabs/ErrorPanel/VBox/BitFlip"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 1
@@ -376,17 +384,32 @@ min_value = 0.1
 value = 0.1
 exp_edit = true
 
-[node name="PhaseFlipOdds" type="HBoxContainer" parent="Tabs/ErrorPanel/VBox"]
+[node name="HSeparator" type="HSeparator" parent="Tabs/ErrorPanel/VBox"]
 layout_mode = 2
-script = ExtResource("22_rgb5v")
-STATIC = "Phase Flip Odds: %0.6f"
 
-[node name="Label" type="Label" parent="Tabs/ErrorPanel/VBox/PhaseFlipOdds"]
+[node name="PhaseFlip" type="GridContainer" parent="Tabs/ErrorPanel/VBox"]
 layout_mode = 2
-size_flags_horizontal = 0
+columns = 2
+script = ExtResource("24_8w6vd")
+error_type = 1
+
+[node name="Name" type="Label" parent="Tabs/ErrorPanel/VBox/PhaseFlip"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Bit Flip Errors"
+
+[node name="Enable" type="CheckButton" parent="Tabs/ErrorPanel/VBox/PhaseFlip"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Enable"
+
+[node name="Prob" type="Label" parent="Tabs/ErrorPanel/VBox/PhaseFlip"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Probability: ???"
 vertical_alignment = 1
 
-[node name="HSlider" type="HSlider" parent="Tabs/ErrorPanel/VBox/PhaseFlipOdds"]
+[node name="ProbSlider" type="HSlider" parent="Tabs/ErrorPanel/VBox/PhaseFlip"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 1
@@ -394,17 +417,32 @@ min_value = 0.1
 value = 0.1
 exp_edit = true
 
-[node name="RelaxOdds" type="HBoxContainer" parent="Tabs/ErrorPanel/VBox"]
+[node name="HSeparator2" type="HSeparator" parent="Tabs/ErrorPanel/VBox"]
 layout_mode = 2
-script = ExtResource("22_rgb5v")
-STATIC = "Relaxation Odds: %0.6f"
 
-[node name="Label" type="Label" parent="Tabs/ErrorPanel/VBox/RelaxOdds"]
+[node name="Relaxation" type="GridContainer" parent="Tabs/ErrorPanel/VBox"]
 layout_mode = 2
-size_flags_horizontal = 0
+columns = 2
+script = ExtResource("24_8w6vd")
+error_type = 2
+
+[node name="Name" type="Label" parent="Tabs/ErrorPanel/VBox/Relaxation"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Bit Flip Errors"
+
+[node name="Enable" type="CheckButton" parent="Tabs/ErrorPanel/VBox/Relaxation"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Enable"
+
+[node name="Prob" type="Label" parent="Tabs/ErrorPanel/VBox/Relaxation"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Probability: ???"
 vertical_alignment = 1
 
-[node name="HSlider" type="HSlider" parent="Tabs/ErrorPanel/VBox/RelaxOdds"]
+[node name="ProbSlider" type="HSlider" parent="Tabs/ErrorPanel/VBox/Relaxation"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 1
@@ -425,11 +463,4 @@ gutters_draw_line_numbers = true
 script = ExtResource("10_amv7k")
 metadata/_tab_index = 1
 
-[connection signal="toggled" from="Tabs/ErrorPanel/VBox/EnableErrors" to="Tabs/ErrorPanel" method="_on_enable_errors_toggled"]
-[connection signal="error_changed" from="Tabs/ErrorPanel/VBox/BitFlipOdds" to="Tabs/ErrorPanel" method="_on_bit_flip_odds_error_changed"]
-[connection signal="value_changed" from="Tabs/ErrorPanel/VBox/BitFlipOdds/HSlider" to="Tabs/ErrorPanel/VBox/BitFlipOdds" method="_on_h_slider_value_changed"]
-[connection signal="error_changed" from="Tabs/ErrorPanel/VBox/PhaseFlipOdds" to="Tabs/ErrorPanel" method="_on_phase_flip_odds_error_changed"]
-[connection signal="value_changed" from="Tabs/ErrorPanel/VBox/PhaseFlipOdds/HSlider" to="Tabs/ErrorPanel/VBox/PhaseFlipOdds" method="_on_h_slider_value_changed"]
-[connection signal="error_changed" from="Tabs/ErrorPanel/VBox/RelaxOdds" to="Tabs/ErrorPanel" method="_on_relax_odds_error_changed"]
-[connection signal="value_changed" from="Tabs/ErrorPanel/VBox/RelaxOdds/HSlider" to="Tabs/ErrorPanel/VBox/RelaxOdds" method="_on_h_slider_value_changed"]
 [connection signal="ready" from="Tabs/QASM" to="Tabs/QASM" method="_on_ready"]

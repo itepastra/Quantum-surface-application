@@ -78,8 +78,6 @@ var start_pos: Vector3
 var qec = Qec.new()
 var camera: Camera
 
-var errors: Vector3 = Vector3.ZERO
-
 var operation_idx: int = 0 # index of the operation that the user will be doing
 var operations: Array[QubitOperation] = []
 
@@ -166,6 +164,7 @@ func parse_js_args() -> void:
 
 func _on_ready() -> void:
 	parse_js_args()
+	init_error_rates()
 	
 	var hb = get_node("/root/Scene/HUD/Spacer/Hotbar/")
 	
@@ -187,7 +186,6 @@ func _on_ready() -> void:
 	(timecontrol.get_node("SkipForward") as Button).pressed.connect(_on_skip_forward)
 	macro_button.pressed.connect(_on_macro_button)
 	
-	(get_node("/root/Scene/HUD/Tabs/ErrorPanel") as ErrorPanel).errors_changed.connect(func(e: Vector3): self.errors = e)
 	
 	self.camera = %Camera as Camera
 	# Resize the camera to fit with the grid
@@ -205,6 +203,16 @@ func _on_ready() -> void:
 	play_timer.autostart = false
 	add_child(play_timer)
 	play_timer.timeout.connect(_on_play_timer_timeout)
+
+var error_rates: PackedFloat32Array;
+
+func init_error_rates() -> void:
+	for type in ErrorControl.ErrType:
+		error_rates.append(0)
+
+func handle_error_changed(value: float, err_type: ErrorControl.ErrType) -> void:
+	error_rates[err_type] = value
+
 
 func _on_macro_button() -> void:
 	if self.recording:
@@ -294,6 +302,38 @@ func make_qubit(pos: Vector2i, basis: int = 10):
 		grid_qubits[nextQubit.array_pos] = nextQubit
 	self.add_child(nextQubit)
 
+func undo_operation(op: QubitOperation):
+	# undo what errors did
+	var esize = op.errors.size()
+	for sub_op_idx in range(esize-1, -1, -1):
+		undo_operation(op.errors[sub_op_idx])
+	
+	var op_idx = pos_to_idx(op.index)
+	var op_tgt = pos_to_idx(op.other)
+	match op.operation:
+		QubitOperation.Operation.RX:
+			rx(op_idx, false, false)
+		QubitOperation.Operation.RY:
+			ry(op_idx, false, false)
+		QubitOperation.Operation.RZ:
+			rz(op_idx, false, false)
+		QubitOperation.Operation.RH:
+			rh(op_idx, false, false)
+		QubitOperation.Operation.RS:
+			rsd(op_idx, false, false)
+		QubitOperation.Operation.RSD:
+			rs(op_idx, false, false)
+		QubitOperation.Operation.ADD:
+			grid_qubits[op_idx].queue_free()
+			grid_qubits[op_idx] = null
+		QubitOperation.Operation.DELETE:
+			make_qubit(op.index, op.basis)
+		QubitOperation.Operation.CX:
+			cx(op_idx, op_tgt, false, false)
+		QubitOperation.Operation.CZ:
+			cz(op_idx, op_tgt, false, false)
+	op.errors = []
+
 func handle_undo() -> void:
 	if self.operation_idx <= 0:
 		return
@@ -301,30 +341,7 @@ func handle_undo() -> void:
 		operation_idx -= 1 # go from "what the user will be doing" to "what the user just did" to undo that
 		var selected_op = operations[self.operation_idx]
 		codeEdit.set_executing(operation_idx)
-		var op_idx = pos_to_idx(selected_op.index)
-		var op_tgt = pos_to_idx(selected_op.other)
-		match selected_op.operation:
-			QubitOperation.Operation.RX:
-				rx(op_idx, false, false)
-			QubitOperation.Operation.RY:
-				ry(op_idx, false, false)
-			QubitOperation.Operation.RZ:
-				rz(op_idx, false, false)
-			QubitOperation.Operation.RH:
-				rh(op_idx, false, false)
-			QubitOperation.Operation.RS:
-				rsd(op_idx, false, false)
-			QubitOperation.Operation.RSD:
-				rs(op_idx, false, false)
-			QubitOperation.Operation.ADD:
-				grid_qubits[op_idx].queue_free()
-				grid_qubits[op_idx] = null
-			QubitOperation.Operation.DELETE:
-				make_qubit(selected_op.index, selected_op.basis)
-			QubitOperation.Operation.CX:
-				cx(op_idx, op_tgt, false, false)
-			QubitOperation.Operation.CZ:
-				cz(op_idx, op_tgt, false, false)
+		undo_operation(selected_op)
 
 func is_not_in_bounds(pos: Vector2i) -> bool:
 	return pos.x < 0 or pos.x/2 >= self.x_qubits or pos.y < 0 or pos.y >= self.y_qubits
@@ -334,6 +351,8 @@ func handle_redo() -> void:
 		return
 	else:
 		var selected_op = operations[self.operation_idx]
+		operation_idx += 1 # redo "what the user will be doing"
+		codeEdit.set_executing(operation_idx)
 		var op_idx = pos_to_idx(selected_op.index)
 		var op_tgt = pos_to_idx(selected_op.other)
 		match selected_op.operation:
@@ -358,8 +377,6 @@ func handle_redo() -> void:
 				cx(op_idx, op_tgt, false)
 			QubitOperation.Operation.CZ:
 				cz(op_idx, op_tgt, false)
-		operation_idx += 1 # redo "what the user will be doing"
-		codeEdit.set_executing(operation_idx)
 
 func _input(event: InputEvent) -> void:
 	# if ctrl + z is pressed
@@ -394,80 +411,80 @@ func _input(event: InputEvent) -> void:
 		drag_gate.setup(pos1 + ndiff/3, world_pos, selected_gate_type)
 
 func rx(qubit: int, update: bool = true, do_errors: bool = true):
+	if update:
+		append_or_update(QubitOperation.Operation.RX, qubit)
 	var q = grid_qubits[qubit]
 	qec.xgate(qubit)
 	if do_errors:
 		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
-	if update:
-		append_or_update(QubitOperation.Operation.RX, qubit)
 
 
 func ry(qubit: int, update: bool = true, do_errors: bool = true):
+	if update:
+		append_or_update(QubitOperation.Operation.RY, qubit)
 	var q = grid_qubits[qubit]
 	qec.ygate(qubit)
 	if do_errors: 
 		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
-	if update:
-		append_or_update(QubitOperation.Operation.RY, qubit)
 
 func rz(qubit: int, update: bool = true, do_errors: bool = true):
+	if update:
+		append_or_update(QubitOperation.Operation.RZ, qubit)
 	var q = grid_qubits[qubit]
 	# the qubit's z-axis is the y axis in godot
 	qec.zgate(qubit)
 	if do_errors: 
 		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
-	if update:
-		append_or_update(QubitOperation.Operation.RZ, qubit)
 
 func rh(qubit: int, update: bool = true, do_errors: bool = true):
+	if update:
+		append_or_update(QubitOperation.Operation.RH, qubit)
 	var q = grid_qubits[qubit]
 	qec.hadamard(qubit)
 	if do_errors: 
 		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
-	if update:
-		append_or_update(QubitOperation.Operation.RH, qubit)
 
 func rs(qubit: int, update: bool = true, do_errors: bool = true):
+	if update:
+		append_or_update(QubitOperation.Operation.RS, qubit)
 	var q = grid_qubits[qubit]
 	qec.phase(qubit)
 	if do_errors: 
 		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
-	if update:
-		append_or_update(QubitOperation.Operation.RS, qubit)
 
 func rsd(qubit: int, update: bool = true, do_errors: bool = true):
+	if update:
+		append_or_update(QubitOperation.Operation.RSD, qubit)
 	var q = grid_qubits[qubit]
 	qec.phase_dag(qubit)
 	if do_errors: 
 		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
-	if update:
-		append_or_update(QubitOperation.Operation.RSD, qubit)
 
 func cx(control: int, target: int, update: bool = true, do_errors: bool = true):
 	if not check_orthogonal_neighbors(control, target, x_qubits):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
-	
+	if update:
+		append_or_update(QubitOperation.Operation.CX, control, target)
 	add_cx_cz_visuals(control, target, Gate.Type.CX)
-	
 	qec.cnot(control, target)
 	if do_errors: 
 		do_errors(control)
 		do_errors(target)
 	set_to_qec_state()
-	if update:
-		append_or_update(QubitOperation.Operation.CX, control, target)
 
 func cz(control: int, target: int, update: bool = true, do_errors: bool = true):
 	if not check_orthogonal_neighbors(control, target, x_qubits):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
+	if update:
+		append_or_update(QubitOperation.Operation.CZ, control, target)
 	
 	add_cx_cz_visuals(control, target, Gate.Type.CZ)
 	
@@ -476,27 +493,32 @@ func cz(control: int, target: int, update: bool = true, do_errors: bool = true):
 		do_errors(control)
 		do_errors(target)
 	set_to_qec_state()
-	if update:
-		append_or_update(QubitOperation.Operation.CZ, control, target)
 
 func measure_z(qubit: int, update: bool = true, do_errors: bool = true):
-	if do_errors:
-		do_errors(qubit)
-	qec.mz(qubit)
-	set_to_qec_state()
 	if update:
 		append_or_update(QubitOperation.Operation.MZ, qubit)
+	qec.mz(qubit)
+	if do_errors:
+		do_errors(qubit)
+	set_to_qec_state()
 
 func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
 	return qubit1_pos != qubit2_pos
 
 func do_errors(qubit: int):
-	if randf() < self.errors.x:
-		qec.xgate(qubit)
-	if randf() < self.errors.y:
-		qec.zgate(qubit)
-	if randf() < self.errors.z:
-		qec.relax(qubit)
+	# reset the errors that may exist from earlier
+	self.operations[operation_idx-1].errors.clear()
+	for i in self.error_rates.size():
+		if randf() < self.error_rates[i]:
+			match i:
+				ErrorControl.ErrType.BITFLIP_GATE:
+					self.operations[operation_idx-1].errors.append(QubitOperation.new(QubitOperation.Operation.RX, idx_to_pos(qubit)))
+					qec.xgate(qubit)
+				ErrorControl.ErrType.PHASEFLIP_GATE:
+					self.operations[operation_idx-1].errors.append(QubitOperation.new(QubitOperation.Operation.RZ, idx_to_pos(qubit)))
+					qec.zgate(qubit)
+				_:
+					print("unhandled error type %d" % i)
 
 func add_cx_cz_visuals(control: int, target: int, gate_type: Gate.Type) -> void:
 	var pos1: Vector3 = grid_qubits[control].position + Vector3(0, 0, 3)
