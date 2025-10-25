@@ -338,6 +338,8 @@ func handle_redo() -> void:
 		return
 	else:
 		var selected_op = operations[self.operation_idx]
+		operation_idx += 1 # redo "what the user will be doing"
+		codeEdit.set_executing(operation_idx)
 		var op_idx = pos_to_idx(selected_op.index)
 		var op_tgt = pos_to_idx(selected_op.other)
 		match selected_op.operation:
@@ -364,8 +366,6 @@ func handle_redo() -> void:
 				cz(op_idx, op_tgt, false)
 			QubitOperation.Operation.MZ:
 				measure_z(op_idx, false)
-		operation_idx += 1 # redo "what the user will be doing"
-		codeEdit.set_executing(operation_idx)
 
 func _input(event: InputEvent) -> void:
 	# if ctrl + z is pressed
@@ -479,8 +479,8 @@ func measure_z(qubit: int, update: bool = true):
 		append_or_update(QubitOperation.Operation.MZ, qubit)
 		# store snapshot under the appended op index
 		# (operation_idx was incremented by append_or_update)
-		snapshots.set(operation_idx - 1, snap)
-		
+	snapshots.set(operation_idx - 1, snap)
+
 func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
 	return qubit1_pos != qubit2_pos
 
