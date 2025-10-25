@@ -396,7 +396,7 @@ error_type = 1
 [node name="Name" type="Label" parent="Tabs/ErrorPanel/VBox/PhaseFlip"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Bit Flip Errors"
+text = "Phase Flip Errors"
 
 [node name="Enable" type="CheckButton" parent="Tabs/ErrorPanel/VBox/PhaseFlip"]
 layout_mode = 2
@@ -429,7 +429,7 @@ error_type = 2
 [node name="Name" type="Label" parent="Tabs/ErrorPanel/VBox/Relaxation"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Bit Flip Errors"
+text = "Relaxation Errors"
 
 [node name="Enable" type="CheckButton" parent="Tabs/ErrorPanel/VBox/Relaxation"]
 layout_mode = 2
