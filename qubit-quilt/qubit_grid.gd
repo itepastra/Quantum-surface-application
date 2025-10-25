@@ -82,6 +82,7 @@ var operation_idx: int = 0 # index of the operation that the user will be doing
 var operations: Array[QubitOperation] = []
 
 var entanglement_groups: Array[Egroup] = []
+var snapshots: Dictionary = {}
 
 # works specifically for the cell size (1.8, 0.9), 
 # calculated by making a square that looked correct and then the inverse affine transform
@@ -321,6 +322,13 @@ func handle_undo() -> void:
 				cx(op_idx, op_tgt, false)
 			QubitOperation.Operation.CZ:
 				cz(op_idx, op_tgt, false)
+			QubitOperation.Operation.MZ:
+				var snap: Dictionary = snapshots.get(operation_idx, null)
+				if snap:
+					qec.restore_entanglement_group(snap)
+					set_to_qec_state()
+				else:
+					print_debug("Missing snapshot for MZ at op index %d" % operation_idx)	
 
 func is_not_in_bounds(pos: Vector2i) -> bool:
 	return pos.x < 0 or pos.x/2 >= self.x_qubits or pos.y < 0 or pos.y >= self.y_qubits
@@ -330,6 +338,8 @@ func handle_redo() -> void:
 		return
 	else:
 		var selected_op = operations[self.operation_idx]
+		operation_idx += 1 # redo "what the user will be doing"
+		codeEdit.set_executing(operation_idx)
 		var op_idx = pos_to_idx(selected_op.index)
 		var op_tgt = pos_to_idx(selected_op.other)
 		match selected_op.operation:
@@ -354,8 +364,8 @@ func handle_redo() -> void:
 				cx(op_idx, op_tgt, false)
 			QubitOperation.Operation.CZ:
 				cz(op_idx, op_tgt, false)
-		operation_idx += 1 # redo "what the user will be doing"
-		codeEdit.set_executing(operation_idx)
+			QubitOperation.Operation.MZ:
+				measure_z(op_idx, false)
 
 func _input(event: InputEvent) -> void:
 	# if ctrl + z is pressed
@@ -458,10 +468,18 @@ func cz(control: int, target: int, update: bool = true):
 		append_or_update(QubitOperation.Operation.CZ, control, target)
 
 func measure_z(qubit: int, update: bool = true):
+	# snapshot of entire entanglement group
+	var snap: Dictionary = qec.snapshot_entanglement_group(qubit)
+
 	qec.mz(qubit)
 	set_to_qec_state()
+
+	# store operation + its snapshot for undo/redo
 	if update:
 		append_or_update(QubitOperation.Operation.MZ, qubit)
+		# store snapshot under the appended op index
+		# (operation_idx was incremented by append_or_update)
+	snapshots.set(operation_idx - 1, snap)
 
 func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
 	return qubit1_pos != qubit2_pos
