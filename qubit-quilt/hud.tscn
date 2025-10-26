@@ -355,6 +355,13 @@ metadata/_tab_index = 0
 layout_mode = 2
 theme = ExtResource("2_1xsix")
 
+[node name="DisableAll" type="CheckButton" parent="Tabs/ErrorPanel/VBox"]
+layout_mode = 2
+text = "Disable all errors"
+
+[node name="HSeparator6" type="HSeparator" parent="Tabs/ErrorPanel/VBox"]
+layout_mode = 2
+
 [node name="Label2" type="Label" parent="Tabs/ErrorPanel/VBox"]
 layout_mode = 2
 text = "Gate Errors"

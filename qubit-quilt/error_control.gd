@@ -36,6 +36,15 @@ func _ready() -> void:
 	
 	slider_val_changed(slider.value)
 
+func disable_toggle(pressed: bool) -> void:
+	var slider: HSlider = get_node("ProbSlider") as HSlider
+	slider.editable = not pressed
+	var enable: CheckButton = get_node("Enable") as CheckButton
+	enable.disabled = pressed
+	if pressed:
+		emit_signal("error_changed", 0, self.error_type)
+	else:
+		emit_signal("error_changed", slider.value, self.error_type)
 
 func slider_val_changed(value: float) -> void:
 	text.text = "Probability: %0.7f" % value
