@@ -1,4 +1,4 @@
-[gd_scene load_steps=46 format=3 uid="uid://8h8kpjesx5mq"]
+[gd_scene load_steps=47 format=3 uid="uid://8h8kpjesx5mq"]
 
 [ext_resource type="Script" uid="uid://c16i7rw21hc40" path="res://hud.gd" id="1_1fv7p"]
 [ext_resource type="Texture2D" uid="uid://dmha0kcdynqvd" path="res://assets/button.png" id="1_640wx"]
@@ -17,12 +17,13 @@
 [ext_resource type="Texture2D" uid="uid://cuxyhqt1qdu0p" path="res://assets/h.png" id="9_4u2vk"]
 [ext_resource type="Texture2D" uid="uid://by2p5qv8s5m2m" path="res://assets/media-controls/skip_forward.png" id="9_bp16l"]
 [ext_resource type="Script" uid="uid://c1vu2ywfadoqj" path="res://code_edit.gd" id="10_amv7k"]
-[ext_resource type="Texture2D" uid="uid://dbmdldt03p44i" path="res://assets/menu.png" id="10_gpiub"]
 [ext_resource type="ButtonGroup" uid="uid://bgpxf2yyv8quc" path="res://control_buttons.tres" id="11_5iihh"]
 [ext_resource type="Script" uid="uid://c43jdqdlgp6h5" path="res://hotbar_button.gd" id="13_rgb5v"]
 [ext_resource type="Texture2D" uid="uid://da2w8t4egghnx" path="res://assets/rz-90.png" id="14_ap7yk"]
 [ext_resource type="Texture2D" uid="uid://nfjwr2wkil0g" path="res://assets/measure.png" id="18_5kc73"]
 [ext_resource type="Texture2D" uid="uid://bfma5yqm5bhlg" path="res://assets/macro.png" id="21_bp16l"]
+[ext_resource type="Script" uid="uid://cnfwx8pehjsq3" path="res://error_panel.gd" id="22_np8ax"]
+[ext_resource type="Script" uid="uid://wymb580hlnu3" path="res://error_control.gd" id="24_8w6vd"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_61f8s"]
 texture = ExtResource("1_640wx")
@@ -98,27 +99,6 @@ events = [SubResource("InputEventAction_4u2vk")]
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_1fv7p")
-
-[node name="CodeEdit" type="CodeEdit" parent="."]
-offset_right = 8.0
-offset_bottom = 8.0
-placeholder_text = "The QASM code indicating the move operations"
-emoji_menu_enabled = false
-wrap_mode = 1
-indent_wrapped_lines = true
-scroll_past_end_of_file = true
-highlight_current_line = true
-gutters_draw_executing_lines = true
-gutters_draw_line_numbers = true
-script = ExtResource("10_amv7k")
-
-[node name="CodeEditor" type="Button" parent="."]
-offset_right = 40.0
-offset_bottom = 40.0
-toggle_mode = true
-icon = ExtResource("10_gpiub")
-icon_alignment = 1
-expand_icon = true
 
 [node name="Spacer" type="Control" parent="."]
 layout_mode = 3
@@ -355,5 +335,246 @@ icon = ExtResource("21_bp16l")
 icon_alignment = 1
 expand_icon = true
 
-[connection signal="ready" from="CodeEdit" to="CodeEdit" method="_on_ready"]
-[connection signal="toggled" from="CodeEditor" to="CodeEdit" method="_on_code_editor_toggled"]
+[node name="Tabs" type="TabContainer" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+theme = ExtResource("2_1xsix")
+tab_alignment = 2
+current_tab = 1
+use_hidden_tabs_for_min_size = true
+deselect_enabled = true
+
+[node name="ErrorPanel" type="PanelContainer" parent="Tabs"]
+visible = false
+layout_mode = 2
+theme = ExtResource("2_1xsix")
+script = ExtResource("22_np8ax")
+metadata/_tab_index = 0
+
+[node name="VBox" type="VBoxContainer" parent="Tabs/ErrorPanel"]
+layout_mode = 2
+theme = ExtResource("2_1xsix")
+
+[node name="DisableAll" type="CheckButton" parent="Tabs/ErrorPanel/VBox"]
+layout_mode = 2
+text = "Disable all errors"
+
+[node name="HSeparator6" type="HSeparator" parent="Tabs/ErrorPanel/VBox"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="Tabs/ErrorPanel/VBox"]
+layout_mode = 2
+text = "Gate Errors"
+
+[node name="BitFlip" type="GridContainer" parent="Tabs/ErrorPanel/VBox"]
+layout_mode = 2
+columns = 2
+script = ExtResource("24_8w6vd")
+
+[node name="Name" type="Label" parent="Tabs/ErrorPanel/VBox/BitFlip"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Bit Flip Errors"
+
+[node name="Enable" type="CheckButton" parent="Tabs/ErrorPanel/VBox/BitFlip"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Enable"
+
+[node name="Prob" type="Label" parent="Tabs/ErrorPanel/VBox/BitFlip"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Probability: ???"
+vertical_alignment = 1
+
+[node name="ProbSlider" type="HSlider" parent="Tabs/ErrorPanel/VBox/BitFlip"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+min_value = 0.1
+value = 0.1
+exp_edit = true
+
+[node name="HSeparator" type="HSeparator" parent="Tabs/ErrorPanel/VBox"]
+layout_mode = 2
+
+[node name="PhaseFlip" type="GridContainer" parent="Tabs/ErrorPanel/VBox"]
+layout_mode = 2
+columns = 2
+script = ExtResource("24_8w6vd")
+error_type = 1
+
+[node name="Name" type="Label" parent="Tabs/ErrorPanel/VBox/PhaseFlip"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Phase Flip Errors"
+
+[node name="Enable" type="CheckButton" parent="Tabs/ErrorPanel/VBox/PhaseFlip"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Enable"
+
+[node name="Prob" type="Label" parent="Tabs/ErrorPanel/VBox/PhaseFlip"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Probability: ???"
+vertical_alignment = 1
+
+[node name="ProbSlider" type="HSlider" parent="Tabs/ErrorPanel/VBox/PhaseFlip"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+min_value = 0.1
+value = 0.1
+exp_edit = true
+
+[node name="HSeparator2" type="HSeparator" parent="Tabs/ErrorPanel/VBox"]
+layout_mode = 2
+
+[node name="Relaxation" type="GridContainer" parent="Tabs/ErrorPanel/VBox"]
+layout_mode = 2
+columns = 2
+script = ExtResource("24_8w6vd")
+error_type = 2
+
+[node name="Name" type="Label" parent="Tabs/ErrorPanel/VBox/Relaxation"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Relaxation Errors"
+
+[node name="Enable" type="CheckButton" parent="Tabs/ErrorPanel/VBox/Relaxation"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Enable"
+
+[node name="Prob" type="Label" parent="Tabs/ErrorPanel/VBox/Relaxation"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Probability: ???"
+vertical_alignment = 1
+
+[node name="ProbSlider" type="HSlider" parent="Tabs/ErrorPanel/VBox/Relaxation"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+min_value = 0.1
+value = 0.1
+exp_edit = true
+
+[node name="HSeparator3" type="HSeparator" parent="Tabs/ErrorPanel/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Tabs/ErrorPanel/VBox"]
+layout_mode = 2
+text = "Global Errors"
+
+[node name="BitflipAny" type="GridContainer" parent="Tabs/ErrorPanel/VBox"]
+layout_mode = 2
+columns = 2
+script = ExtResource("24_8w6vd")
+error_type = 3
+
+[node name="Name" type="Label" parent="Tabs/ErrorPanel/VBox/BitflipAny"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Bit Flip Errors"
+
+[node name="Enable" type="CheckButton" parent="Tabs/ErrorPanel/VBox/BitflipAny"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Enable"
+
+[node name="Prob" type="Label" parent="Tabs/ErrorPanel/VBox/BitflipAny"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Probability: ???"
+vertical_alignment = 1
+
+[node name="ProbSlider" type="HSlider" parent="Tabs/ErrorPanel/VBox/BitflipAny"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+min_value = 0.1
+value = 0.1
+exp_edit = true
+
+[node name="HSeparator4" type="HSeparator" parent="Tabs/ErrorPanel/VBox"]
+layout_mode = 2
+
+[node name="PhaseflipAny" type="GridContainer" parent="Tabs/ErrorPanel/VBox"]
+layout_mode = 2
+columns = 2
+script = ExtResource("24_8w6vd")
+error_type = 4
+
+[node name="Name" type="Label" parent="Tabs/ErrorPanel/VBox/PhaseflipAny"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Phase Flip Errors"
+
+[node name="Enable" type="CheckButton" parent="Tabs/ErrorPanel/VBox/PhaseflipAny"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Enable"
+
+[node name="Prob" type="Label" parent="Tabs/ErrorPanel/VBox/PhaseflipAny"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Probability: ???"
+vertical_alignment = 1
+
+[node name="ProbSlider" type="HSlider" parent="Tabs/ErrorPanel/VBox/PhaseflipAny"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+min_value = 0.1
+value = 0.1
+exp_edit = true
+
+[node name="HSeparator5" type="HSeparator" parent="Tabs/ErrorPanel/VBox"]
+layout_mode = 2
+
+[node name="RelaxationAny" type="GridContainer" parent="Tabs/ErrorPanel/VBox"]
+layout_mode = 2
+columns = 2
+script = ExtResource("24_8w6vd")
+error_type = 5
+
+[node name="Name" type="Label" parent="Tabs/ErrorPanel/VBox/RelaxationAny"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Relaxation Errors"
+
+[node name="Enable" type="CheckButton" parent="Tabs/ErrorPanel/VBox/RelaxationAny"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Enable"
+
+[node name="Prob" type="Label" parent="Tabs/ErrorPanel/VBox/RelaxationAny"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Probability: ???"
+vertical_alignment = 1
+
+[node name="ProbSlider" type="HSlider" parent="Tabs/ErrorPanel/VBox/RelaxationAny"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+min_value = 0.1
+value = 0.1
+exp_edit = true
+
+[node name="QASM" type="CodeEdit" parent="Tabs"]
+layout_mode = 2
+placeholder_text = "The QASM code indicating the move operations"
+emoji_menu_enabled = false
+wrap_mode = 1
+indent_wrapped_lines = true
+scroll_past_end_of_file = true
+highlight_current_line = true
+gutters_draw_executing_lines = true
+gutters_draw_line_numbers = true
+script = ExtResource("10_amv7k")
+metadata/_tab_index = 1
+
+[connection signal="ready" from="Tabs/QASM" to="Tabs/QASM" method="_on_ready"]
