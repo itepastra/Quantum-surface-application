@@ -110,7 +110,7 @@ process_material = SubResource("ParticleProcessMaterial_p1x3c")
 draw_pass_1 = SubResource("SphereMesh_xbv63")
 
 [node name="QubitText" type="Label3D" parent="."]
-transform = Transform3D(0.999926, 0.0121472, 0, -0.0121472, 0.999926, 0, 0, 0, 1, 0, 0, 1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
 pixel_size = 0.0085
 text = "0"
 
@@ -133,6 +133,10 @@ one_shot = true
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_xbv63")
 draw_pass_1 = SubResource("SphereMesh_1if3u")
+
+[node name="MRes" type="Label3D" parent="."]
+transform = Transform3D(0.999999, 0, 0, 0, 0.999999, 0, 0, 0, 1, 0.35, 0.35, 0.7)
+pixel_size = 0.0085
 
 [connection signal="input_event" from="QubitBody" to="." method="_on_input_event"]
 [connection signal="mouse_entered" from="QubitBody" to="." method="_on_qubit_body_mouse_entered"]
