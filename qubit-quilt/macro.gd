@@ -98,3 +98,4 @@ func execute(target: Vector2i) -> void:
 func _on_pressed() -> void:
 	if hotbar.get_pressed_button():
 		hotbar.get_pressed_button().button_pressed = false
+		

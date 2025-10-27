@@ -111,6 +111,7 @@ func handle_macro(macro: Button):
 	if macro == null:
 		return
 	grid.macros[macro.idx].execute(self.pos)
+	
 
 const labels: Dictionary[int, String] = {
 	0: "+",
