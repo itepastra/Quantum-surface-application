@@ -4,6 +4,9 @@ var operation: Operation
 var index: Vector2i # arrayindex of the operation
 var other: Vector2i # only used with 2 qubit operations
 var basis: int
+var snap: Dictionary
+
+var errors: Array[QubitOperation] = []
 
 enum Operation {RX, RY, RZ, RH, RS, RSD, CX, CZ, DELETE, ADD, MZ, LABELA, LABELD}
 
@@ -15,3 +18,10 @@ func _init(operation: Operation, index: Vector2i, other: Vector2i = Vector2i(0,0
 
 func is_two_qubit() -> bool:
 	return self.operation in [Operation.CX, Operation.CZ]
+
+func print_op(indent: int = 0):
+	print("%sOperation %d between %v and %v" % [" ".repeat(indent), self.operation, self.index, self.other])
+	if self.errors.size() > 0:
+		print("%sErrors:" % " ".repeat(indent))
+		for e in errors:
+			e.print_op(indent + 4)

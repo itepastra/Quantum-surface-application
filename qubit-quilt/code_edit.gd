@@ -34,26 +34,27 @@ func set_executing(step: int):
 func update_qubit_operations(op: QubitOperation) -> void:
 	match op.operation:
 		QubitOperation.Operation.RX:
-			self.text += "X %s\n" % [grid.pos_to_idx(op.index)]
+			self.text += "X %s" % [grid.pos_to_idx(op.index)]
 		QubitOperation.Operation.RY:
-			self.text += "Y %s\n" % [grid.pos_to_idx(op.index)]
+			self.text += "Y %s" % [grid.pos_to_idx(op.index)]
 		QubitOperation.Operation.RZ:
-			self.text += "Z %s\n" % [grid.pos_to_idx(op.index)]
+			self.text += "Z %s" % [grid.pos_to_idx(op.index)]
 		QubitOperation.Operation.RH:
-			self.text += "H %s\n" % [grid.pos_to_idx(op.index)]
+			self.text += "H %s" % [grid.pos_to_idx(op.index)]
 		QubitOperation.Operation.RS:
-			self.text += "S %s\n" % [grid.pos_to_idx(op.index)]
+			self.text += "S %s" % [grid.pos_to_idx(op.index)]
 		QubitOperation.Operation.CX:
-			self.text += "CNOT %s %s\n" % [grid.pos_to_idx(op.index), grid.pos_to_idx(op.other)]
+			self.text += "CNOT %s %s" % [grid.pos_to_idx(op.index), grid.pos_to_idx(op.other)]
 		QubitOperation.Operation.CZ:
-			self.text += "CZ %s %s\n" % [grid.pos_to_idx(op.index), grid.pos_to_idx(op.other)]
+			self.text += "CZ %s %s" % [grid.pos_to_idx(op.index), grid.pos_to_idx(op.other)]
 		QubitOperation.Operation.DELETE:
-			self.text += "reset %s\n" % [grid.pos_to_idx(op.index)]
+			self.text += "reset %s" % [grid.pos_to_idx(op.index)]
 		QubitOperation.Operation.ADD:
-			self.text += "init %s\n" % [grid.pos_to_idx(op.index)]
+			self.text += "init %s" % [grid.pos_to_idx(op.index)]
 		QubitOperation.Operation.MZ:
-			self.text += "measure %s\n" % [grid.pos_to_idx(op.index)]
+			self.text += "measure %s" % [grid.pos_to_idx(op.index)]
 		QubitOperation.Operation.LABELA:
-			self.text += "#label ancilla %s\n" % [grid.pos_to_idx(op.index)]
+			self.text += "#label ancilla %s" % [grid.pos_to_idx(op.index)]
 		QubitOperation.Operation.LABELD:
-			self.text += "#label data %s\n" % [grid.pos_to_idx(op.index)]
+			self.text += "#label data %s" % [grid.pos_to_idx(op.index)]
+	self.text += "\n"
