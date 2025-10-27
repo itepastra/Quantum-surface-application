@@ -4,11 +4,9 @@ weight = 1
 sort_by = "weight"
 +++
 
-On this website we'll try to explain everything you might need to understand what lattice surgery is.
-We start by explaining the necessary parts of a physical qubit, followed by
-how gates can influence this qubit or even two at once.
-Then we go into how stabilizers allow for quantum error correction codes to form logical qubits
-and finally we will show how two logical qubits can interact by merging and splitting again.
-
-All these words might seem daunting, but we'll explain all of them in the following chapters.
-We also include a simulation for you to play with and tasks that'll hopefully make you understand better.
+We've been working on an interactive application to learn about Quantum Error Correction (QEC) and some
+other basic Quantum Computing concepts. 
+If you want to learn about how to control the application but already understand how QEC works
+it may be useful to skip ahead to the [controls](@/sandbox/controls.md).
+Otherwise, look through the other pages and figure out how the simulator works while learning how
+various Quantum Computing concepts are described by it in a way that we hope is understandable.
