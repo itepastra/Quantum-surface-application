@@ -566,6 +566,91 @@ func ninja_star():
 	ops.append(QubitOperation.new(QubitOperation.Operation.CX, z4, d8))
 	ops.append(QubitOperation.new(QubitOperation.Operation.CX, d8, z4))
 	
+	#X stabilizers
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d4))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d5))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d6))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d7))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d8))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d9))
+
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, x1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, x2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, x3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, x4))
+	
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d2, x1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d6, x2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d8, x3))
+	
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d1, x1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d5, x2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d7, x3))
+	
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d3, x2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d5, x3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d9, x4))
+	
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d2, x2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d4, x3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d8, x4))
+	
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d4))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d5))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d6))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d7))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d8))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, d9))
+
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, x1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, x2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, x3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, x4))
+	
+	
+	#Z stabilizers
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, z1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, z2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, z3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, z4))
+	
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d5, z1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d7, z3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d9, z4))
+	
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d2, z1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d4, z3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d6, z4))
+	
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d4, z1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d6, z2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d8, z4))
+	
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d1, z1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d3, z2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.CZ, d5, z4))
+	
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, z1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, z2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, z3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.RH, z4))
+	
+	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, x1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, x2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, x3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, x4))
+	
+	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, z1))
+	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, z2))
+	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, z3))
+	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, z4))
+	
 	create_default_macro("NINJA STAR", Vector2i(0,0), ops)
 	
 
