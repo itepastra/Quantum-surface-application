@@ -45,3 +45,5 @@ and will happen in very simple QASM code. It is editable, but the simulation doe
 The other tab, called ErrorPanel contains controls for changing rates of various errors that
 could happen on the qubits. Each error type can be enabled/have their probability controlled
 independently. The errors will have the probability to happen on every qubit operation executed.
+
+{{ qubitquilt(w=30,h=60,gates='["X","Y","Z","H","S","CX","CZ","MZ","ADD","REMOVE","LABELA","LABELD"]') }}
