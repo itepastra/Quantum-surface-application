@@ -81,10 +81,13 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 					grid.cz(grid.selected_qubit, array_pos)
 					grid.selected_qubit = -1
 			"REMOVE":
-				grid.measure_z(array_pos)
+				var snap = grid.qec.snapshot_entanglement_group(array_pos)
+				grid.qec.mz(array_pos)
 				grid.grid_qubits[array_pos] = null
 				grid.append_or_update(QubitOperation.Operation.DELETE, array_pos, -1, grid.qec.get_vop(self.array_pos))
+				grid.operations[grid.operation_idx-1].snap = snap
 				self.queue_free()
+				grid.set_to_qec_state()
 			"MZ":
 				grid.measure_z(array_pos)
 				self.set_label(grid.qec.get_vop(self.array_pos))
