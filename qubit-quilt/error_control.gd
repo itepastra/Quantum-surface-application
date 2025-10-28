@@ -10,8 +10,6 @@ enum ErrType {
 	BITFLIP_ANY,
 	PHASEFLIP_ANY,
 	RELAXATION_ANY,
-	# These apply to a whole region *NOT YET IMPLEMENTED*
-	COHERENT_SPACE,
 }
 
 @onready var text: Label = get_node("Prob") as Label
