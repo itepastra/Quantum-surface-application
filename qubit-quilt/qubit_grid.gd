@@ -410,6 +410,29 @@ func handle_redo() -> void:
 			QubitOperation.Operation.LABELA:
 				grid_qubits[op_idx].toggle_ancilla()
 
+func add_qubit_at_mouse(event: InputEventMouseButton) -> void:
+	# get the position in grid space of the click
+	var mevent: InputEventMouseButton = event as InputEventMouseButton
+	var world_pos: Vector3 = camera.project_position(mevent.position, 10)
+	var transformed: Vector3 = (aftrans * world_pos).snapped(Vector3(1.0, 1.0, 1.0))
+	var pos: Vector2i = Vector2i((transformed.x - transformed.y), (transformed.x + transformed.y))
+	var idx: int = pos_to_idx(pos)
+	if self.is_not_in_bounds(pos):
+		pass
+	elif grid_qubits[idx] == null:
+		make_qubit(Vector2i((transformed.x - transformed.y), (transformed.x + transformed.y)))
+		append_or_update(QubitOperation.Operation.ADD, idx)
+
+func display_drag_cnot(event: InputEventMouseMotion):
+	if drag_gate == null:
+		drag_gate = gate_scene.instantiate()
+		drag_gate.process_mode = Node.PROCESS_MODE_DISABLED
+		self.add_child(drag_gate)
+	var world_pos: Vector3 = camera.project_position(event.position, 7)
+	var pos1: Vector3 = grid_qubits[self.selected_qubit].position + Vector3(0, 0, 3)
+	var ndiff: Vector3 = (world_pos - pos1).normalized()
+	drag_gate.setup(pos1 + ndiff/3, world_pos, selected_gate_type)
+
 func _input(event: InputEvent) -> void:
 	# if ctrl + z is pressed
 	if event.is_action_pressed("undo", false, true):
@@ -421,26 +444,9 @@ func _input(event: InputEvent) -> void:
 		return
 	# filter out all the input events that aren't mouse clicks with the create button selected
 	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT and self.button.button_pressed:
-		# get the position in grid space of the click
-		var mevent: InputEventMouseButton = event as InputEventMouseButton
-		var world_pos: Vector3 = camera.project_position(mevent.position, 10)
-		var transformed: Vector3 = (aftrans * world_pos).snapped(Vector3(1.0, 1.0, 1.0))
-		var pos: Vector2i = Vector2i((transformed.x - transformed.y), (transformed.x + transformed.y))
-		var idx: int = pos_to_idx(pos)
-		if self.is_not_in_bounds(pos):
-			pass
-		elif grid_qubits[idx] == null:
-			make_qubit(Vector2i((transformed.x - transformed.y), (transformed.x + transformed.y)))
-			append_or_update(QubitOperation.Operation.ADD, idx)
+		add_qubit_at_mouse(event)
 	elif self.selected_qubit != -1 and event is InputEventMouseMotion:
-		if drag_gate == null:
-			drag_gate = gate_scene.instantiate()
-			drag_gate.process_mode = Node.PROCESS_MODE_DISABLED
-			self.add_child(drag_gate)
-		var world_pos: Vector3 = camera.project_position(event.position, 7)
-		var pos1: Vector3 = grid_qubits[self.selected_qubit].position + Vector3(0, 0, 3)
-		var ndiff: Vector3 = (world_pos - pos1).normalized()
-		drag_gate.setup(pos1 + ndiff/3, world_pos, selected_gate_type)
+		display_drag_cnot(event)
 
 func create_default_macro(name: String, root: Vector2i, operations: Array[QubitOperation], texture: Texture2D) -> void:
 	var macro: Macro = macro_scene.instantiate()
