@@ -480,7 +480,7 @@ func x_stabilizer() -> void:
 	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, root))
 	create_default_macro("X STABILIZER", root, ops, preload("res://assets/Xstabilizer.png"))
 
-func z_stabilizer():
+func z_stabilizer() -> void:
 	var ops: Array[QubitOperation] = []
 	var root = Vector2i(0,0)  # relative reference qubit
 
@@ -497,7 +497,7 @@ func z_stabilizer():
 	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, root))
 	create_default_macro("Z STABILIZER", root, ops, preload("res://assets/Zstabilizer.png"))
 
-func ninja_star():
+func ninja_star() -> void:
 	var ops: Array[QubitOperation] = []
 
 	var data = [
@@ -647,21 +647,21 @@ func ninja_star():
 	
 	create_default_macro("NINJA STAR", Vector2i(0,0), ops, preload("res://assets/ninja.png"))
 
-func logical_X():
+func logical_X() -> void:
 	var ops: Array[QubitOperation] = []
 	ops.append(QubitOperation.new(QubitOperation.Operation.RX, Vector2i(0,2)))
 	ops.append(QubitOperation.new(QubitOperation.Operation.RX, Vector2i(0,0)))
 	ops.append(QubitOperation.new(QubitOperation.Operation.RX, Vector2i(0,-2)))
 	create_default_macro("LOGICAL X", Vector2i(0,0), ops, preload("res://assets/logicalX.png"))
 
-func logical_Z():
+func logical_Z() -> void:
 	var ops: Array[QubitOperation] = []
 	ops.append(QubitOperation.new(QubitOperation.Operation.RZ, Vector2i(2,0)))
 	ops.append(QubitOperation.new(QubitOperation.Operation.RZ, Vector2i(0,0)))
 	ops.append(QubitOperation.new(QubitOperation.Operation.RZ, Vector2i(-2,0)))
 	create_default_macro("LOGICAL Z", Vector2i(0,0), ops, preload("res://assets/logicalZ.png"))
 
-func stabilize_ninja_star():
+func stabilize_ninja_star() -> void:
 	var ops: Array[QubitOperation] = []
 	var d1 = Vector2i(-2,-2)
 	var d2 = Vector2i(0, -2)
@@ -770,7 +770,7 @@ func stabilize_ninja_star():
 	
 	create_default_macro("STABILIZE NINJA STAR", Vector2i(0,0), ops, preload("res://assets/stabilize_ninja_star.png"))
 
-func measure_LOGICAL():
+func measure_LOGICAL() -> void:
 	var ops: Array[QubitOperation] = []
 	var data = [
 		Vector2i(-2,2), #up left
@@ -789,7 +789,7 @@ func measure_LOGICAL():
 
 	create_default_macro("MEASURE LOGICAL", Vector2i(0,0), ops, preload("res://assets/measure_logical.png"))
 
-func rx(qubit: int, update: bool = true, do_errors: bool = true):
+func rx(qubit: int, update: bool = true, do_errors: bool = true) -> void:
 	if update:
 		append_or_update(QubitOperation.Operation.RX, qubit)
 	var q = grid_qubits[qubit]
@@ -798,7 +798,7 @@ func rx(qubit: int, update: bool = true, do_errors: bool = true):
 		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 
-func ry(qubit: int, update: bool = true, do_errors: bool = true):
+func ry(qubit: int, update: bool = true, do_errors: bool = true) -> void:
 	if update:
 		append_or_update(QubitOperation.Operation.RY, qubit)
 	var q = grid_qubits[qubit]
@@ -807,7 +807,7 @@ func ry(qubit: int, update: bool = true, do_errors: bool = true):
 		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 
-func rz(qubit: int, update: bool = true, do_errors: bool = true):
+func rz(qubit: int, update: bool = true, do_errors: bool = true) -> void:
 	if update:
 		append_or_update(QubitOperation.Operation.RZ, qubit)
 	var q = grid_qubits[qubit]
@@ -817,7 +817,7 @@ func rz(qubit: int, update: bool = true, do_errors: bool = true):
 		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 
-func rh(qubit: int, update: bool = true, do_errors: bool = true):
+func rh(qubit: int, update: bool = true, do_errors: bool = true) -> void:
 	if update:
 		append_or_update(QubitOperation.Operation.RH, qubit)
 	var q = grid_qubits[qubit]
@@ -826,7 +826,7 @@ func rh(qubit: int, update: bool = true, do_errors: bool = true):
 		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 
-func rs(qubit: int, update: bool = true, do_errors: bool = true):
+func rs(qubit: int, update: bool = true, do_errors: bool = true) -> void:
 	if update:
 		append_or_update(QubitOperation.Operation.RS, qubit)
 	var q = grid_qubits[qubit]
@@ -835,7 +835,7 @@ func rs(qubit: int, update: bool = true, do_errors: bool = true):
 		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 
-func rsd(qubit: int, update: bool = true, do_errors: bool = true):
+func rsd(qubit: int, update: bool = true, do_errors: bool = true) -> void:
 	if update:
 		append_or_update(QubitOperation.Operation.RSD, qubit)
 	var q = grid_qubits[qubit]
@@ -844,7 +844,7 @@ func rsd(qubit: int, update: bool = true, do_errors: bool = true):
 		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 
-func cx(control: int, target: int, update: bool = true, do_errors: bool = true):
+func cx(control: int, target: int, update: bool = true, do_errors: bool = true) -> void:
 	if not check_different_qubits(control, target, x_qubits):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
@@ -857,7 +857,7 @@ func cx(control: int, target: int, update: bool = true, do_errors: bool = true):
 		do_errors(target)
 	set_to_qec_state()
 
-func cz(control: int, target: int, update: bool = true, do_errors: bool = true):
+func cz(control: int, target: int, update: bool = true, do_errors: bool = true) -> void:
 	if not check_different_qubits(control, target, x_qubits):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
@@ -872,7 +872,7 @@ func cz(control: int, target: int, update: bool = true, do_errors: bool = true):
 		do_errors(target)
 	set_to_qec_state()
 
-func measure_z(qubit: int, update: bool = true, do_errors: bool = true):
+func measure_z(qubit: int, update: bool = true, do_errors: bool = true) -> void:
 	var snap: Dictionary = qec.snapshot_entanglement_group(qubit)
 	if update:
 		append_or_update(QubitOperation.Operation.MZ, qubit)
@@ -885,19 +885,19 @@ func measure_z(qubit: int, update: bool = true, do_errors: bool = true):
 func check_different_qubits(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
 	return qubit1_pos != qubit2_pos
 
-func do_bitflip_error(qubit: int):
+func do_bitflip_error(qubit: int) -> void:
 	qec.xgate(qubit)
 	if self.grid_qubits[qubit]:
 		self.operations[operation_idx-1].errors.append(QubitOperation.new(QubitOperation.Operation.RX, idx_to_pos(qubit)))
 		self.grid_qubits[qubit].set_base(qec.get_vop(qubit))
 
-func do_phaseflip_error(qubit: int):
+func do_phaseflip_error(qubit: int) -> void:
 	qec.zgate(qubit)
 	if self.grid_qubits[qubit]:
 		self.operations[operation_idx-1].errors.append(QubitOperation.new(QubitOperation.Operation.RZ, idx_to_pos(qubit)))
 		self.grid_qubits[qubit].set_base(qec.get_vop(qubit))
 
-func do_relaxation_error(qubit: int):
+func do_relaxation_error(qubit: int) -> void:
 	var new_op = QubitOperation.new(QubitOperation.Operation.MZ, idx_to_pos(qubit))
 	new_op.snap = qec.snapshot_entanglement_group(qubit)
 	qec.relax(qubit)
@@ -905,7 +905,7 @@ func do_relaxation_error(qubit: int):
 		self.operations[operation_idx-1].errors.append(new_op)
 		self.grid_qubits[qubit].set_base(qec.get_vop(qubit))
 
-func do_errors(qubit: int):
+func do_errors(qubit: int) -> void:
 	# reset the errors that may exist from earlier
 	self.operations[operation_idx-1].errors.clear()
 	for i in self.error_rates.size():
