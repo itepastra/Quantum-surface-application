@@ -350,6 +350,10 @@ func undo_operation(op: QubitOperation):
 				set_to_qec_state()
 			else:
 				print_debug("Missing snapshot for MZ at op index %d" % operation_idx)
+		QubitOperation.Operation.LABELD:
+			grid_qubits[op_idx].toggle_data()
+		QubitOperation.Operation.LABELA:
+			grid_qubits[op_idx].toggle_ancilla()
 	op.errors = []
 
 func handle_undo() -> void:
@@ -397,6 +401,10 @@ func handle_redo() -> void:
 				cz(op_idx, op_tgt, false)
 			QubitOperation.Operation.MZ:
 				measure_z(op_idx, false)
+			QubitOperation.Operation.LABELD:
+				grid_qubits[op_idx].toggle_data()
+			QubitOperation.Operation.LABELA:
+				grid_qubits[op_idx].toggle_ancilla()
 
 func _input(event: InputEvent) -> void:
 	# if ctrl + z is pressed
