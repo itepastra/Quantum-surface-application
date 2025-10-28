@@ -839,7 +839,7 @@ func rsd(qubit: int, update: bool = true, do_errors: bool = true):
 	q.set_base(qec.get_vop(qubit))
 
 func cx(control: int, target: int, update: bool = true, do_errors: bool = true):
-	if not check_orthogonal_neighbors(control, target, x_qubits):
+	if not check_different_qubits(control, target, x_qubits):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
 	if update:
@@ -852,7 +852,7 @@ func cx(control: int, target: int, update: bool = true, do_errors: bool = true):
 	set_to_qec_state()
 
 func cz(control: int, target: int, update: bool = true, do_errors: bool = true):
-	if not check_orthogonal_neighbors(control, target, x_qubits):
+	if not check_different_qubits(control, target, x_qubits):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
 	if update:
@@ -876,7 +876,7 @@ func measure_z(qubit: int, update: bool = true, do_errors: bool = true):
 	self.operations[operation_idx-1].snap = snap
 	set_to_qec_state()
 
-func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
+func check_different_qubits(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
 	return qubit1_pos != qubit2_pos
 
 func do_bitflip_error(qubit: int):
