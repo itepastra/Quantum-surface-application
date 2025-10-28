@@ -87,9 +87,7 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 				self.queue_free()
 			"MZ":
 				grid.measure_z(array_pos)
-				if (self.get_node("BG") as Node3D).visible and self.label.text == "1":
-					(self.get_node("Error") as GPUParticles3D).emitting = true
-				meas_res.text = labels[grid.qec.get_vop(self.array_pos)]
+				self.set_label(grid.qec.get_vop(self.array_pos))
 			"LABELA":
 				grid.append_or_update(QubitOperation.Operation.LABELA, array_pos)
 				self.toggle_ancilla()
@@ -99,6 +97,9 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 			_:
 				return
 		sound.play()
+
+func set_label(vop: int):
+	meas_res.text = labels[vop]
 
 func toggle_ancilla():
 	(self.get_node("BG") as Node3D).visible = not (self.get_node("BG") as Node3D).visible
@@ -114,6 +115,7 @@ func handle_macro(macro: Button):
 	
 
 const labels: Dictionary[int, String] = {
+	-1: "",
 	0: "+",
 	1: "+",
 	2: "-",
