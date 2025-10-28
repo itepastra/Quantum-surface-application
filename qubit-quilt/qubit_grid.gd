@@ -430,36 +430,13 @@ func _input(event: InputEvent) -> void:
 		var ndiff: Vector3 = (world_pos - pos1).normalized()
 		drag_gate.setup(pos1 + ndiff/3, world_pos, selected_gate_type)
 		
-func create_default_macro(name: String, root: Vector2i, operations: Array[QubitOperation]) -> void:
-	var Xstabilizer: Texture2D = preload("res://assets/Xstabilizer.png")
-	var Zstabilizer: Texture2D = preload("res://assets/Zstabilizer.png")
-	var ninja: Texture2D = preload("res://assets/ninja.png")
-	var stabilize_ninja: Texture2D = preload("res://assets/stabilize_ninja_star.png")
-	var logicalX: Texture2D = preload("res://assets/logicalX.png")
-	var logicalZ: Texture2D = preload("res://assets/logicalZ.png")
-	var measure_logical: Texture2D = preload("res://assets/measure_logical.png")
-	
+func create_default_macro(name: String, root: Vector2i, operations: Array[QubitOperation], texture: Texture2D) -> void:
 	var macro: Macro = macro_scene.instantiate()
 	macro.root = root
 	macro.instructions = operations
 	macro.name = name
 	macro.idx = len(macros)
-	
-	match name:
-		"X STABILIZER":
-			macro.icon = Xstabilizer
-		"Z STABILIZER":
-			macro.icon = Zstabilizer
-		"NINJA STAR":
-			macro.icon = ninja
-		"LOGICAL X":
-			macro.icon = logicalX
-		"LOGICAL Z":
-			macro.icon = logicalZ
-		"STABILIZE NINJA STAR":
-			macro.icon = stabilize_ninja
-		"MEASURE LOGICAL":
-			macro.icon = measure_logical
+	macro.icon = texture
 
 	macros.append(macro)
 	get_node("/root/Scene/HUD/Spacer/Macros").add_child(macro)
@@ -483,7 +460,7 @@ func x_stabilizer() -> void:
 	
 	ops.append(QubitOperation.new(QubitOperation.Operation.RH, root))
 	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, root))
-	create_default_macro("X STABILIZER", root, ops)
+	create_default_macro("X STABILIZER", root, ops, preload("res://assets/Xstabilizer.png"))
 	
 	
 func z_stabilizer():
@@ -501,7 +478,7 @@ func z_stabilizer():
 		ops.append(QubitOperation.new(QubitOperation.Operation.CX, offset, root))
 
 	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, root))
-	create_default_macro("Z STABILIZER", root, ops)
+	create_default_macro("Z STABILIZER", root, ops, preload("res://assets/Zstabilizer.png"))
 	
 func ninja_star():
 	var ops: Array[QubitOperation] = []
@@ -651,7 +628,7 @@ func ninja_star():
 	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, z3))
 	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, z4))
 	
-	create_default_macro("NINJA STAR", Vector2i(0,0), ops)
+	create_default_macro("NINJA STAR", Vector2i(0,0), ops, preload("res://assets/ninja.png"))
 	
 
 func logical_X():
@@ -659,14 +636,14 @@ func logical_X():
 	ops.append(QubitOperation.new(QubitOperation.Operation.RX, Vector2i(0,2)))
 	ops.append(QubitOperation.new(QubitOperation.Operation.RX, Vector2i(0,0)))
 	ops.append(QubitOperation.new(QubitOperation.Operation.RX, Vector2i(0,-2)))
-	create_default_macro("LOGICAL X", Vector2i(0,0), ops)
+	create_default_macro("LOGICAL X", Vector2i(0,0), ops, preload("res://assets/logicalX.png"))
 	
 func logical_Z():
 	var ops: Array[QubitOperation] = []
 	ops.append(QubitOperation.new(QubitOperation.Operation.RZ, Vector2i(2,0)))
 	ops.append(QubitOperation.new(QubitOperation.Operation.RZ, Vector2i(0,0)))
 	ops.append(QubitOperation.new(QubitOperation.Operation.RZ, Vector2i(-2,0)))
-	create_default_macro("LOGICAL Z", Vector2i(0,0), ops)
+	create_default_macro("LOGICAL Z", Vector2i(0,0), ops, preload("res://assets/logicalZ.png"))
 	
 func stabilize_ninja_star():
 	var ops: Array[QubitOperation] = []
@@ -775,7 +752,7 @@ func stabilize_ninja_star():
 	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, z3))
 	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, z4))
 	
-	create_default_macro("STABILIZE NINJA STAR", Vector2i(0,0), ops)
+	create_default_macro("STABILIZE NINJA STAR", Vector2i(0,0), ops, preload("res://assets/stabilize_ninja_star.png"))
 	
 func measure_LOGICAL():
 	var ops: Array[QubitOperation] = []
@@ -794,7 +771,7 @@ func measure_LOGICAL():
 	for qubit in data:
 		ops.append(QubitOperation.new(QubitOperation.Operation.MZ, qubit))
 
-	create_default_macro("MEASURE LOGICAL", Vector2i(0,0), ops)
+	create_default_macro("MEASURE LOGICAL", Vector2i(0,0), ops, preload("res://assets/measure_logical.png"))
 	
 
 func rx(qubit: int, update: bool = true, do_errors: bool = true):
