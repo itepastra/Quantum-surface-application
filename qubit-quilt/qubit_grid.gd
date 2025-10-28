@@ -897,48 +897,47 @@ func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) ->
 	return qubit1_pos != qubit2_pos
 
 func do_bitflip_error(qubit: int):
-	self.operations[operation_idx-1].errors.append(QubitOperation.new(QubitOperation.Operation.RX, idx_to_pos(qubit)))
 	qec.xgate(qubit)
-	self.grid_qubits[qubit].set_base(qec.get_vop(qubit))
+	if self.grid_qubits[qubit]:
+		self.operations[operation_idx-1].errors.append(QubitOperation.new(QubitOperation.Operation.RX, idx_to_pos(qubit)))
+		self.grid_qubits[qubit].set_base(qec.get_vop(qubit))
 
 func do_phaseflip_error(qubit: int):
-	self.operations[operation_idx-1].errors.append(QubitOperation.new(QubitOperation.Operation.RZ, idx_to_pos(qubit)))
 	qec.zgate(qubit)
-	self.grid_qubits[qubit].set_base(qec.get_vop(qubit))
+	if self.grid_qubits[qubit]:
+		self.operations[operation_idx-1].errors.append(QubitOperation.new(QubitOperation.Operation.RZ, idx_to_pos(qubit)))
+		self.grid_qubits[qubit].set_base(qec.get_vop(qubit))
 
 func do_relaxation_error(qubit: int):
 	var new_op = QubitOperation.new(QubitOperation.Operation.MZ, idx_to_pos(qubit))
 	new_op.snap = qec.snapshot_entanglement_group(qubit)
-	self.operations[operation_idx-1].errors.append(new_op)
 	qec.relax(qubit)
-	self.grid_qubits[qubit].set_base(qec.get_vop(qubit))
+	if self.grid_qubits[qubit]:
+		self.operations[operation_idx-1].errors.append(new_op)
+		self.grid_qubits[qubit].set_base(qec.get_vop(qubit))
 
 func do_errors(qubit: int):
 	# reset the errors that may exist from earlier
 	self.operations[operation_idx-1].errors.clear()
 	for i in self.error_rates.size():
-		if randf() < self.error_rates[i]:
-			match i:
-				ErrorControl.ErrType.BITFLIP_GATE:
+		match i:
+			ErrorControl.ErrType.BITFLIP_GATE:
+				if randf() < self.error_rates[i]:
 					do_bitflip_error(qubit)
-				ErrorControl.ErrType.PHASEFLIP_GATE:
+			ErrorControl.ErrType.PHASEFLIP_GATE:
+				if randf() < self.error_rates[i]:
 					do_phaseflip_error(qubit)
-				ErrorControl.ErrType.RELAXATION_GATE:
+			ErrorControl.ErrType.RELAXATION_GATE:
+				if randf() < self.error_rates[i]:
 					do_relaxation_error(qubit)
-				ErrorControl.ErrType.BITFLIP_ANY:
-					var target = randi_range(0, grid_qubits.size() - 1)
-					if grid_qubits[target] != null:
-						do_bitflip_error(target)
-				ErrorControl.ErrType.PHASEFLIP_ANY:
-					var target = randi_range(0, grid_qubits.size() - 1)
-					if grid_qubits[target] != null:
-						do_phaseflip_error(target)
-				ErrorControl.ErrType.RELAXATION_ANY:
-					var target = randi_range(0, grid_qubits.size() - 1)
-					if grid_qubits[target] != null:
-						do_relaxation_error(target)
-				_:
-					print("unhandled error type %d" % i)
+			ErrorControl.ErrType.BITFLIP_ANY:
+				range(grid_qubits.size()).map(func(qb): if randf() < self.error_rates[i]: do_bitflip_error(qb))
+			ErrorControl.ErrType.PHASEFLIP_ANY:
+				range(grid_qubits.size()).map(func(qb): if randf() < self.error_rates[i]: do_phaseflip_error(qb))
+			ErrorControl.ErrType.RELAXATION_ANY:
+				range(grid_qubits.size()).map(func(qb): if randf() < self.error_rates[i]: do_relaxation_error(qb))
+			_:
+				print("unhandled error type %d" % i)
 
 func add_cx_cz_visuals(control: int, target: int, gate_type: Gate.Type) -> void:
 	var pos1: Vector3 = grid_qubits[control].position + Vector3(0, 0, 3)
