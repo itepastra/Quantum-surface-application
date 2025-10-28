@@ -348,6 +348,7 @@ func undo_operation(op: QubitOperation):
 			if op.snap:
 				qec.restore_entanglement_group(op.snap)
 				set_to_qec_state()
+				grid_qubits[op_idx].set_label(-1)
 			else:
 				print_debug("Missing snapshot for MZ at op index %d" % operation_idx)
 	op.errors = []
@@ -397,6 +398,7 @@ func handle_redo() -> void:
 				cz(op_idx, op_tgt, false)
 			QubitOperation.Operation.MZ:
 				measure_z(op_idx, false)
+				grid_qubits[op_idx].set_label(qec.get_vop(op_idx))
 
 func _input(event: InputEvent) -> void:
 	# if ctrl + z is pressed
