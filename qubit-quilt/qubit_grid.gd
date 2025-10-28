@@ -8,11 +8,48 @@ extends Node3D
 @export var qubit_scene: PackedScene
 @export var gate_scene: PackedScene
 
+@onready var codeEdit: CodeEdit = get_node("/root/Scene/HUD/Tabs/QASM")
+@onready var play_timer: Timer = Timer.new()
+@onready var play_pause: Button = get_node("/root/Scene/HUD/Spacer/TimeControl/PlayPause") as Button
+@onready var play_icon: Texture2D = preload("res://assets/media-controls/play.png")
+@onready var pause_icon: Texture2D = preload("res://assets/media-controls/pause.png")
+@onready var macro_button: Button = get_node("/root/Scene/HUD/Spacer/Macros/RecordMacro") as Button
+
 var enabled_gates: Array[String] = ["X", "Y", "Z", "H", "S", "CX", "CZ", "MZ", "ADD", "REMOVE", "LABELA", "LABELD"]
 
 var drag_gate: Gate
 var selected_gate_type: Gate.Type
 
+const cell_size: Vector3 = Vector3(1.8, 0.9, 1.0)
+
+var recording = false
+var macro_instructions: Array[QubitOperation] = []
+var macros: Array[Macro] = []
+var macro_idx: int = 0
+var button: Button
+var two_qubit_mode: bool = false
+var selected_qubit: int = -1
+var is_playing: bool = false
+var macro_ninja: bool = false
+var two_qubit_gate_type: String = ""
+var grid_qubits: Array[Qubit] = []
+var start_pos: Vector3
+var qec = Qec.new()
+var camera: Camera
+var operation_idx: int = 0 # index of the operation that the user will be doing
+var operations: Array[QubitOperation] = []
+var entanglement_groups: Array[Egroup] = []
+
+# works specifically for the cell size (1.8, 0.9), 
+# calculated by making a square that looked correct and then the inverse affine transform
+# offset is calculated at initialisation, since it depends on the amount of qubits
+var aftrans: Transform3D = Transform3D(Basis(
+	Vector3(5.0/9.0, -5.0/9.0, 0.0), 
+	Vector3(5.0/9.0, 5.0/9.0, 0.0),
+	Vector3(0.0, 0.0, 1.0/sqrt(2))
+), 
+	Vector3(0.0, 0.0, 0.0)
+)
 
 class Egroup:
 	extends Node
@@ -54,48 +91,6 @@ class Egroup:
 		var results = qec.peek_measurement_random(qubit_idxs)
 		for i in len(results):
 			qubits[i].set_base(results[i]&0b11111)
-
-@onready var codeEdit: CodeEdit = get_node("/root/Scene/HUD/Tabs/QASM")
-@onready var play_timer: Timer = Timer.new()
-@onready var play_pause: Button = get_node("/root/Scene/HUD/Spacer/TimeControl/PlayPause") as Button
-@onready var play_icon: Texture2D = preload("res://assets/media-controls/play.png")
-@onready var pause_icon: Texture2D = preload("res://assets/media-controls/pause.png")
-@onready var macro_button: Button = get_node("/root/Scene/HUD/Spacer/Macros/RecordMacro") as Button
-
-
-var recording = false
-var macro_instructions: Array[QubitOperation] = []
-var macros: Array[Macro] = []
-var macro_idx: int = 0
-
-const qubit_size = 1
-
-var button: Button
-var two_qubit_mode: bool = false
-var selected_qubit: int = -1
-var is_playing: bool = false
-var macro_ninja: bool = false
-var two_qubit_gate_type: String = ""
-var grid_qubits: Array[Qubit] = []
-var start_pos: Vector3
-var qec = Qec.new()
-var camera: Camera
-
-var operation_idx: int = 0 # index of the operation that the user will be doing
-var operations: Array[QubitOperation] = []
-
-var entanglement_groups: Array[Egroup] = []
-
-# works specifically for the cell size (1.8, 0.9), 
-# calculated by making a square that looked correct and then the inverse affine transform
-# offset is calculated at initialisation, since it depends on the amount of qubits
-var aftrans: Transform3D = Transform3D(Basis(
-	Vector3(5.0/9.0, -5.0/9.0, 0.0), 
-	Vector3(5.0/9.0, 5.0/9.0, 0.0),
-	Vector3(0.0, 0.0, 1.0/sqrt(2))
-), 
-	Vector3(0.0, 0.0, 0.0)
-)
 
 func set_to_qec_state():
 	var graph: Dictionary[int,PackedInt32Array] = {};
@@ -141,6 +136,12 @@ func pos_to_idx(pos: Vector2i) -> int:
 func idx_to_pos(idx: int) -> Vector2i:
 	var y = idx / self.x_qubits
 	return Vector2i((idx % self.x_qubits)*2 + (y&1), y)
+
+func check_different_qubits(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
+	return qubit1_pos != qubit2_pos
+
+func is_not_in_bounds(pos: Vector2i) -> bool:
+	return pos.x < 0 or pos.x/2 >= self.x_qubits or pos.y < 0 or pos.y >= self.y_qubits
 
 func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, target_idx: int = 0, basis: int = 10) -> void:
 	operations.resize(operation_idx + 1)
@@ -268,6 +269,7 @@ func _on_skip_forward() -> void:
 	while self.operation_idx < len(self.operations):
 		self.handle_redo()
 
+#region Macros
 
 func start_record_macro():
 	self.macro_instructions = [] # reset the macro instructions
@@ -287,8 +289,8 @@ func stop_record_macro():
 	macro.idx = len(macros)
 	self.macros.append(macro)
 	get_node("/root/Scene/HUD/Spacer/Macros").add_child(macro)
+#endregion
 
-const cell_size: Vector3 = Vector3(1.8, 0.9, 1.0)
 
 func make_qubit(pos: Vector2i, basis: int = 10):
 	var nextQubit: Qubit = qubit_scene.instantiate()
@@ -359,6 +361,8 @@ func undo_operation(op: QubitOperation):
 			grid_qubits[op_idx].toggle_ancilla()
 	op.errors = []
 
+#region Input Handling, Undo and Redo
+
 func handle_undo() -> void:
 	if self.operation_idx <= 0:
 		return
@@ -367,9 +371,6 @@ func handle_undo() -> void:
 		var selected_op = operations[self.operation_idx]
 		codeEdit.set_executing(operation_idx)
 		undo_operation(selected_op)
-
-func is_not_in_bounds(pos: Vector2i) -> bool:
-	return pos.x < 0 or pos.x/2 >= self.x_qubits or pos.y < 0 or pos.y >= self.y_qubits
 
 func handle_redo() -> void:
 	if self.operation_idx >= len(operations):
@@ -410,6 +411,29 @@ func handle_redo() -> void:
 			QubitOperation.Operation.LABELA:
 				grid_qubits[op_idx].toggle_ancilla()
 
+func add_qubit_at_mouse(event: InputEventMouseButton) -> void:
+	# get the position in grid space of the click
+	var mevent: InputEventMouseButton = event as InputEventMouseButton
+	var world_pos: Vector3 = camera.project_position(mevent.position, 10)
+	var transformed: Vector3 = (aftrans * world_pos).snapped(Vector3(1.0, 1.0, 1.0))
+	var pos: Vector2i = Vector2i((transformed.x - transformed.y), (transformed.x + transformed.y))
+	var idx: int = pos_to_idx(pos)
+	if self.is_not_in_bounds(pos):
+		pass
+	elif grid_qubits[idx] == null:
+		make_qubit(Vector2i((transformed.x - transformed.y), (transformed.x + transformed.y)))
+		append_or_update(QubitOperation.Operation.ADD, idx)
+
+func display_drag_cnot(event: InputEventMouseMotion):
+	if drag_gate == null:
+		drag_gate = gate_scene.instantiate()
+		drag_gate.process_mode = Node.PROCESS_MODE_DISABLED
+		self.add_child(drag_gate)
+	var world_pos: Vector3 = camera.project_position(event.position, 7)
+	var pos1: Vector3 = grid_qubits[self.selected_qubit].position + Vector3(0, 0, 3)
+	var ndiff: Vector3 = (world_pos - pos1).normalized()
+	drag_gate.setup(pos1 + ndiff/3, world_pos, selected_gate_type)
+
 func _input(event: InputEvent) -> void:
 	# if ctrl + z is pressed
 	if event.is_action_pressed("undo", false, true):
@@ -421,61 +445,23 @@ func _input(event: InputEvent) -> void:
 		return
 	# filter out all the input events that aren't mouse clicks with the create button selected
 	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT and self.button.button_pressed:
-		# get the position in grid space of the click
-		var mevent: InputEventMouseButton = event as InputEventMouseButton
-		var world_pos: Vector3 = camera.project_position(mevent.position, 10)
-		var transformed: Vector3 = (aftrans * world_pos).snapped(Vector3(1.0, 1.0, 1.0))
-		var pos: Vector2i = Vector2i((transformed.x - transformed.y), (transformed.x + transformed.y))
-		var idx: int = pos_to_idx(pos)
-		if self.is_not_in_bounds(pos):
-			pass
-		elif grid_qubits[idx] == null:
-			make_qubit(Vector2i((transformed.x - transformed.y), (transformed.x + transformed.y)))
-			append_or_update(QubitOperation.Operation.ADD, idx)
+		add_qubit_at_mouse(event)
 	elif self.selected_qubit != -1 and event is InputEventMouseMotion:
-		if drag_gate == null:
-			drag_gate = gate_scene.instantiate()
-			drag_gate.process_mode = Node.PROCESS_MODE_DISABLED
-			self.add_child(drag_gate)
-		var world_pos: Vector3 = camera.project_position(event.position, 7)
-		var pos1: Vector3 = grid_qubits[self.selected_qubit].position + Vector3(0, 0, 3)
-		var ndiff: Vector3 = (world_pos - pos1).normalized()
-		drag_gate.setup(pos1 + ndiff/3, world_pos, selected_gate_type)
-		
-func create_default_macro(name: String, root: Vector2i, operations: Array[QubitOperation]) -> void:
-	var Xstabilizer: Texture2D = preload("res://assets/Xstabilizer.png")
-	var Zstabilizer: Texture2D = preload("res://assets/Zstabilizer.png")
-	var ninja: Texture2D = preload("res://assets/ninja.png")
-	var stabilize_ninja: Texture2D = preload("res://assets/stabilize_ninja_star.png")
-	var logicalX: Texture2D = preload("res://assets/logicalX.png")
-	var logicalZ: Texture2D = preload("res://assets/logicalZ.png")
-	var measure_logical: Texture2D = preload("res://assets/measure_logical.png")
-	
+		display_drag_cnot(event)
+#endregion
+
+#region Default Macros
+func create_default_macro(name: String, root: Vector2i, operations: Array[QubitOperation], texture: Texture2D) -> void:
 	var macro: Macro = macro_scene.instantiate()
 	macro.root = root
 	macro.instructions = operations
 	macro.name = name
 	macro.idx = len(macros)
-	
-	match name:
-		"X STABILIZER":
-			macro.icon = Xstabilizer
-		"Z STABILIZER":
-			macro.icon = Zstabilizer
-		"NINJA STAR":
-			macro.icon = ninja
-		"LOGICAL X":
-			macro.icon = logicalX
-		"LOGICAL Z":
-			macro.icon = logicalZ
-		"STABILIZE NINJA STAR":
-			macro.icon = stabilize_ninja
-		"MEASURE LOGICAL":
-			macro.icon = measure_logical
+	macro.icon = texture
 
 	macros.append(macro)
 	get_node("/root/Scene/HUD/Spacer/Macros").add_child(macro)
-	
+
 func x_stabilizer() -> void:
 	var ops: Array[QubitOperation] = []
 	var root = Vector2i(0,0)  # relative reference qubit
@@ -495,10 +481,9 @@ func x_stabilizer() -> void:
 	
 	ops.append(QubitOperation.new(QubitOperation.Operation.RH, root))
 	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, root))
-	create_default_macro("X STABILIZER", root, ops)
-	
-	
-func z_stabilizer():
+	create_default_macro("X STABILIZER", root, ops, preload("res://assets/Xstabilizer.png"))
+
+func z_stabilizer() -> void:
 	var ops: Array[QubitOperation] = []
 	var root = Vector2i(0,0)  # relative reference qubit
 
@@ -513,9 +498,9 @@ func z_stabilizer():
 		ops.append(QubitOperation.new(QubitOperation.Operation.CX, offset, root))
 
 	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, root))
-	create_default_macro("Z STABILIZER", root, ops)
-	
-func ninja_star():
+	create_default_macro("Z STABILIZER", root, ops, preload("res://assets/Zstabilizer.png"))
+
+func ninja_star() -> void:
 	var ops: Array[QubitOperation] = []
 
 	var data = [
@@ -663,24 +648,23 @@ func ninja_star():
 	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, z3))
 	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, z4))
 	
-	create_default_macro("NINJA STAR", Vector2i(0,0), ops)
-	
+	create_default_macro("NINJA STAR", Vector2i(0,0), ops, preload("res://assets/ninja.png"))
 
-func logical_X():
+func logical_X() -> void:
 	var ops: Array[QubitOperation] = []
 	ops.append(QubitOperation.new(QubitOperation.Operation.RX, Vector2i(0,2)))
 	ops.append(QubitOperation.new(QubitOperation.Operation.RX, Vector2i(0,0)))
 	ops.append(QubitOperation.new(QubitOperation.Operation.RX, Vector2i(0,-2)))
-	create_default_macro("LOGICAL X", Vector2i(0,0), ops)
-	
-func logical_Z():
+	create_default_macro("LOGICAL X", Vector2i(0,0), ops, preload("res://assets/logicalX.png"))
+
+func logical_Z() -> void:
 	var ops: Array[QubitOperation] = []
 	ops.append(QubitOperation.new(QubitOperation.Operation.RZ, Vector2i(2,0)))
 	ops.append(QubitOperation.new(QubitOperation.Operation.RZ, Vector2i(0,0)))
 	ops.append(QubitOperation.new(QubitOperation.Operation.RZ, Vector2i(-2,0)))
-	create_default_macro("LOGICAL Z", Vector2i(0,0), ops)
-	
-func stabilize_ninja_star():
+	create_default_macro("LOGICAL Z", Vector2i(0,0), ops, preload("res://assets/logicalZ.png"))
+
+func stabilize_ninja_star() -> void:
 	var ops: Array[QubitOperation] = []
 	var d1 = Vector2i(-2,-2)
 	var d2 = Vector2i(0, -2)
@@ -787,9 +771,9 @@ func stabilize_ninja_star():
 	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, z3))
 	ops.append(QubitOperation.new(QubitOperation.Operation.MZ, z4))
 	
-	create_default_macro("STABILIZE NINJA STAR", Vector2i(0,0), ops)
-	
-func measure_LOGICAL():
+	create_default_macro("STABILIZE NINJA STAR", Vector2i(0,0), ops, preload("res://assets/stabilize_ninja_star.png"))
+
+func measure_LOGICAL() -> void:
 	var ops: Array[QubitOperation] = []
 	var data = [
 		Vector2i(-2,2), #up left
@@ -806,10 +790,12 @@ func measure_LOGICAL():
 	for qubit in data:
 		ops.append(QubitOperation.new(QubitOperation.Operation.MZ, qubit))
 
-	create_default_macro("MEASURE LOGICAL", Vector2i(0,0), ops)
-	
+	create_default_macro("MEASURE LOGICAL", Vector2i(0,0), ops, preload("res://assets/measure_logical.png"))
+#endregion
 
-func rx(qubit: int, update: bool = true, do_errors: bool = true):
+#region Qubit Operations
+
+func rx(qubit: int, update: bool = true, do_errors: bool = true) -> void:
 	if update:
 		append_or_update(QubitOperation.Operation.RX, qubit)
 	var q = grid_qubits[qubit]
@@ -818,8 +804,7 @@ func rx(qubit: int, update: bool = true, do_errors: bool = true):
 		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 
-
-func ry(qubit: int, update: bool = true, do_errors: bool = true):
+func ry(qubit: int, update: bool = true, do_errors: bool = true) -> void:
 	if update:
 		append_or_update(QubitOperation.Operation.RY, qubit)
 	var q = grid_qubits[qubit]
@@ -828,7 +813,7 @@ func ry(qubit: int, update: bool = true, do_errors: bool = true):
 		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 
-func rz(qubit: int, update: bool = true, do_errors: bool = true):
+func rz(qubit: int, update: bool = true, do_errors: bool = true) -> void:
 	if update:
 		append_or_update(QubitOperation.Operation.RZ, qubit)
 	var q = grid_qubits[qubit]
@@ -838,7 +823,7 @@ func rz(qubit: int, update: bool = true, do_errors: bool = true):
 		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 
-func rh(qubit: int, update: bool = true, do_errors: bool = true):
+func rh(qubit: int, update: bool = true, do_errors: bool = true) -> void:
 	if update:
 		append_or_update(QubitOperation.Operation.RH, qubit)
 	var q = grid_qubits[qubit]
@@ -847,7 +832,7 @@ func rh(qubit: int, update: bool = true, do_errors: bool = true):
 		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 
-func rs(qubit: int, update: bool = true, do_errors: bool = true):
+func rs(qubit: int, update: bool = true, do_errors: bool = true) -> void:
 	if update:
 		append_or_update(QubitOperation.Operation.RS, qubit)
 	var q = grid_qubits[qubit]
@@ -856,7 +841,7 @@ func rs(qubit: int, update: bool = true, do_errors: bool = true):
 		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 
-func rsd(qubit: int, update: bool = true, do_errors: bool = true):
+func rsd(qubit: int, update: bool = true, do_errors: bool = true) -> void:
 	if update:
 		append_or_update(QubitOperation.Operation.RSD, qubit)
 	var q = grid_qubits[qubit]
@@ -865,8 +850,8 @@ func rsd(qubit: int, update: bool = true, do_errors: bool = true):
 		do_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 
-func cx(control: int, target: int, update: bool = true, do_errors: bool = true):
-	if not check_orthogonal_neighbors(control, target, x_qubits):
+func cx(control: int, target: int, update: bool = true, do_errors: bool = true) -> void:
+	if not check_different_qubits(control, target, x_qubits):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
 	if update:
@@ -878,8 +863,8 @@ func cx(control: int, target: int, update: bool = true, do_errors: bool = true):
 		do_errors(target)
 	set_to_qec_state()
 
-func cz(control: int, target: int, update: bool = true, do_errors: bool = true):
-	if not check_orthogonal_neighbors(control, target, x_qubits):
+func cz(control: int, target: int, update: bool = true, do_errors: bool = true) -> void:
+	if not check_different_qubits(control, target, x_qubits):
 		print_debug("Not nearest neighbors in this grid configuration")
 		return
 	if update:
@@ -893,7 +878,7 @@ func cz(control: int, target: int, update: bool = true, do_errors: bool = true):
 		do_errors(target)
 	set_to_qec_state()
 
-func measure_z(qubit: int, update: bool = true, do_errors: bool = true):
+func measure_z(qubit: int, update: bool = true, do_errors: bool = true) -> void:
 	var snap: Dictionary = qec.snapshot_entanglement_group(qubit)
 	if update:
 		append_or_update(QubitOperation.Operation.MZ, qubit)
@@ -902,23 +887,22 @@ func measure_z(qubit: int, update: bool = true, do_errors: bool = true):
 		do_errors(qubit)
 	self.operations[operation_idx-1].snap = snap
 	set_to_qec_state()
+#endregion
 
-func check_orthogonal_neighbors(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
-	return qubit1_pos != qubit2_pos
-
-func do_bitflip_error(qubit: int):
+#region Qubit Errors
+func do_bitflip_error(qubit: int) -> void:
 	qec.xgate(qubit)
 	if self.grid_qubits[qubit]:
 		self.operations[operation_idx-1].errors.append(QubitOperation.new(QubitOperation.Operation.RX, idx_to_pos(qubit)))
 		self.grid_qubits[qubit].set_base(qec.get_vop(qubit))
 
-func do_phaseflip_error(qubit: int):
+func do_phaseflip_error(qubit: int) -> void:
 	qec.zgate(qubit)
 	if self.grid_qubits[qubit]:
 		self.operations[operation_idx-1].errors.append(QubitOperation.new(QubitOperation.Operation.RZ, idx_to_pos(qubit)))
 		self.grid_qubits[qubit].set_base(qec.get_vop(qubit))
 
-func do_relaxation_error(qubit: int):
+func do_relaxation_error(qubit: int) -> void:
 	var new_op = QubitOperation.new(QubitOperation.Operation.MZ, idx_to_pos(qubit))
 	new_op.snap = qec.snapshot_entanglement_group(qubit)
 	qec.relax(qubit)
@@ -926,7 +910,8 @@ func do_relaxation_error(qubit: int):
 		self.operations[operation_idx-1].errors.append(new_op)
 		self.grid_qubits[qubit].set_base(qec.get_vop(qubit))
 
-func do_errors(qubit: int):
+func do_errors(qubit: int) -> void:
+#endregion
 	# reset the errors that may exist from earlier
 	self.operations[operation_idx-1].errors.clear()
 	for i in self.error_rates.size():
