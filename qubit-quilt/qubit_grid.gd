@@ -340,6 +340,8 @@ func undo_operation(op: QubitOperation):
 			grid_qubits[op_idx] = null
 		QubitOperation.Operation.DELETE:
 			make_qubit(op.index, op.basis)
+			qec.restore_entanglement_group(op.snap)
+			set_to_qec_state()
 		QubitOperation.Operation.CX:
 			cx(op_idx, op_tgt, false, false)
 		QubitOperation.Operation.CZ:
