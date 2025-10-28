@@ -8,11 +8,48 @@ extends Node3D
 @export var qubit_scene: PackedScene
 @export var gate_scene: PackedScene
 
+@onready var codeEdit: CodeEdit = get_node("/root/Scene/HUD/Tabs/QASM")
+@onready var play_timer: Timer = Timer.new()
+@onready var play_pause: Button = get_node("/root/Scene/HUD/Spacer/TimeControl/PlayPause") as Button
+@onready var play_icon: Texture2D = preload("res://assets/media-controls/play.png")
+@onready var pause_icon: Texture2D = preload("res://assets/media-controls/pause.png")
+@onready var macro_button: Button = get_node("/root/Scene/HUD/Spacer/Macros/RecordMacro") as Button
+
 var enabled_gates: Array[String] = ["X", "Y", "Z", "H", "S", "CX", "CZ", "MZ", "ADD", "REMOVE", "LABELA", "LABELD"]
 
 var drag_gate: Gate
 var selected_gate_type: Gate.Type
 
+const cell_size: Vector3 = Vector3(1.8, 0.9, 1.0)
+
+var recording = false
+var macro_instructions: Array[QubitOperation] = []
+var macros: Array[Macro] = []
+var macro_idx: int = 0
+var button: Button
+var two_qubit_mode: bool = false
+var selected_qubit: int = -1
+var is_playing: bool = false
+var macro_ninja: bool = false
+var two_qubit_gate_type: String = ""
+var grid_qubits: Array[Qubit] = []
+var start_pos: Vector3
+var qec = Qec.new()
+var camera: Camera
+var operation_idx: int = 0 # index of the operation that the user will be doing
+var operations: Array[QubitOperation] = []
+var entanglement_groups: Array[Egroup] = []
+
+# works specifically for the cell size (1.8, 0.9), 
+# calculated by making a square that looked correct and then the inverse affine transform
+# offset is calculated at initialisation, since it depends on the amount of qubits
+var aftrans: Transform3D = Transform3D(Basis(
+	Vector3(5.0/9.0, -5.0/9.0, 0.0), 
+	Vector3(5.0/9.0, 5.0/9.0, 0.0),
+	Vector3(0.0, 0.0, 1.0/sqrt(2))
+), 
+	Vector3(0.0, 0.0, 0.0)
+)
 
 class Egroup:
 	extends Node
@@ -54,48 +91,6 @@ class Egroup:
 		var results = qec.peek_measurement_random(qubit_idxs)
 		for i in len(results):
 			qubits[i].set_base(results[i]&0b11111)
-
-@onready var codeEdit: CodeEdit = get_node("/root/Scene/HUD/Tabs/QASM")
-@onready var play_timer: Timer = Timer.new()
-@onready var play_pause: Button = get_node("/root/Scene/HUD/Spacer/TimeControl/PlayPause") as Button
-@onready var play_icon: Texture2D = preload("res://assets/media-controls/play.png")
-@onready var pause_icon: Texture2D = preload("res://assets/media-controls/pause.png")
-@onready var macro_button: Button = get_node("/root/Scene/HUD/Spacer/Macros/RecordMacro") as Button
-
-
-var recording = false
-var macro_instructions: Array[QubitOperation] = []
-var macros: Array[Macro] = []
-var macro_idx: int = 0
-
-const qubit_size = 1
-
-var button: Button
-var two_qubit_mode: bool = false
-var selected_qubit: int = -1
-var is_playing: bool = false
-var macro_ninja: bool = false
-var two_qubit_gate_type: String = ""
-var grid_qubits: Array[Qubit] = []
-var start_pos: Vector3
-var qec = Qec.new()
-var camera: Camera
-
-var operation_idx: int = 0 # index of the operation that the user will be doing
-var operations: Array[QubitOperation] = []
-
-var entanglement_groups: Array[Egroup] = []
-
-# works specifically for the cell size (1.8, 0.9), 
-# calculated by making a square that looked correct and then the inverse affine transform
-# offset is calculated at initialisation, since it depends on the amount of qubits
-var aftrans: Transform3D = Transform3D(Basis(
-	Vector3(5.0/9.0, -5.0/9.0, 0.0), 
-	Vector3(5.0/9.0, 5.0/9.0, 0.0),
-	Vector3(0.0, 0.0, 1.0/sqrt(2))
-), 
-	Vector3(0.0, 0.0, 0.0)
-)
 
 func set_to_qec_state():
 	var graph: Dictionary[int,PackedInt32Array] = {};
@@ -141,6 +136,12 @@ func pos_to_idx(pos: Vector2i) -> int:
 func idx_to_pos(idx: int) -> Vector2i:
 	var y = idx / self.x_qubits
 	return Vector2i((idx % self.x_qubits)*2 + (y&1), y)
+
+func check_different_qubits(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
+	return qubit1_pos != qubit2_pos
+
+func is_not_in_bounds(pos: Vector2i) -> bool:
+	return pos.x < 0 or pos.x/2 >= self.x_qubits or pos.y < 0 or pos.y >= self.y_qubits
 
 func append_or_update(operation: QubitOperation.Operation, qubit_idx: int, target_idx: int = 0, basis: int = 10) -> void:
 	operations.resize(operation_idx + 1)
@@ -290,7 +291,6 @@ func stop_record_macro():
 	get_node("/root/Scene/HUD/Spacer/Macros").add_child(macro)
 #endregion
 
-const cell_size: Vector3 = Vector3(1.8, 0.9, 1.0)
 
 func make_qubit(pos: Vector2i, basis: int = 10):
 	var nextQubit: Qubit = qubit_scene.instantiate()
@@ -371,9 +371,6 @@ func handle_undo() -> void:
 		var selected_op = operations[self.operation_idx]
 		codeEdit.set_executing(operation_idx)
 		undo_operation(selected_op)
-
-func is_not_in_bounds(pos: Vector2i) -> bool:
-	return pos.x < 0 or pos.x/2 >= self.x_qubits or pos.y < 0 or pos.y >= self.y_qubits
 
 func handle_redo() -> void:
 	if self.operation_idx >= len(operations):
@@ -891,9 +888,6 @@ func measure_z(qubit: int, update: bool = true, do_errors: bool = true) -> void:
 	self.operations[operation_idx-1].snap = snap
 	set_to_qec_state()
 #endregion
-
-func check_different_qubits(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
-	return qubit1_pos != qubit2_pos
 
 #region Qubit Errors
 func do_bitflip_error(qubit: int) -> void:
