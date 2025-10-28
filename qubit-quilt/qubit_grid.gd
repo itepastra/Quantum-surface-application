@@ -268,6 +268,7 @@ func _on_skip_forward() -> void:
 	while self.operation_idx < len(self.operations):
 		self.handle_redo()
 
+#region Macros
 
 func start_record_macro():
 	self.macro_instructions = [] # reset the macro instructions
@@ -287,6 +288,7 @@ func stop_record_macro():
 	macro.idx = len(macros)
 	self.macros.append(macro)
 	get_node("/root/Scene/HUD/Spacer/Macros").add_child(macro)
+#endregion
 
 const cell_size: Vector3 = Vector3(1.8, 0.9, 1.0)
 
@@ -358,6 +360,8 @@ func undo_operation(op: QubitOperation):
 		QubitOperation.Operation.LABELA:
 			grid_qubits[op_idx].toggle_ancilla()
 	op.errors = []
+
+#region Input Handling, Undo and Redo
 
 func handle_undo() -> void:
 	if self.operation_idx <= 0:
@@ -447,7 +451,9 @@ func _input(event: InputEvent) -> void:
 		add_qubit_at_mouse(event)
 	elif self.selected_qubit != -1 and event is InputEventMouseMotion:
 		display_drag_cnot(event)
+#endregion
 
+#region Default Macros
 func create_default_macro(name: String, root: Vector2i, operations: Array[QubitOperation], texture: Texture2D) -> void:
 	var macro: Macro = macro_scene.instantiate()
 	macro.root = root
@@ -788,6 +794,9 @@ func measure_LOGICAL() -> void:
 		ops.append(QubitOperation.new(QubitOperation.Operation.MZ, qubit))
 
 	create_default_macro("MEASURE LOGICAL", Vector2i(0,0), ops, preload("res://assets/measure_logical.png"))
+#endregion
+
+#region Qubit Operations
 
 func rx(qubit: int, update: bool = true, do_errors: bool = true) -> void:
 	if update:
@@ -881,10 +890,12 @@ func measure_z(qubit: int, update: bool = true, do_errors: bool = true) -> void:
 		do_errors(qubit)
 	self.operations[operation_idx-1].snap = snap
 	set_to_qec_state()
+#endregion
 
 func check_different_qubits(qubit1_pos: int, qubit2_pos: int, width: int) -> bool:
 	return qubit1_pos != qubit2_pos
 
+#region Qubit Errors
 func do_bitflip_error(qubit: int) -> void:
 	qec.xgate(qubit)
 	if self.grid_qubits[qubit]:
@@ -906,6 +917,7 @@ func do_relaxation_error(qubit: int) -> void:
 		self.grid_qubits[qubit].set_base(qec.get_vop(qubit))
 
 func do_errors(qubit: int) -> void:
+#endregion
 	# reset the errors that may exist from earlier
 	self.operations[operation_idx-1].errors.clear()
 	for i in self.error_rates.size():
