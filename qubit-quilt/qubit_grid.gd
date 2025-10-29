@@ -61,6 +61,7 @@ class Egroup:
 @onready var pause_icon: Texture2D = preload("res://assets/media-controls/pause.png")
 @onready var macro_button: Button = get_node("/root/Scene/HUD/Spacer/Macros/RecordMacro") as Button
 
+
 var recording = false
 var macro_instructions: Array[QubitOperation] = []
 var macros: Array[Macro] = []
@@ -186,6 +187,9 @@ func _on_ready() -> void:
 	(timecontrol.get_node("SkipForward") as Button).pressed.connect(_on_skip_forward)
 	macro_button.pressed.connect(_on_macro_button)
 	
+	var default_macros: Array[Macro] = MacroStore.instantiate_loaded_macros()
+	for m in default_macros:
+		get_node("/root/Scene/HUD/Spacer/Macros").add_child(m)
 	
 	self.camera = %Camera as Camera
 	# Resize the camera to fit with the grid

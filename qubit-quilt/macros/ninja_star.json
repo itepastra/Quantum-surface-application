@@ -1,0 +1,116 @@
+{
+  "title": "NINJA STAR",
+  "root": [0, 0],
+  "instructions": [
+	{ "operation": "LABELD", "index": [-2,  2], "other": [0, 0], "basis": 10 },
+	{ "operation": "LABELD", "index": [ 0,  2], "other": [0, 0], "basis": 10 },
+	{ "operation": "LABELD", "index": [ 2,  2], "other": [0, 0], "basis": 10 },
+	{ "operation": "LABELD", "index": [ 2,  0], "other": [0, 0], "basis": 10 },
+	{ "operation": "LABELD", "index": [ 2, -2], "other": [0, 0], "basis": 10 },
+	{ "operation": "LABELD", "index": [ 0, -2], "other": [0, 0], "basis": 10 },
+	{ "operation": "LABELD", "index": [-2, -2], "other": [0, 0], "basis": 10 },
+	{ "operation": "LABELD", "index": [-2,  0], "other": [0, 0], "basis": 10 },
+	{ "operation": "LABELD", "index": [ 0,  0], "other": [0, 0], "basis": 10 },
+
+	{ "operation": "LABELA", "index": [-1,  1], "other": [0, 0], "basis": 10 },
+	{ "operation": "LABELA", "index": [ 1,  1], "other": [0, 0], "basis": 10 },
+	{ "operation": "LABELA", "index": [ 1, -1], "other": [0, 0], "basis": 10 },
+	{ "operation": "LABELA", "index": [-1, -1], "other": [0, 0], "basis": 10 },
+	{ "operation": "LABELA", "index": [ 1,  3], "other": [0, 0], "basis": 10 },
+	{ "operation": "LABELA", "index": [ 3, -1], "other": [0, 0], "basis": 10 },
+	{ "operation": "LABELA", "index": [-1, -3], "other": [0, 0], "basis": 10 },
+	{ "operation": "LABELA", "index": [-3,  1], "other": [0, 0], "basis": 10 },
+
+	{ "operation": "CX", "index": [ 0,  0], "other": [ 1, -1], "basis": 10 },
+	{ "operation": "CX", "index": [ 0,  0], "other": [ 1,  1], "basis": 10 },
+
+	{ "operation": "CX", "index": [ 1, -1], "other": [ 0, -2], "basis": 10 },
+	{ "operation": "CX", "index": [ 0, -2], "other": [ 1, -1], "basis": 10 },
+
+	{ "operation": "CX", "index": [ 1,  1], "other": [ 0,  2], "basis": 10 },
+	{ "operation": "CX", "index": [ 0,  2], "other": [ 1,  1], "basis": 10 },
+
+	{ "operation": "RH", "index": [-2, -2], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [ 0, -2], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [ 2, -2], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [-2,  0], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [ 0,  0], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [ 2,  0], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [-2,  2], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [ 0,  2], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [ 2,  2], "other": [0, 0], "basis": 10 },
+
+	{ "operation": "RH", "index": [-1, -3], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [ 1, -1], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [-1,  1], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [ 1,  3], "other": [0, 0], "basis": 10 },
+
+	{ "operation": "CZ", "index": [ 0, -2], "other": [-1, -3], "basis": 10 },
+	{ "operation": "CZ", "index": [ 2,  0], "other": [ 1, -1], "basis": 10 },
+	{ "operation": "CZ", "index": [ 0,  2], "other": [-1,  1], "basis": 10 },
+
+	{ "operation": "CZ", "index": [-2, -2], "other": [-1, -3], "basis": 10 },
+	{ "operation": "CZ", "index": [ 0,  0], "other": [ 1, -1], "basis": 10 },
+	{ "operation": "CZ", "index": [-2,  2], "other": [-1,  1], "basis": 10 },
+
+	{ "operation": "CZ", "index": [ 2, -2], "other": [ 1, -1], "basis": 10 },
+	{ "operation": "CZ", "index": [ 0,  0], "other": [-1,  1], "basis": 10 },
+	{ "operation": "CZ", "index": [ 2,  2], "other": [ 1,  3], "basis": 10 },
+
+	{ "operation": "CZ", "index": [ 0, -2], "other": [ 1, -1], "basis": 10 },
+	{ "operation": "CZ", "index": [-2,  0], "other": [-1,  1], "basis": 10 },
+	{ "operation": "CZ", "index": [ 0,  2], "other": [ 1,  3], "basis": 10 },
+
+	{ "operation": "RH", "index": [-2, -2], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [ 0, -2], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [ 2, -2], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [-2,  0], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [ 0,  0], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [ 2,  0], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [-2,  2], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [ 0,  2], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [ 2,  2], "other": [0, 0], "basis": 10 },
+
+	{ "operation": "RH", "index": [-1, -3], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [ 1, -1], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [-1,  1], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [ 1,  3], "other": [0, 0], "basis": 10 },
+
+	{ "operation": "RH", "index": [-1, -1], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [ 3, -1], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [-3,  1], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [ 1,  1], "other": [0, 0], "basis": 10 },
+
+	{ "operation": "CZ", "index": [ 0,  0], "other": [-1, -1], "basis": 10 },
+	{ "operation": "CZ", "index": [-2,  2], "other": [-3,  1], "basis": 10 },
+	{ "operation": "CZ", "index": [ 2,  2], "other": [ 1,  1], "basis": 10 },
+
+	{ "operation": "CZ", "index": [ 0, -2], "other": [-1, -1], "basis": 10 },
+	{ "operation": "CZ", "index": [-2,  0], "other": [-3,  1], "basis": 10 },
+	{ "operation": "CZ", "index": [ 2,  0], "other": [ 1,  1], "basis": 10 },
+
+	{ "operation": "CZ", "index": [-2,  0], "other": [-1, -1], "basis": 10 },
+	{ "operation": "CZ", "index": [ 2,  0], "other": [ 3, -1], "basis": 10 },
+	{ "operation": "CZ", "index": [ 0,  2], "other": [ 1,  1], "basis": 10 },
+
+	{ "operation": "CZ", "index": [-2, -2], "other": [-1, -1], "basis": 10 },
+	{ "operation": "CZ", "index": [ 2, -2], "other": [ 3, -1], "basis": 10 },
+	{ "operation": "CZ", "index": [ 0,  0], "other": [ 1,  1], "basis": 10 },
+
+	{ "operation": "RH", "index": [-1, -1], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [ 3, -1], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [-3,  1], "other": [0, 0], "basis": 10 },
+	{ "operation": "RH", "index": [ 1,  1], "other": [0, 0], "basis": 10 },
+
+	{ "operation": "MZ", "index": [-1, -3], "other": [0, 0], "basis": 10 },
+	{ "operation": "MZ", "index": [ 1, -1], "other": [0, 0], "basis": 10 },
+	{ "operation": "MZ", "index": [-1,  1], "other": [0, 0], "basis": 10 },
+	{ "operation": "MZ", "index": [ 1,  3], "other": [0, 0], "basis": 10 },
+
+	{ "operation": "MZ", "index": [-1, -1], "other": [0, 0], "basis": 10 },
+	{ "operation": "MZ", "index": [ 3, -1], "other": [0, 0], "basis": 10 },
+	{ "operation": "MZ", "index": [-3,  1], "other": [0, 0], "basis": 10 },
+	{ "operation": "MZ", "index": [ 1,  1], "other": [0, 0], "basis": 10 }
+  ],
+  "spread": []
+}

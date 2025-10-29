@@ -25,3 +25,36 @@ func print_op(indent: int = 0):
 		print("%sErrors:" % " ".repeat(indent))
 		for e in errors:
 			e.print_op(indent + 4)
+
+static func _v2_to_arr(v: Vector2i) -> Array[int]:
+	return [v.x, v.y]
+
+static func _arr_to_v2(a: Array) -> Vector2i:
+	if a.size() >= 2:
+		return Vector2i(int(a[0]), int(a[1]))
+	return Vector2i.ZERO
+
+static func op_to_str(op: Operation) -> String:
+	return Operation.keys()[int(op)]
+
+static func op_from_str(s: String) -> Operation:
+	var key := s.strip_edges()  # keep whitespace-tolerant
+	# key must match an enum key exactly as declared
+	assert(Operation.has(key), "QubitOperation: unknown operation '%s'. Allowed: %s" % [key, ", ".join(Operation.keys())])
+	return Operation[key]
+
+func to_dict() -> Dictionary:
+	return {
+		"operation": QubitOperation.op_to_str(self.operation),
+		"index": _v2_to_arr(self.index),
+		"other": _v2_to_arr(self.other),
+		"basis": int(self.basis),
+	}
+
+static func from_dict(d: Dictionary) -> QubitOperation:
+	assert(d.has("operation"), "QubitOperation.from_dict: missing 'operation'")
+	var op := QubitOperation.op_from_str(String(d["operation"]))
+	var idx := _arr_to_v2(d.get("index", [0, 0]))
+	var oth := _arr_to_v2(d.get("other", [0, 0]))
+	var basis := int(d.get("basis", 10))
+	return QubitOperation.new(op, idx, oth, basis)

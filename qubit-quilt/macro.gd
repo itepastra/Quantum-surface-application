@@ -98,3 +98,45 @@ func execute(target: Vector2i) -> void:
 func _on_pressed() -> void:
 	if hotbar.get_pressed_button():
 		hotbar.get_pressed_button().button_pressed = false
+		
+
+static func _v2_to_arr(v: Vector2i) -> Array[int]:
+	return [v.x, v.y]
+
+static func _arr_to_v2(a: Array) -> Vector2i:
+	if a.size() >= 2:
+		return Vector2i(int(a[0]), int(a[1]))
+	return Vector2i.ZERO
+
+func to_dict() -> Dictionary:
+	var ins := []
+	for i in instructions:
+		ins.append(i.to_dict())
+
+	var spread_arr := []
+	if spread:
+		for v in spread:
+			spread_arr.append(_v2_to_arr(v))
+
+	return {
+		"title": text, 
+		"root": _v2_to_arr(root),
+		"instructions": ins,
+		"spread": spread_arr,
+	}
+
+static func from_dict(d: Dictionary) -> Macro:
+	var m := Macro.new()
+	m.text = String(d.get("title", "Macro"))
+	m.root = _arr_to_v2(d.get("root", [0, 0]))
+	m.instructions.clear()
+	for it in (d.get("instructions", []) as Array):
+		m.instructions.append(QubitOperation.from_dict(it))
+	m.spread = []
+	for s in (d.get("spread", []) as Array):
+		m.spread.append(_arr_to_v2(s))
+	if "rebase_to_root" in m:
+		m.rebase_to_root()
+	if "gen_spread" in m:
+		m.gen_spread()
+	return m
