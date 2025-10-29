@@ -19,7 +19,6 @@ func load_defaults() -> void:
 	# Read all macros from res://macros set recursive=true for subfolders
 	var seeded_arr: Array = _read_all_res_macros("res://macros", false)
 
-	# Fallback sample if folder is missing/empty/invalid
 	if seeded_arr.is_empty():
 		push_warning("No default macros detected")
 
@@ -54,7 +53,6 @@ static func _read_all_res_macros(dir_path: String = "res://macros", recursive: b
 		push_warning("[MacroStore] Macro folder not found: %s" % dir_path)
 		return out
 
-	# Files in this directory
 	for fname in dir.get_files():
 		if not String(fname).to_lower().ends_with(".json"):
 			continue
@@ -70,7 +68,7 @@ static func _read_all_res_macros(dir_path: String = "res://macros", recursive: b
 			_:
 				push_warning("[MacroStore] Skipping invalid JSON: %s" % full)
 
-	# Optional recursion into subfolders
+	# recursion into subfolders
 	if recursive:
 		for sub in dir.get_directories():
 			var sub_path := dir_path.path_join(sub)
@@ -140,14 +138,14 @@ func load_all() -> Array[Dictionary]:
 			push_warning("[MacroStore] Skipping non-dictionary item in saved macros")
 	return out
 
-# Turn saved dicts into Macro nodes
+# dicts into Macro nodes
 func instantiate_loaded_macros() -> Array[Macro]:
 	var result: Array[Macro] = []
 	for d in load_all():
 		result.append(Macro.from_dict(d))
 	return result
 
-# Export to a downloadable JSON file in the browser
+# export to a downloadable JSON file in the browser
 func export_download(macros: Array) -> void:
 	var payload := []
 	for m in macros:
@@ -178,7 +176,7 @@ func export_download(macros: Array) -> void:
 	body.call("removeChild", a)
 	URLintf.call("revokeObjectURL", url)
 
-#  Import from browser file picker
+#  import from browser
 func import_from_file_picker(callback: Callable) -> void:
 	if not OS.has_feature("web"):
 		push_warning("File picker import is browser-only; use user://macros.json on desktop.")
