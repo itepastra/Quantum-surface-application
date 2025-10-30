@@ -569,6 +569,7 @@ exp_edit = true
 visible = false
 layout_mode = 2
 placeholder_text = "The QASM code indicating the move operations"
+editable = false
 emoji_menu_enabled = false
 wrap_mode = 1
 indent_wrapped_lines = true
