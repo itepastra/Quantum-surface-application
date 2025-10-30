@@ -6,7 +6,7 @@ var root: Vector2i # index of the macro root in the grid
 var instructions: Array[QubitOperation] = []
 var idx: int # position in macros array
 var spread: Array[Vector2i] # stored in rot format
-var macro_icon: String # icon for macro
+var macro_icon: String = "" # icon for macro
 
 @onready var grid: QubitGrid = get_node("/root/Scene/QubitGrid")
 @onready var hotbar: ButtonGroup = preload("res://control_buttons.tres")
@@ -28,7 +28,7 @@ func gen_spread() -> void:
 			self.spread.append(instr.index)
 		if (not instr.other in self.spread) and (instr.is_two_qubit()):
 			self.spread.append(instr.other)
-	print(self.spread)
+	#print(self.spread)
 
 func check_valid(target: Vector2i) -> bool:
 	for instr in self.instructions:
@@ -125,5 +125,5 @@ static func from_dict(d: Dictionary) -> Macro:
 	m.instructions.clear()
 	for it in (d.get("instructions", []) as Array):
 		m.instructions.append(QubitOperation.from_dict(it))
-	m.macro_icon = String(d.get("macro_icon", null))
+	m.macro_icon = str(d.get("macro_icon", ""))
 	return m

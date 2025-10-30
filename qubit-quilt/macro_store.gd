@@ -3,6 +3,8 @@ extends Node
 const LS_DEFAULT_KEY := "qec_macros_default_v1"
 const LS_USER_KEY := "qec_macros_user_v1" 
 
+signal user_macros_updated(macros: Array)
+
 func load_defaults() -> void:
 	print_debug("[MacroStore] load_defaults()")
 
@@ -28,9 +30,6 @@ func load_defaults() -> void:
 	if is_web:
 		var ls2: Variant = JavaScriptBridge.get_interface("localStorage")
 		ls2.setItem(LS_DEFAULT_KEY, json)
-	else:
-		_write_text_to_user_file(json)
-
 	print_debug("[MacroStore] defaults seeded from res://macros/")
 
 
@@ -77,17 +76,6 @@ static func _read_all_res_macros(dir_path: String = "res://macros", recursive: b
 
 	return out
 
-
-func save_one(macro: Variant) -> void:
-	var arr := load_all()
-	arr.append(macro if typeof(macro) == TYPE_DICTIONARY else macro.to_dict())
-	var json := JSON.stringify(arr)
-	if OS.has_feature("web"):
-		var ls := JavaScriptBridge.get_interface("localStorage")
-		ls.setItem(LS_USER_KEY, json)
-	else:
-		_write_text_to_user_file(json)
-
 static func _read_text_from_user_file() -> String:
 	if not FileAccess.file_exists("user://macros.json"):
 		return ""
@@ -96,30 +84,14 @@ static func _read_text_from_user_file() -> String:
 	f.close()
 	return s
 
-static func _write_text_to_user_file(text: String) -> void:
-	var f := FileAccess.open("user://macros.json", FileAccess.WRITE)
-	f.store_string(text)
-	f.close()
 
-func save_all(macros: Array) -> void:
-	var payload := []
-	for m in macros:
-		payload.append(m if typeof(m) == TYPE_DICTIONARY else m.to_dict())
-	var json := JSON.stringify(payload)
-
-	if OS.has_feature("web"):
-		var ls := JavaScriptBridge.get_interface("localStorage")
-		ls.setItem(LS_USER_KEY, json)
-	else:
-		_write_text_to_user_file(json)
-
-func load_all() -> Array[Dictionary]:
+func load_all(LS_KEY: String = LS_DEFAULT_KEY) -> Array[Dictionary]:
 	var empty: Array[Dictionary] = []
 
 	var json := ""
 	if OS.has_feature("web"):
 		var ls := JavaScriptBridge.get_interface("localStorage")
-		json = str(ls.getItem(LS_DEFAULT_KEY))
+		json = str(ls.getItem(LS_KEY))
 		if json == "null" or json.strip_edges() == "":
 			return empty
 	else:
@@ -142,90 +114,73 @@ func load_all() -> Array[Dictionary]:
 # dicts into Macro nodes
 func instantiate_loaded_macros() -> Array[Macro]:
 	var result: Array[Macro] = []
-	for d in load_all():
+	for d in load_all(LS_DEFAULT_KEY):
 		result.append(Macro.from_dict(d))
+	for u in load_all(LS_USER_KEY):
+		result.append(Macro.from_dict(u))
 	return result
 
-# export to a downloadable JSON file in the browser
-func export_download(macros: Array) -> void:
-	var payload := []
-	for m in macros:
-		payload.append(m if typeof(m) == TYPE_DICTIONARY else m.to_dict())
-	var json := JSON.stringify(payload)
+static func _parse_json_array_or_empty(raw: Variant) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	if raw == null:
+		return out
 
-	if not OS.has_feature("web"):
-		_write_text_to_user_file(json)
-		return
+	var s: Variant = raw
+	if not (s is String):
+		s = str(raw)
+		
+	if s == "" or s == "null" or s == "Null":
+		return out
 
-	var window: Variant = JavaScriptBridge.get_interface("window")
-	var URLintf: Variant = JavaScriptBridge.get_interface("URL")
-	var document: Variant = JavaScriptBridge.get_interface("document")
-	if window == null or URLintf == null or document == null:
-		push_warning("Browser interfaces unavailable; cannot export.")
-		return
+	var parsed: Variant = JSON.parse_string(s)
+	if parsed is Array:
+		for it in (parsed as Array):
+			if it is Dictionary:
+				out.append(it as Dictionary)
+	elif parsed is Dictionary:
+		out.append(parsed as Dictionary)
+	return out
 
-	# Blob([json], {type:'application/json'})
-	var blob: Variant = JavaScriptBridge.create_object("Blob", [[json], {"type":"application/json"}])
-	var url: Variant = URLintf.call("createObjectURL", blob)
+func get_user_macros() -> Array[Dictionary]:
+	if OS.has_feature("web"):
+		var ls := JavaScriptBridge.get_interface("localStorage")
+		if ls == null:
+			push_warning("localStorage not available (web).")
+			return []
+		return _parse_json_array_or_empty(str(ls.getItem(LS_USER_KEY)))
+	else:
+		var p := "user://macros_user.json"
+		if not FileAccess.file_exists(p):
+			return []
+		var f := FileAccess.open(p, FileAccess.READ)
+		var txt := f.get_as_text()
+		f.close()
+		return _parse_json_array_or_empty(txt)
 
-	var body: Variant = document.get("body")
-	var a: Variant = document.call("createElement", "a")
-	a.set("href", url)
-	a.set("download", "macros.json")
-	body.call("appendChild", a)
-	a.call("click")
-	body.call("removeChild", a)
-	URLintf.call("revokeObjectURL", url)
-
-#  import from browser
-func import_from_file_picker(callback: Callable) -> void:
-	if not OS.has_feature("web"):
-		push_warning("File picker import is browser-only; use user://macros.json on desktop.")
-		return
-
-	var document: Variant = JavaScriptBridge.get_interface("document")
-	if document == null:
-		callback.call([])
-		return
-
-	var body: Variant = document.get("body")
-	var input: Variant = document.call("createElement", "input")
-	input.set("type", "file")
-	input.set("accept", "application/json,.json")
-	input.set("style", "display:none")
-	body.call("appendChild", input)
-
-	var onchange_cb: Variant = JavaScriptBridge.create_callback(func(_ev):
-		var files: Variant = input.get("files")
-		if files == null:
-			body.call("removeChild", input)
-			callback.call([])
+func _set_user_macros(arr: Array[Dictionary]) -> void:
+	var json_txt := JSON.stringify(arr)
+	if OS.has_feature("web"):
+		var ls := JavaScriptBridge.get_interface("localStorage")
+		if ls == null:
+			push_warning("localStorage not available (web).")
 			return
-		var length := int(files.get("length"))
-		if length <= 0:
-			body.call("removeChild", input)
-			callback.call([])
-			return
+		ls.setItem(LS_USER_KEY, json_txt)
+	emit_signal("user_macros_updated", arr)
 
-		var file0: Variant = files.call("item", 0)
-		var reader: Variant = JavaScriptBridge.create_object("FileReader")
+func append_user_macro(macro_dict: Dictionary) -> void:
+	# very light schema check
+	if not macro_dict.has("instructions"):
+		push_warning("append_user_macro: missing 'instructions'.")
+		return
+	var arr := get_user_macros()
+	arr.append(macro_dict)
+	_set_user_macros(arr)
 
-		var onload_cb: Variant = JavaScriptBridge.create_callback(func(_e):
-			var result_text := String(reader.get("result"))
-			var parsed: Variant = JSON.parse_string(result_text)
-			body.call("removeChild", input)
-			if typeof(parsed) != TYPE_ARRAY:
-				callback.call([])
-				return
-			callback.call((parsed as Array) as Array[Dictionary])
-		)
+func replace_all_user_macros(macros_arr: Array[Dictionary]) -> void:
+	_set_user_macros(macros_arr)
 
-		reader.set("onload", onload_cb)
-		reader.call("readAsText", file0)
-	)
-
-	input.set("onchange", onchange_cb)
-	input.call("click")
+func clear_user_macros() -> void:
+	_set_user_macros([])
 
 func _ready() -> void:
 	print_debug("STARTING MACRO STORE")
