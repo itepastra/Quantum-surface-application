@@ -90,6 +90,7 @@ func execute(target: Vector2i) -> void:
 				grid.cz(index, other)
 			QubitOperation.Operation.MZ:
 				grid.measure_z(index)
+				grid.grid_qubits[index].set_label(grid.qec.get_vop(index))
 			QubitOperation.Operation.LABELA:
 				grid.grid_qubits[index].toggle_ancilla()
 			QubitOperation.Operation.LABELD:
