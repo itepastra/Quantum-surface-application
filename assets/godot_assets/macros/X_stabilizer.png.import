@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ciltwgm1ioufn"
-path="res://.godot/imported/ninja.png-b4db26c871e15ccafd514c602fe95c74.ctex"
+uid="uid://lyyhi5h3308o"
+path="res://.godot/imported/X_stabilizer.png-fbb466a43aa3685f264db35cc9e7e314.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ninja.png"
-dest_files=["res://.godot/imported/ninja.png-b4db26c871e15ccafd514c602fe95c74.ctex"]
+source_file="res://assets/macros/X_stabilizer.png"
+dest_files=["res://.godot/imported/X_stabilizer.png-fbb466a43aa3685f264db35cc9e7e314.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dfs0kxqsvndlm"
-path="res://.godot/imported/logicalZ.png-ef538e70d409f9c6f3dd134f36b408c3.ctex"
+uid="uid://pa8sryu7c4a4"
+path="res://.godot/imported/stabilize_ninja_star.png-aa8d92d9dbdbc31711f991772a29b48b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/logicalZ.png"
-dest_files=["res://.godot/imported/logicalZ.png-ef538e70d409f9c6f3dd134f36b408c3.ctex"]
+source_file="res://assets/macros/stabilize_ninja_star.png"
+dest_files=["res://.godot/imported/stabilize_ninja_star.png-aa8d92d9dbdbc31711f991772a29b48b.ctex"]
 
 [params]
 

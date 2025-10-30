@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ct10yhxbvp7yl"
-path="res://.godot/imported/measure_logical.png-f8d489807d9495b4743907c7dc7eff49.ctex"
+uid="uid://ccn2f4ndsdu6e"
+path="res://.godot/imported/logical_X.png-a9468a43eed409ce377361134fe18fbb.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/measure_logical.png"
-dest_files=["res://.godot/imported/measure_logical.png-f8d489807d9495b4743907c7dc7eff49.ctex"]
+source_file="res://assets/macros/logical_X.png"
+dest_files=["res://.godot/imported/logical_X.png-a9468a43eed409ce377361134fe18fbb.ctex"]
 
 [params]
 
