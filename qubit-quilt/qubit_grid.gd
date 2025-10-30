@@ -194,12 +194,12 @@ func _on_ready() -> void:
 		var m: Macro = macro_scene.instantiate()
 		m.root = dm.root
 		m.instructions = dm.instructions
-		m.name = dm.name
+		#m.name = dm.name
 		m.idx = len(macros)
-		print(dm.macro_icon)
 		if dm.macro_icon and dm.macro_icon != "":
 			m.icon = load(dm.macro_icon) as Texture2D
-
+		else:
+			m.text = dm.text
 		macros.append(m)
 		get_node("/root/Scene/HUD/Spacer/Macros").add_child(m)
 	
@@ -291,12 +291,13 @@ func stop_record_macro():
 	macro.idx = len(macros)
 	self.macros.append(macro)
 	get_node("/root/Scene/HUD/Spacer/Macros").add_child(macro)
+	print_debug(macro.root)
 	var as_dict := {
 		"title": macro.text,
-		"root": [macro.root[0], macro.root[1]],
+		"root": [0.0, 0.0],
 		"instructions": macro.instructions.map(func (op: QubitOperation): return op.to_dict()),
 	}
-	print(as_dict)
+	print_debug(as_dict)
 	MacroStore.append_user_macro(as_dict)
 
 const cell_size: Vector3 = Vector3(1.8, 0.9, 1.0)

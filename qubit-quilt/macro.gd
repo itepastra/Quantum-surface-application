@@ -28,7 +28,6 @@ func gen_spread() -> void:
 			self.spread.append(instr.index)
 		if (not instr.other in self.spread) and (instr.is_two_qubit()):
 			self.spread.append(instr.other)
-	#print(self.spread)
 
 func check_valid(target: Vector2i) -> bool:
 	for instr in self.instructions:

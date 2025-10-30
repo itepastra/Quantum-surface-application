@@ -44,11 +44,17 @@ static func op_from_str(s: String) -> Operation:
 	return Operation[key]
 
 func to_dict() -> Dictionary:
-	return {
-		"operation": QubitOperation.op_to_str(self.operation),
-		"index": _v2_to_arr(self.index),
-		"other": _v2_to_arr(self.other),
-	}
+	if self.is_two_qubit():
+		return {
+			"operation": QubitOperation.op_to_str(self.operation),
+			"index": _v2_to_arr(self.index),
+			"other": _v2_to_arr(self.other),
+		}
+	else:
+		return {
+			"operation": QubitOperation.op_to_str(self.operation),
+			"index": _v2_to_arr(self.index),
+		}
 
 static func from_dict(d: Dictionary) -> QubitOperation:
 	assert(d.has("operation"), "QubitOperation.from_dict: missing 'operation'")
