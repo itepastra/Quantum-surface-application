@@ -195,7 +195,7 @@ func _on_ready() -> void:
 		m.root = dm.root
 		m.instructions = dm.instructions
 		m.name = dm.name
-		m.idx = dm.idx
+		m.idx = len(macros)
 		if dm.macro_icon:
 			m.icon = load(dm.macro_icon) as Texture2D
 
