@@ -110,20 +110,10 @@ static func _arr_to_v2(a: Array) -> Vector2i:
 	return Vector2i.ZERO
 
 func to_dict() -> Dictionary:
-	var ins := []
-	for i in instructions:
-		ins.append(i.to_dict())
-
-	var spread_arr := []
-	if spread:
-		for v in spread:
-			spread_arr.append(_v2_to_arr(v))
-
 	return {
-		"title": text, 
-		"root": _v2_to_arr(root),
-		"instructions": ins,
-		"spread": spread_arr, 
+		"title": self.text, # or another title property you use
+		"root": [root.x, root.y],
+		"instructions": instructions.map(func (op: QubitOperation): return op.to_dict()),
 		"macro_icon": macro_icon,
 	}
 
@@ -134,12 +124,5 @@ static func from_dict(d: Dictionary) -> Macro:
 	m.instructions.clear()
 	for it in (d.get("instructions", []) as Array):
 		m.instructions.append(QubitOperation.from_dict(it))
-	m.spread = []
-	for s in (d.get("spread", []) as Array):
-		m.spread.append(_arr_to_v2(s))
-	if "rebase_to_root" in m:
-		m.rebase_to_root()
-	if "gen_spread" in m:
-		m.gen_spread()
 	m.macro_icon = String(d.get("macro_icon", null))
 	return m

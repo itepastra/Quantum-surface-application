@@ -1,6 +1,7 @@
 extends Node
 
-const LS_KEY := "qec_macros_v1"
+const LS_DEFAULT_KEY := "qec_macros_default_v1"
+const LS_USER_KEY := "qec_macros_user_v1" 
 
 func load_defaults() -> void:
 	print_debug("[MacroStore] load_defaults()")
@@ -26,7 +27,7 @@ func load_defaults() -> void:
 
 	if is_web:
 		var ls2: Variant = JavaScriptBridge.get_interface("localStorage")
-		ls2.setItem(LS_KEY, json)
+		ls2.setItem(LS_DEFAULT_KEY, json)
 	else:
 		_write_text_to_user_file(json)
 
@@ -83,7 +84,7 @@ func save_one(macro: Variant) -> void:
 	var json := JSON.stringify(arr)
 	if OS.has_feature("web"):
 		var ls := JavaScriptBridge.get_interface("localStorage")
-		ls.setItem(LS_KEY, json)
+		ls.setItem(LS_USER_KEY, json)
 	else:
 		_write_text_to_user_file(json)
 
@@ -108,7 +109,7 @@ func save_all(macros: Array) -> void:
 
 	if OS.has_feature("web"):
 		var ls := JavaScriptBridge.get_interface("localStorage")
-		ls.setItem(LS_KEY, json)
+		ls.setItem(LS_USER_KEY, json)
 	else:
 		_write_text_to_user_file(json)
 
@@ -118,7 +119,7 @@ func load_all() -> Array[Dictionary]:
 	var json := ""
 	if OS.has_feature("web"):
 		var ls := JavaScriptBridge.get_interface("localStorage")
-		json = str(ls.getItem(LS_KEY))
+		json = str(ls.getItem(LS_DEFAULT_KEY))
 		if json == "null" or json.strip_edges() == "":
 			return empty
 	else:

@@ -48,7 +48,6 @@ func to_dict() -> Dictionary:
 		"operation": QubitOperation.op_to_str(self.operation),
 		"index": _v2_to_arr(self.index),
 		"other": _v2_to_arr(self.other),
-		"basis": int(self.basis),
 	}
 
 static func from_dict(d: Dictionary) -> QubitOperation:
@@ -56,5 +55,4 @@ static func from_dict(d: Dictionary) -> QubitOperation:
 	var op := QubitOperation.op_from_str(String(d["operation"]))
 	var idx := _arr_to_v2(d.get("index", [0, 0]))
 	var oth := _arr_to_v2(d.get("other", [0, 0]))
-	var basis := int(d.get("basis", 10))
-	return QubitOperation.new(op, idx, oth, basis)
+	return QubitOperation.new(op, idx, oth)
