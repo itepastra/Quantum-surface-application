@@ -1,6 +1,7 @@
 {
   "title": "NINJA STAR",
   "root": [0, 0],
+  "macro_icon": "res://assets/ninja.png",
   "instructions": [
 	{ "operation": "LABELD", "index": [-2,  2], "other": [0, 0], "basis": 10 },
 	{ "operation": "LABELD", "index": [ 0,  2], "other": [0, 0], "basis": 10 },

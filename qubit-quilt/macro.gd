@@ -6,6 +6,7 @@ var root: Vector2i # index of the macro root in the grid
 var instructions: Array[QubitOperation] = []
 var idx: int # position in macros array
 var spread: Array[Vector2i] # stored in rot format
+var macro_icon: String # icon for macro
 
 @onready var grid: QubitGrid = get_node("/root/Scene/QubitGrid")
 @onready var hotbar: ButtonGroup = preload("res://control_buttons.tres")
@@ -122,7 +123,8 @@ func to_dict() -> Dictionary:
 		"title": text, 
 		"root": _v2_to_arr(root),
 		"instructions": ins,
-		"spread": spread_arr,
+		"spread": spread_arr, 
+		"macro_icon": macro_icon,
 	}
 
 static func from_dict(d: Dictionary) -> Macro:
@@ -139,4 +141,5 @@ static func from_dict(d: Dictionary) -> Macro:
 		m.rebase_to_root()
 	if "gen_spread" in m:
 		m.gen_spread()
+	m.macro_icon = String(d.get("macro_icon", null))
 	return m

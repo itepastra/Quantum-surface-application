@@ -190,7 +190,16 @@ func _on_ready() -> void:
 	macro_button.pressed.connect(_on_macro_button)
 	
 	var default_macros: Array[Macro] = MacroStore.instantiate_loaded_macros()
-	for m in default_macros:
+	for dm in default_macros:
+		var m: Macro = macro_scene.instantiate()
+		m.root = dm.root
+		m.instructions = dm.instructions
+		m.name = dm.name
+		m.idx = dm.idx
+		if dm.macro_icon:
+			m.icon = load(dm.macro_icon) as Texture2D
+
+		macros.append(m)
 		get_node("/root/Scene/HUD/Spacer/Macros").add_child(m)
 	
 	self.camera = %Camera as Camera
