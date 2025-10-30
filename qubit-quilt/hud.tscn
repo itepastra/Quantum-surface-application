@@ -342,7 +342,6 @@ offset_right = 40.0
 offset_bottom = 40.0
 theme = ExtResource("2_1xsix")
 tab_alignment = 2
-current_tab = 1
 use_hidden_tabs_for_min_size = true
 deselect_enabled = true
 
@@ -567,8 +566,10 @@ value = 0.1
 exp_edit = true
 
 [node name="QASM" type="CodeEdit" parent="Tabs"]
+visible = false
 layout_mode = 2
 placeholder_text = "The QASM code indicating the move operations"
+editable = false
 emoji_menu_enabled = false
 wrap_mode = 1
 indent_wrapped_lines = true

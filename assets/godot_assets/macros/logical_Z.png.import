@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bjievwfivew5"
-path="res://.godot/imported/Zstabilizer.png-b119d6c88b1f5aed86c3bacae9775c0d.ctex"
+uid="uid://n73pplo76q2q"
+path="res://.godot/imported/logical_Z.png-1d169b939a697d5ca610df7ddd261b2c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/Zstabilizer.png"
-dest_files=["res://.godot/imported/Zstabilizer.png-b119d6c88b1f5aed86c3bacae9775c0d.ctex"]
+source_file="res://assets/macros/logical_Z.png"
+dest_files=["res://.godot/imported/logical_Z.png-1d169b939a697d5ca610df7ddd261b2c.ctex"]
 
 [params]
 

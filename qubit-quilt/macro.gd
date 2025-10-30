@@ -6,6 +6,7 @@ var root: Vector2i # index of the macro root in the grid
 var instructions: Array[QubitOperation] = []
 var idx: int # position in macros array
 var spread: Array[Vector2i] # stored in rot format
+var macro_icon: String = "" # icon for macro
 
 @onready var grid: QubitGrid = get_node("/root/Scene/QubitGrid")
 @onready var hotbar: ButtonGroup = preload("res://control_buttons.tres")
@@ -27,7 +28,6 @@ func gen_spread() -> void:
 			self.spread.append(instr.index)
 		if (not instr.other in self.spread) and (instr.is_two_qubit()):
 			self.spread.append(instr.other)
-	print(self.spread)
 
 func check_valid(target: Vector2i) -> bool:
 	for instr in self.instructions:
@@ -100,3 +100,29 @@ func _on_pressed() -> void:
 	if hotbar.get_pressed_button():
 		hotbar.get_pressed_button().button_pressed = false
 		
+
+static func _v2_to_arr(v: Vector2i) -> Array[int]:
+	return [v.x, v.y]
+
+static func _arr_to_v2(a: Array) -> Vector2i:
+	if a.size() >= 2:
+		return Vector2i(int(a[0]), int(a[1]))
+	return Vector2i.ZERO
+
+func to_dict() -> Dictionary:
+	return {
+		"title": self.text, # or another title property you use
+		"root": [root.x, root.y],
+		"instructions": instructions.map(func (op: QubitOperation): return op.to_dict()),
+		"macro_icon": macro_icon,
+	}
+
+static func from_dict(d: Dictionary) -> Macro:
+	var m := Macro.new()
+	m.text = String(d.get("title", "Macro"))
+	m.root = _arr_to_v2(d.get("root", [0, 0]))
+	m.instructions.clear()
+	for it in (d.get("instructions", []) as Array):
+		m.instructions.append(QubitOperation.from_dict(it))
+	m.macro_icon = str(d.get("macro_icon", ""))
+	return m
