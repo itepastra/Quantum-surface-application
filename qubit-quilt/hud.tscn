@@ -581,3 +581,4 @@ script = ExtResource("10_amv7k")
 metadata/_tab_index = 1
 
 [connection signal="ready" from="Tabs/QASM" to="Tabs/QASM" method="_on_ready"]
+[connection signal="visibility_changed" from="Tabs/QASM" to="Tabs/QASM" method="_on_visibility_changed"]
