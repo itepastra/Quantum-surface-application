@@ -7,6 +7,7 @@ var instructions: Array[QubitOperation] = []
 var idx: int # position in macros array
 var spread: Array[Vector2i] # stored in rot format
 var macro_icon: String = "" # icon for macro
+var skipping: bool = false
 
 @onready var grid: QubitGrid = get_node("/root/Scene/QubitGrid")
 @onready var hotbar: ButtonGroup = preload("res://control_buttons.tres")
@@ -47,6 +48,7 @@ func check_valid(target: Vector2i) -> bool:
 	return true
 
 func execute(target: Vector2i) -> void:
+	grid.macro_running = self
 	for instr in self.instructions:
 		var offindex = instr.index + target
 		var offother = instr.other + target
@@ -94,7 +96,10 @@ func execute(target: Vector2i) -> void:
 				grid.grid_qubits[index].toggle_ancilla()
 			QubitOperation.Operation.LABELD:
 				grid.grid_qubits[index].toggle_data()
-		await get_tree().create_timer(DELAY).timeout
+		if not self.skipping:
+			await get_tree().create_timer(DELAY).timeout
+	self.skipping = false
+	grid.macro_running = null
 
 func _on_pressed() -> void:
 	if hotbar.get_pressed_button():

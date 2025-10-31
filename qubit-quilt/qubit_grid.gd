@@ -81,6 +81,8 @@ var start_pos: Vector3
 var qec = Qec.new()
 var camera: Camera
 
+var macro_running: Macro = null
+
 var operation_idx: int = 0 # index of the operation that the user will be doing
 var operations: Array[QubitOperation] = []
 

@@ -51,6 +51,11 @@ func _on_input_event(_cam: Node, event: InputEvent, _event_position: Vector3, _n
 	# the user clicked on the qubit
 	
 	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT:
+		if grid.macro_running:
+			grid.macro_running.skipping = true
+			while grid.macro_running:
+				await get_tree().create_timer(0.1).timeout
+
 		# find the selected rotation direction from the buttongroup
 		var pressed: Button = button_group.get_pressed_button()
 		var macro: Button = macro_group.get_pressed_button()
