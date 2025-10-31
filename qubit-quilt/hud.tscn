@@ -323,6 +323,7 @@ anchors_preset = 9
 anchor_bottom = 1.0
 offset_right = 84.0
 grow_vertical = 2
+mouse_filter = 2
 alignment = 1
 
 [node name="RecordMacro" type="Button" parent="Spacer/Macros"]
