@@ -3,6 +3,9 @@ extends Node
 const LS_DEFAULT_KEY := "qec_macros_default_v1"
 const LS_USER_KEY := "qec_macros_user_v1" 
 
+const USR_FILE := "user://qubit-quilt/user_macros.json"
+const DEFAULT_FILE := "user://qubit-quilt/default_macros.json"
+
 signal user_macros_updated(macros: Array)
 
 func load_defaults() -> void:
@@ -15,21 +18,27 @@ func load_defaults() -> void:
 		if ls == null:
 			push_warning("localStorage not available.")
 			return
-	else:
-		print_debug("[MacroStore] Not web, no default macros loaded")
-		return
-		
+	
 	# Read all macros from res://macros set recursive=true for subfolders
 	var seeded_arr: Array = _read_all_res_macros("res://macros", false)
 
 	if seeded_arr.is_empty():
 		push_warning("No default macros detected")
 
-	var json := JSON.stringify(seeded_arr)
-
+	var json: String = JSON.stringify(seeded_arr)
+	
 	if is_web:
 		var ls2: Variant = JavaScriptBridge.get_interface("localStorage")
 		ls2.setItem(LS_DEFAULT_KEY, json)
+	else:
+		var da = DirAccess.open("user://")
+		da.make_dir("qubit-quilt")
+		var file: FileAccess = FileAccess.open(DEFAULT_FILE, FileAccess.WRITE)
+		var error_str: String = error_string(FileAccess.get_open_error())
+		push_warning("Couldn't open file because: %s" % error_str)
+
+		file.store_string(json)
+	
 	print_debug("[MacroStore] defaults seeded from res://macros/")
 
 
@@ -76,10 +85,10 @@ static func _read_all_res_macros(dir_path: String = "res://macros", recursive: b
 
 	return out
 
-static func _read_text_from_user_file() -> String:
-	if not FileAccess.file_exists("user://macros.json"):
+static func _read_text_from_user_file(file: String) -> String:
+	if not FileAccess.file_exists(file):
 		return ""
-	var f := FileAccess.open("user://macros.json", FileAccess.READ)
+	var f := FileAccess.open(file, FileAccess.READ)
 	var s := f.get_as_text()
 	f.close()
 	return s
@@ -95,7 +104,7 @@ func load_all(LS_KEY: String = LS_DEFAULT_KEY) -> Array[Dictionary]:
 		if json == "null" or json.strip_edges() == "":
 			return empty
 	else:
-		json = _read_text_from_user_file()
+		json = _read_text_from_user_file(LS_KEY)
 		if json.strip_edges() == "":
 			return empty
 
@@ -114,10 +123,16 @@ func load_all(LS_KEY: String = LS_DEFAULT_KEY) -> Array[Dictionary]:
 # dicts into Macro nodes
 func instantiate_loaded_macros() -> Array[Macro]:
 	var result: Array[Macro] = []
-	for d in load_all(LS_DEFAULT_KEY):
-		result.append(Macro.from_dict(d))
-	for u in load_all(LS_USER_KEY):
-		result.append(Macro.from_dict(u))
+	if OS.has_feature("web"):
+		for d in load_all(LS_DEFAULT_KEY):
+			result.append(Macro.from_dict(d))
+		for u in load_all(LS_USER_KEY):
+			result.append(Macro.from_dict(u))
+	else:
+		for d in load_all(DEFAULT_FILE):
+			result.append(Macro.from_dict(d))
+		for u in load_all(USR_FILE):
+			result.append(Macro.from_dict(u))
 	return result
 
 static func _parse_json_array_or_empty(raw: Variant) -> Array[Dictionary]:
@@ -149,7 +164,7 @@ func get_user_macros() -> Array[Dictionary]:
 			return []
 		return _parse_json_array_or_empty(str(ls.getItem(LS_USER_KEY)))
 	else:
-		var p := "user://macros_user.json"
+		var p := USR_FILE
 		if not FileAccess.file_exists(p):
 			return []
 		var f := FileAccess.open(p, FileAccess.READ)
@@ -165,6 +180,9 @@ func _set_user_macros(arr: Array[Dictionary]) -> void:
 			push_warning("localStorage not available (web).")
 			return
 		ls.setItem(LS_USER_KEY, json_txt)
+	else:
+		var file = FileAccess.open(USR_FILE, FileAccess.WRITE)
+		file.store_string(json_txt)
 	emit_signal("user_macros_updated", arr)
 
 func append_user_macro(macro_dict: Dictionary) -> void:

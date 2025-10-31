@@ -81,10 +81,14 @@ var start_pos: Vector3
 var qec = Qec.new()
 var camera: Camera
 
+var macro_running: Macro = null
+
 var operation_idx: int = 0 # index of the operation that the user will be doing
 var operations: Array[QubitOperation] = []
 
 var entanglement_groups: Array[Egroup] = []
+
+signal rotate_macro()
 
 # works specifically for the cell size (1.8, 0.9), 
 # calculated by making a square that looked correct and then the inverse affine transform
@@ -164,6 +168,17 @@ func parse_js_args() -> void:
 			self.enabled_gates = []
 			for i in iface.gates.length:
 				self.enabled_gates.append(iface.gates[i])
+	else:
+		var args = OS.get_cmdline_args()
+		for arg in args:
+			if arg.begins_with("--qw="):
+				var vals = arg.split("=", false, 1)
+				if vals.size() > 1:
+					self.x_qubits = vals[1]
+			elif arg.begins_with("--qh="):
+				var vals = arg.split("=", false, 1)
+				if vals.size() > 1:
+					self.y_qubits = vals[1]
 
 func _on_ready() -> void:
 	parse_js_args()
@@ -422,6 +437,9 @@ func handle_redo() -> void:
 			QubitOperation.Operation.LABELA:
 				grid_qubits[op_idx].toggle_ancilla()
 
+func handle_rotate() -> void:
+	rotate_macro.emit()
+
 func _input(event: InputEvent) -> void:
 	# if ctrl + z is pressed
 	if event.is_action_pressed("undo", false, true):
@@ -430,6 +448,9 @@ func _input(event: InputEvent) -> void:
 	# if ctrl + shift + z is pressed
 	if event.is_action_pressed("redo", false, true):
 		handle_redo()
+		return
+	if event.is_action_pressed("rotate", false, true):
+		handle_rotate()
 		return
 	# filter out all the input events that aren't mouse clicks with the create button selected
 	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT and self.button.button_pressed:
@@ -460,7 +481,7 @@ func rx(qubit: int, update: bool = true, do_errors: bool = true):
 	var q = grid_qubits[qubit]
 	qec.xgate(qubit)
 	if do_errors:
-		do_errors(qubit)
+		sim_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 
 
@@ -470,7 +491,7 @@ func ry(qubit: int, update: bool = true, do_errors: bool = true):
 	var q = grid_qubits[qubit]
 	qec.ygate(qubit)
 	if do_errors: 
-		do_errors(qubit)
+		sim_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 
 func rz(qubit: int, update: bool = true, do_errors: bool = true):
@@ -480,7 +501,7 @@ func rz(qubit: int, update: bool = true, do_errors: bool = true):
 	# the qubit's z-axis is the y axis in godot
 	qec.zgate(qubit)
 	if do_errors: 
-		do_errors(qubit)
+		sim_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 
 func rh(qubit: int, update: bool = true, do_errors: bool = true):
@@ -489,7 +510,7 @@ func rh(qubit: int, update: bool = true, do_errors: bool = true):
 	var q = grid_qubits[qubit]
 	qec.hadamard(qubit)
 	if do_errors: 
-		do_errors(qubit)
+		sim_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 
 func rs(qubit: int, update: bool = true, do_errors: bool = true):
@@ -498,7 +519,7 @@ func rs(qubit: int, update: bool = true, do_errors: bool = true):
 	var q = grid_qubits[qubit]
 	qec.phase(qubit)
 	if do_errors: 
-		do_errors(qubit)
+		sim_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 
 func rsd(qubit: int, update: bool = true, do_errors: bool = true):
@@ -507,7 +528,7 @@ func rsd(qubit: int, update: bool = true, do_errors: bool = true):
 	var q = grid_qubits[qubit]
 	qec.phase_dag(qubit)
 	if do_errors: 
-		do_errors(qubit)
+		sim_errors(qubit)
 	q.set_base(qec.get_vop(qubit))
 
 func cx(control: int, target: int, update: bool = true, do_errors: bool = true):
@@ -519,8 +540,8 @@ func cx(control: int, target: int, update: bool = true, do_errors: bool = true):
 	add_cx_cz_visuals(control, target, Gate.Type.CX)
 	qec.cnot(control, target)
 	if do_errors: 
-		do_errors(control)
-		do_errors(target)
+		sim_errors(control)
+		sim_errors(target)
 	set_to_qec_state()
 
 func cz(control: int, target: int, update: bool = true, do_errors: bool = true):
@@ -534,8 +555,8 @@ func cz(control: int, target: int, update: bool = true, do_errors: bool = true):
 	
 	qec.cphase(control, target)
 	if do_errors: 
-		do_errors(control)
-		do_errors(target)
+		sim_errors(control)
+		sim_errors(target)
 	set_to_qec_state()
 
 func measure_z(qubit: int, update: bool = true, do_errors: bool = true):
@@ -544,7 +565,7 @@ func measure_z(qubit: int, update: bool = true, do_errors: bool = true):
 		append_or_update(QubitOperation.Operation.MZ, qubit)
 	qec.mz(qubit)
 	if do_errors:
-		do_errors(qubit)
+		sim_errors(qubit)
 	self.operations[operation_idx-1].snap = snap
 	set_to_qec_state()
 
@@ -571,7 +592,7 @@ func do_relaxation_error(qubit: int):
 		self.operations[operation_idx-1].errors.append(new_op)
 		self.grid_qubits[qubit].set_base(qec.get_vop(qubit))
 
-func do_errors(qubit: int):
+func sim_errors(qubit: int):
 	# reset the errors that may exist from earlier
 	self.operations[operation_idx-1].errors.clear()
 	for i in self.error_rates.size():

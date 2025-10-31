@@ -17,3 +17,5 @@ you wouldn't be able to know if you were the first or the second person to measu
 This makes it impossible to actually transmit information using the pair, since both
 people just measure their own qubit as blue half the time and as yellow the other half.
 This doesn't mean entanglement is useless, it just can't be used for transmitting data directly.
+
+{{ qubitquilt(w=3,h=5,gates='["X","Y","Z","H","S","CX","CZ","MZ","ADD","REMOVE","LABELA","LABELD"]') }}

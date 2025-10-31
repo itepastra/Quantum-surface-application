@@ -264,5 +264,21 @@
 	  { "operation": "MZ", "index": [0, 2] },
 	  { "operation": "MZ", "index": [2, 2] }
 	]
+  },
+  {
+	"title": "Merge Surface-17s",
+	"root": [0, 0],
+	"macro_icon": "res://assets/macros/merge_surface_17s.png",
+	"instructions": [
+	  { "operation": "MZ", "index": [0, 0] }
+	]
+  },
+  {
+	"title": "Split Surface-17s",
+	"root": [0, 0],
+	"macro_icon": "res://assets/macros/split_surface_17s.png",
+	"instructions": [
+	  { "operation": "MZ", "index": [0, 0] }
+	]
   }
 ]

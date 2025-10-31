@@ -7,15 +7,32 @@ var instructions: Array[QubitOperation] = []
 var idx: int # position in macros array
 var spread: Array[Vector2i] # stored in rot format
 var macro_icon: String = "" # icon for macro
+var skipping: bool = false
+
+var rot: int = 0
 
 @onready var grid: QubitGrid = get_node("/root/Scene/QubitGrid")
 @onready var hotbar: ButtonGroup = preload("res://control_buttons.tres")
+
+func rotate() -> void:
+	self.rot -= 1
+	self.rot &= 0b11
 
 func _ready() -> void:
 	self.button_group = preload("res://macros.tres")
 	self.rebase_to_root()
 	self.gen_spread()
 
+func dir_func() -> Callable:
+	match self.rot:
+		0: return func(pos: Vector2i) -> Vector2i: return pos
+		1: return func(pos: Vector2i) -> Vector2i: return Vector2i(-pos.y, pos.x)
+		2: return func(pos: Vector2i) -> Vector2i: return Vector2i(-pos.x, -pos.y)
+		3: return func(pos: Vector2i) -> Vector2i: return Vector2i(pos.y, -pos.x)
+		_: return func(pos: Vector2i) -> Vector2i: return Vector2i.ZERO
+
+func get_spread() -> Array:
+	return spread.map(self.dir_func())
 
 func rebase_to_root() -> void:
 	for instr in self.instructions:
@@ -46,8 +63,14 @@ func check_valid(target: Vector2i) -> bool:
 			return false
 	return true
 
+func rot_instr(instr: QubitOperation) -> QubitOperation:
+	var rfunc: Callable = dir_func()
+	return QubitOperation.new(instr.operation, rfunc.call(instr.index), rfunc.call(instr.other), instr.basis)
+
 func execute(target: Vector2i) -> void:
-	for instr in self.instructions:
+	grid.macro_running = self
+	var rot_instructions = self.instructions.map(rot_instr)
+	for instr in rot_instructions:
 		var offindex = instr.index + target
 		var offother = instr.other + target
 		
@@ -58,7 +81,7 @@ func execute(target: Vector2i) -> void:
 		var index = grid.pos_to_idx(offindex)
 		var other = grid.pos_to_idx(offother)
 		
-		if (grid.grid_qubits[other] == null) and (instr.is_two_qubit()):
+		if (instr.is_two_qubit()) and (grid.grid_qubits[other] == null):
 			continue
 		if grid.grid_qubits[index] == null:
 			continue
@@ -94,7 +117,10 @@ func execute(target: Vector2i) -> void:
 				grid.grid_qubits[index].toggle_ancilla()
 			QubitOperation.Operation.LABELD:
 				grid.grid_qubits[index].toggle_data()
-		await get_tree().create_timer(DELAY).timeout
+		if not self.skipping:
+			await get_tree().create_timer(DELAY).timeout
+	self.skipping = false
+	grid.macro_running = null
 
 func _on_pressed() -> void:
 	if hotbar.get_pressed_button():
