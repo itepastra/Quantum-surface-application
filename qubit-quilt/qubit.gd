@@ -178,16 +178,40 @@ const bases: Dictionary[int, Basis] = {
 	23: Basis(Vector3(1,0,0),Vector3(0,0,-1), Vector3(0,1,0)),
 }
 
+func _on_macro_rotate() -> void:
+	var macro: Macro = macro_group.get_pressed_button()
+	if macro == null:
+		return
+		
+	# remove old spread
+	var spread = macro.get_spread()
+	for s in spread:
+		var offset: Vector2i = self.pos + s
+		if grid.is_not_in_bounds(offset):
+			continue
+		var other = self.grid.pos_to_idx(offset)
+		if grid.grid_qubits[other] == null:
+			continue
+		var glow = grid.grid_qubits[other].get_node("Glow") as GPUParticles3D
+		glow.emitting = false
+	
+	macro.rotate()
+	
+	_on_qubit_body_mouse_entered()
+
 
 func _on_qubit_body_mouse_entered() -> void:
 	var macro: Macro = macro_group.get_pressed_button()
 	if macro == null:
 		return
 	
+	if not grid.rotate_macro.is_connected(_on_macro_rotate):
+		grid.rotate_macro.connect(_on_macro_rotate)
+	
 	var all_valid: bool = true
 	var to_toggle: Array[Qubit] = []
-	
-	for s in macro.spread:
+	var spread = macro.get_spread()
+	for s in spread:
 		var offset: Vector2i = self.pos + s
 		if grid.is_not_in_bounds(offset):
 			all_valid = false
@@ -205,16 +229,20 @@ func _on_qubit_body_mouse_entered() -> void:
 		var glow = q.get_node("Glow") as GPUParticles3D
 		glow.emitting = true
 
-
 func _on_qubit_body_mouse_exited() -> void:
 	var macro: Macro = macro_group.get_pressed_button()
 	if macro == null:
 		return
+
+	if grid.rotate_macro.is_connected(_on_macro_rotate):
+		grid.rotate_macro.disconnect(_on_macro_rotate)
+
 	is_hovered = false
 	
 	var to_toggle: Array[Qubit] = []
 	
-	for s in macro.spread:
+	var rspread = macro.get_spread()
+	for s in rspread:
 		var offset: Vector2i = self.pos + s
 		if grid.is_not_in_bounds(offset):
 			continue

@@ -88,6 +88,8 @@ var operations: Array[QubitOperation] = []
 
 var entanglement_groups: Array[Egroup] = []
 
+signal rotate_macro()
+
 # works specifically for the cell size (1.8, 0.9), 
 # calculated by making a square that looked correct and then the inverse affine transform
 # offset is calculated at initialisation, since it depends on the amount of qubits
@@ -424,6 +426,9 @@ func handle_redo() -> void:
 			QubitOperation.Operation.LABELA:
 				grid_qubits[op_idx].toggle_ancilla()
 
+func handle_rotate() -> void:
+	rotate_macro.emit()
+
 func _input(event: InputEvent) -> void:
 	# if ctrl + z is pressed
 	if event.is_action_pressed("undo", false, true):
@@ -432,6 +437,9 @@ func _input(event: InputEvent) -> void:
 	# if ctrl + shift + z is pressed
 	if event.is_action_pressed("redo", false, true):
 		handle_redo()
+		return
+	if event.is_action_pressed("rotate", false, true):
+		handle_rotate()
 		return
 	# filter out all the input events that aren't mouse clicks with the create button selected
 	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT and self.button.button_pressed:
