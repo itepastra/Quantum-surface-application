@@ -168,6 +168,17 @@ func parse_js_args() -> void:
 			self.enabled_gates = []
 			for i in iface.gates.length:
 				self.enabled_gates.append(iface.gates[i])
+	else:
+		var args = OS.get_cmdline_args()
+		for arg in args:
+			if arg.begins_with("--qw="):
+				var vals = arg.split("=", false, 1)
+				if vals.size() > 1:
+					self.x_qubits = vals[1]
+			elif arg.begins_with("--qh="):
+				var vals = arg.split("=", false, 1)
+				if vals.size() > 1:
+					self.y_qubits = vals[1]
 
 func _on_ready() -> void:
 	parse_js_args()
