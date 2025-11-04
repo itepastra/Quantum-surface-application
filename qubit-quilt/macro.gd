@@ -114,8 +114,10 @@ func execute(target: Vector2i) -> void:
 				grid.measure_z(index)
 				grid.grid_qubits[index].set_label(grid.qec.get_vop(index))
 			QubitOperation.Operation.LABELA:
+				grid.append_or_update(QubitOperation.Operation.LABELA, index)
 				grid.grid_qubits[index].toggle_ancilla()
 			QubitOperation.Operation.LABELD:
+				grid.append_or_update(QubitOperation.Operation.LABELD, index)
 				grid.grid_qubits[index].toggle_data()
 		if not self.skipping:
 			await get_tree().create_timer(DELAY).timeout
