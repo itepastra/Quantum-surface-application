@@ -122,61 +122,6 @@ func handle_macro(macro: Button):
 	grid.macros[macro.idx].execute(self.pos)
 	
 
-const labels: Dictionary[int, String] = {
-	-1: "",
-	0: "+",
-	1: "+",
-	2: "-",
-	3: "-",
-	4: "+i",
-	5: "+i",
-	6: "-i",
-	7: "-i",
-	8: "1",
-	9: "1",
-	10: "0",
-	11: "0",
-	12: "-",
-	13: "-",
-	14: "+",
-	15: "+",
-	16: "-i",
-	17: "-i",
-	18: "+i",
-	19: "+i",
-	20: "0",
-	21: "0",
-	22: "1",
-	23: "1"
-}
-
-
-const bases: Dictionary[int, Basis] = {
-	0: Basis(Vector3(0,0,1),Vector3(0,-1,0), Vector3(1,0,0)),
-	1: Basis(Vector3(0,0,1),Vector3(0,1,0),Vector3(-1,0,0)),
-	2: Basis(Vector3(0,0,-1),Vector3(0,1,0),Vector3(1,0,0)),
-	3: Basis(Vector3(0,0,-1),Vector3(0,-1,0), Vector3(-1,0,0)),
-	4: Basis(Vector3(1,0,0),Vector3(0,1,0),Vector3(0,0,1)),
-	5: Basis(Vector3(-1,0,0),Vector3(0,-1,0), Vector3(0,0,1)),
-	6: Basis(Vector3(1,0,0),Vector3(0,-1,0), Vector3(0,0,-1)),
-	7: Basis(Vector3(-1,0,0),Vector3(0,1,0), Vector3(0,0,-1)),
-	8: Basis(Vector3(0,1,0), Vector3(0,0,-1), Vector3(-1,0,0)),
-	9: Basis(Vector3(0,-1,0), Vector3(0,0,-1), Vector3(1,0,0)),
-	10: Basis(Vector3(0,-1,0), Vector3(0,0,1), Vector3(-1,0,0)),
-	11: Basis(Vector3(0,1,0), Vector3(0,0,1), Vector3(1,0,0)),
-	12: Basis(Vector3(0,0,-1), Vector3(1,0,0), Vector3(0,-1,0)),
-	13: Basis(Vector3(0,0,-1), Vector3(-1,0,0), Vector3(0,1,0)),
-	14: Basis(Vector3(0,0,1), Vector3(1,0,0), Vector3(0,1,0)),
-	15: Basis(Vector3(0,0,1), Vector3(-1,0,0), Vector3(0,-1,0)),
-	16: Basis(Vector3(0,-1,0), Vector3(-1,0,0), Vector3(0,0,-1)),
-	17: Basis(Vector3(0,1,0), Vector3(1,0,0), Vector3(0,0,-1)),
-	18: Basis(Vector3(0,1,0), Vector3(-1,0,0), Vector3(0,0,1)),
-	19: Basis(Vector3(0,-1,0), Vector3(1,0,0), Vector3(0,0,1)),
-	20: Basis(Vector3(-1,0,0), Vector3(0,0,1), Vector3(0,1,0)),
-	21: Basis(Vector3(1,0,0), Vector3(0,0,1), Vector3(0,-1,0)),
-	22: Basis(Vector3(-1,0,0),Vector3(0,0,-1), Vector3(0,-1,0)),
-	23: Basis(Vector3(1,0,0),Vector3(0,0,-1), Vector3(0,1,0)),
-}
 
 func _on_macro_rotate() -> void:
 	var macro: Macro = macro_group.get_pressed_button()
@@ -254,7 +199,59 @@ func _on_qubit_body_mouse_exited() -> void:
 	for q in to_toggle:
 		var glow = q.get_node("Glow") as GPUParticles3D
 		glow.emitting = false
-	# get the selected macro spread
-	
-	# for each qubit in the spread
-		# disable the emitter
+
+const labels: Dictionary[int, String] = {
+	-1: "",
+	0: "+",
+	1: "+",
+	2: "-",
+	3: "-",
+	4: "+i",
+	5: "+i",
+	6: "-i",
+	7: "-i",
+	8: "1",
+	9: "1",
+	10: "0",
+	11: "0",
+	12: "-",
+	13: "-",
+	14: "+",
+	15: "+",
+	16: "-i",
+	17: "-i",
+	18: "+i",
+	19: "+i",
+	20: "0",
+	21: "0",
+	22: "1",
+	23: "1"
+}
+
+
+const bases: Dictionary[int, Basis] = {
+	0: Basis(Vector3(0,0,1),Vector3(0,-1,0), Vector3(1,0,0)),
+	1: Basis(Vector3(0,0,1),Vector3(0,1,0),Vector3(-1,0,0)),
+	2: Basis(Vector3(0,0,-1),Vector3(0,1,0),Vector3(1,0,0)),
+	3: Basis(Vector3(0,0,-1),Vector3(0,-1,0), Vector3(-1,0,0)),
+	4: Basis(Vector3(1,0,0),Vector3(0,1,0),Vector3(0,0,1)),
+	5: Basis(Vector3(-1,0,0),Vector3(0,-1,0), Vector3(0,0,1)),
+	6: Basis(Vector3(1,0,0),Vector3(0,-1,0), Vector3(0,0,-1)),
+	7: Basis(Vector3(-1,0,0),Vector3(0,1,0), Vector3(0,0,-1)),
+	8: Basis(Vector3(0,1,0), Vector3(0,0,-1), Vector3(-1,0,0)),
+	9: Basis(Vector3(0,-1,0), Vector3(0,0,-1), Vector3(1,0,0)),
+	10: Basis(Vector3(0,-1,0), Vector3(0,0,1), Vector3(-1,0,0)),
+	11: Basis(Vector3(0,1,0), Vector3(0,0,1), Vector3(1,0,0)),
+	12: Basis(Vector3(0,0,-1), Vector3(1,0,0), Vector3(0,-1,0)),
+	13: Basis(Vector3(0,0,-1), Vector3(-1,0,0), Vector3(0,1,0)),
+	14: Basis(Vector3(0,0,1), Vector3(1,0,0), Vector3(0,1,0)),
+	15: Basis(Vector3(0,0,1), Vector3(-1,0,0), Vector3(0,-1,0)),
+	16: Basis(Vector3(0,-1,0), Vector3(-1,0,0), Vector3(0,0,-1)),
+	17: Basis(Vector3(0,1,0), Vector3(1,0,0), Vector3(0,0,-1)),
+	18: Basis(Vector3(0,1,0), Vector3(-1,0,0), Vector3(0,0,1)),
+	19: Basis(Vector3(0,-1,0), Vector3(1,0,0), Vector3(0,0,1)),
+	20: Basis(Vector3(-1,0,0), Vector3(0,0,1), Vector3(0,1,0)),
+	21: Basis(Vector3(1,0,0), Vector3(0,0,1), Vector3(0,-1,0)),
+	22: Basis(Vector3(-1,0,0),Vector3(0,0,-1), Vector3(0,-1,0)),
+	23: Basis(Vector3(1,0,0),Vector3(0,0,-1), Vector3(0,1,0)),
+}
