@@ -45,7 +45,7 @@
           fs = pkgs.lib.fileset;
         in
         rec {
-          godot = pkgs.callPackage ./godot.nix { inherit (inputs) godot_src; };
+          godot = pkgs.callPackage ./helpers/godot.nix { inherit (inputs) godot_src; };
 
           default = pkgs.stdenv.mkDerivation {
             name = "Qubit Quilt website";
@@ -197,7 +197,7 @@
 
             buildPhase = ''
               mkdir -p $out
-              cp ${./render-math.js} ./render-math.js
+              cp ${./helpers/render-math.js} ./render-math.js
               node ./render-math.js $src $out
             '';
 
